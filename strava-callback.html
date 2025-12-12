@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Strava Callback</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var code = params.get('code');
+        var error = params.get('error');
+        var state = params.get('state');
+
+        function safeDecodeState(v) {
+          if (!v) return null;
+          try {
+            // state may be URI encoded and/or base64url encoded
+            var s = decodeURIComponent(v);
+            // base64url -> base64
+            s = s.replace(/-/g, '+').replace(/_/g, '/');
+            while (s.length % 4) s += '=';
+            return atob(s);
+          } catch (e) {
+            try {
+              return decodeURIComponent(v);
+            } catch (e2) {
+              return null;
+            }
+          }
+        }
+
+        var returnTo = safeDecodeState(state);
+
+        // Fallback: show something useful if state is missing
+        if (!returnTo) {
+          document.body.innerText = 'Missing return URL. Please go back to the app and try again.';
+          return;
+        }
+
+        var sep = returnTo.indexOf('?') === -1 ? '?' : '&';
+        var target = returnTo;
+        if (code) target += sep + 'code=' + encodeURIComponent(code);
+        else if (error) target += sep + 'error=' + encodeURIComponent(error);
+        else target += sep + 'error=' + encodeURIComponent('missing_code');
+
+        window.location.replace(target);
+      })();
+    </script>
+  </body>
+</html>
