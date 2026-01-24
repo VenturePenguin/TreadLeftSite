@@ -21,6 +21,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
@@ -148,11 +150,12 @@
                         <input 
                             type="email" 
                             placeholder="Enter your email" 
+                            aria-label="Email address"
                             required
                             class="user-email-input w-full pl-10 px-4 py-4 rounded-xl bg-white border border-brand-border text-brand-navy placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition shadow-sm"
                         >
                     </div>
-                    <button type="submit" class="px-8 py-4 bg-brand-orange text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-lg shadow-orange-200 transform active:scale-95">
+                    <button type="submit" aria-label="Join Waitlist" class="px-8 py-4 bg-brand-orange text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-lg shadow-orange-200 transform active:scale-95">
                         Join Waitlist
                     </button>
                 </form>
@@ -215,7 +218,7 @@
                             <p class="text-sm font-semibold text-slate-700">Recommended Replacement</p>
                             <span class="text-xs font-bold text-brand-teal bg-teal-50 border border-teal-100 px-2 py-0.5 rounded">SAVE £40</span>
                         </div>
-                        <button class="w-full py-3 bg-brand-navy text-white font-bold rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-md">
+                        <button aria-label="Check Deal for Brooks Ghost 15" class="w-full py-3 bg-brand-navy text-white font-bold rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-md">
                             <span>Check Deal: £89.99</span>
                             <i data-lucide="arrow-right" class="w-4 h-4 text-brand-orange"></i>
                         </button>
@@ -401,8 +404,8 @@
                 &copy; 2026 TreadLeft. Built for runners, by runners.
             </p>
             <div class="flex justify-center gap-6">
-                <a href="privacy.html" class="text-brand-slate hover:text-brand-orange transition text-sm">Privacy Policy</a>
-                <a href="mailto:support@treadleft.app" class="text-brand-slate hover:text-brand-orange transition"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                <a href="privacy.html" aria-label="Privacy Policy" class="text-brand-slate hover:text-brand-orange transition text-sm">Privacy Policy</a>
+                <a href="mailto:support@treadleft.app" aria-label="Contact Support" class="text-brand-slate hover:text-brand-orange transition"><i data-lucide="mail" class="w-5 h-5"></i></a>
             </div>
         </div>
     </footer>
