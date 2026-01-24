@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTPW725M30"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-HTPW725M30');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - TreadLeft</title>
+    <meta name="description" content="Page not found.">
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            orange: '#f97316', // Primary
+                            navy: '#0f172a',   // Text Main
+                            slate: '#64748b',  // Text Secondary
+                            blue: '#3b82f6',   // Accents
+                            teal: '#14b8a6',   // Success
+                            light: '#f1f5f9',  // App Background
+                            card: '#ffffff',   // App Card
+                            border: '#e2e8f0', // App Border
+                        }
+                    },
+                    backgroundImage: {
+                        'dot-pattern': "radial-gradient(#cbd5e1 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .bg-dots { background-size: 24px 24px; }
+    </style>
+</head>
+<body class="bg-brand-light text-brand-navy font-sans antialiased h-screen flex flex-col">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full bg-brand-light/80 backdrop-blur-md border-b border-brand-border z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <a href="/" class="flex items-center gap-2">
+                    <svg class="w-8 h-8 text-brand-orange" viewBox="0 0 100 100" fill="currentColor">
+                        <rect x="45" y="10" width="30" height="8" rx="4" />
+                        <circle cx="35" cy="24" r="4" />
+                        <rect x="42" y="20" width="24" height="8" rx="4" />
+                        <rect x="70" y="20" width="15" height="8" rx="4" />
+                        <rect x="30" y="32" width="30" height="8" rx="4" />
+                        <rect x="64" y="32" width="22" height="8" rx="4" />
+                        <rect x="25" y="44" width="20" height="8" rx="4" />
+                        <circle cx="50" cy="48" r="4" />
+                        <rect x="58" y="44" width="24" height="8" rx="4" />
+                        <rect x="28" y="56" width="35" height="8" rx="4" />
+                        <rect x="67" y="56" width="14" height="8" rx="4" />
+                        <rect x="22" y="68" width="24" height="8" rx="4" />
+                        <rect x="50" y="68" width="28" height="8" rx="4" />
+                        <g transform="rotate(-15 40 95)">
+                            <rect x="25" y="85" width="25" height="8" rx="4" />
+                            <circle cx="56" cy="89" r="4" />
+                            <rect x="30" y="97" width="18" height="8" rx="4" />
+                            <circle cx="54" cy="101" r="4" />
+                            <rect x="35" y="109" width="16" height="8" rx="4" />
+                        </g>
+                    </svg>
+                    <span class="text-xl font-bold tracking-tight text-brand-navy">Tread<span class="text-brand-orange">Left</span></span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <main class="flex-grow flex items-center justify-center relative overflow-hidden pt-20">
+        <!-- Dot Pattern Background -->
+        <div class="absolute inset-0 bg-dot-pattern bg-dots opacity-40 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-brand-light pointer-events-none"></div>
+
+        <div class="relative z-10 text-center px-6">
+            <h1 class="text-9xl font-bold text-brand-orange opacity-20 select-none">404</h1>
+            <div class="-mt-12 mb-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4">Page not found</h2>
+                <p class="text-lg text-brand-slate max-w-md mx-auto">
+                    Sorry, we couldn't find the page you're looking for. It might have been moved or doesn't exist.
+                </p>
+            </div>
+            
+            <a href="/" class="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-lg shadow-orange-200 transform active:scale-95">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Back to Home
+            </a>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
