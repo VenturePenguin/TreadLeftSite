@@ -1,0 +1,22 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/legal-terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/legal-privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/legal-privacy.html"
+  status = 301
