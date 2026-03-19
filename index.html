@@ -385,65 +385,64 @@
                 <p class="text-lg text-brand-slate">Don't rely on memory or spreadsheets. Rely on automated data.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Feature 1: Passive Sync -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-1">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-blue/30 transition">
-                        <i data-lucide="refresh-cw" class="text-brand-blue w-6 h-6"></i>
+            <!-- Bento Grid -->
+            <div class="grid md:grid-cols-3 gap-4 auto-rows-auto">
+
+                <!-- LARGE: Passive Sync — spans 2 cols, accent bg -->
+                <div class="md:col-span-2 p-10 rounded-3xl bg-brand-navy text-white border border-brand-navy hover:shadow-xl transition duration-300 group reveal reveal-delay-1 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 border border-white/20">
+                        <i data-lucide="refresh-cw" class="text-white w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Passive Sync</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        Connect once and forget it. We passively monitor your Strava runs in the background. No manual entry required.
-                    </p>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-3">Passive Sync</h3>
+                        <p class="text-slate-300 leading-relaxed max-w-md">Connect once and forget it. We passively monitor your Strava runs in the background — every run automatically updates your shoe mileage. No manual entry, ever.</p>
+                    </div>
                 </div>
 
-                <!-- Feature 2: Injury Prevention -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-2">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-orange/30 transition">
+                <!-- SMALL: Injury Prevention -->
+                <div class="p-8 rounded-3xl bg-orange-50 border border-orange-100 hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-2 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-orange-100">
                         <i data-lucide="heart-pulse" class="text-brand-orange w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Injury Prevention</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        Running on dead foam causes shin splints. We alert you exactly when your shoe hits its manufacturer mileage limit.
-                    </p>
-                </div>
-
-                <!-- Feature 3: Smart Price Finder -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-3">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-teal/30 transition">
-                        <i data-lucide="tag" class="text-brand-teal w-6 h-6"></i>
+                    <div>
+                        <h3 class="text-xl font-bold text-brand-navy mb-2">Injury Prevention</h3>
+                        <p class="text-brand-slate text-sm leading-relaxed">Get alerted before dead foam causes shin splints. We track every km against manufacturer limits.</p>
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Smart Price Finder</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        When it's time to replace, we instantly scan retailers to find the best price for your specific model.
-                    </p>
                 </div>
 
-            </div>
-
-            <!-- Bottom row: 2 cards centered -->
-            <div class="grid md:grid-cols-2 gap-8 mt-8 md:w-2/3 mx-auto">
-                <!-- Feature 4: Run History -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-2">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-blue/30 transition">
+                <!-- SMALL: Run History -->
+                <div class="p-8 rounded-3xl bg-blue-50 border border-blue-100 hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-1 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-blue-100">
                         <i data-lucide="list" class="text-brand-blue w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Complete Run History</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        Every run logged with pace, distance, and which shoe you wore. Search and filter your entire history in seconds.
-                    </p>
+                    <div>
+                        <h3 class="text-xl font-bold text-brand-navy mb-2">Complete Run History</h3>
+                        <p class="text-brand-slate text-sm leading-relaxed">Every run logged with pace, distance, and which shoe you wore. Search and filter in seconds.</p>
+                    </div>
                 </div>
 
-                <!-- Feature 5: Shoe Deals -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-3">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-orange/30 transition">
-                        <i data-lucide="shopping-bag" class="text-brand-orange w-6 h-6"></i>
+                <!-- LARGE: Shoe Deals — spans 2 cols, teal accent -->
+                <div class="md:col-span-2 p-10 rounded-3xl bg-teal-600 text-white border border-teal-600 hover:shadow-xl transition duration-300 group reveal reveal-delay-2 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 border border-white/20">
+                        <i data-lucide="shopping-bag" class="text-white w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Shoe Deals</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        Browse verified deals on your exact shoe model from top retailers — right inside the app, without leaving TreadLeft.
-                    </p>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-3">Shoe Deals</h3>
+                        <p class="text-teal-100 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers across 5 currencies to find the best price for your exact model — right inside the app.</p>
+                    </div>
                 </div>
+
+                <!-- SMALL: Smart Price Finder stat callout -->
+                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-3 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border">
+                        <i data-lucide="tag" class="text-brand-teal w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-brand-navy mb-2">Smart Price Finder</h3>
+                        <p class="text-brand-slate text-sm leading-relaxed">Instantly compare prices across top retailers when your shoe hits its limit.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
