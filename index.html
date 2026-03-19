@@ -388,56 +388,67 @@
             <!-- Bento Grid -->
             <div class="grid md:grid-cols-3 gap-4 auto-rows-auto">
 
-                <!-- LARGE: Passive Sync — spans 2 cols, accent bg -->
-                <div class="md:col-span-2 p-10 rounded-3xl bg-brand-navy text-white border border-brand-navy hover:shadow-xl transition duration-300 group reveal reveal-delay-1 flex flex-col justify-between min-h-[220px]">
-                    <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 border border-white/20">
+                <!-- LARGE: Passive Sync -->
+                <div class="md:col-span-2 p-10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-1 group cursor-default"
+                     style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); box-shadow: 0 4px 24px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.07);">
+                    <!-- Decorative circle -->
+                    <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 group-hover:opacity-20 transition duration-500" style="background: radial-gradient(circle, #f97316, transparent)"></div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6 border border-white/20 relative z-10" style="background:rgba(255,255,255,0.08); box-shadow: 0 0 16px rgba(249,115,22,0.3);">
                         <i data-lucide="refresh-cw" class="text-white w-6 h-6"></i>
                     </div>
-                    <div>
-                        <h3 class="text-2xl font-bold mb-3">Passive Sync</h3>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Passive Sync</h3>
                         <p class="text-slate-300 leading-relaxed max-w-md">Connect once and forget it. We passively monitor your Strava runs in the background — every run automatically updates your shoe mileage. No manual entry, ever.</p>
                     </div>
                 </div>
 
                 <!-- SMALL: Injury Prevention -->
-                <div class="p-8 rounded-3xl bg-orange-50 border border-orange-100 hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-2 flex flex-col justify-between min-h-[220px]">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-orange-100">
+                <div class="p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300"
+                     style="background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%); box-shadow: 0 4px 20px rgba(249,115,22,0.10), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid #fed7aa;">
+                    <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-20 group-hover:opacity-30 transition duration-500" style="background: radial-gradient(circle, #f97316, transparent)"></div>
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 relative z-10" style="box-shadow: 0 0 0 4px rgba(249,115,22,0.12), 0 2px 8px rgba(249,115,22,0.15);">
                         <i data-lucide="heart-pulse" class="text-brand-orange w-6 h-6"></i>
                     </div>
-                    <div>
+                    <div class="relative z-10">
                         <h3 class="text-xl font-bold text-brand-navy mb-2">Injury Prevention</h3>
                         <p class="text-brand-slate text-sm leading-relaxed">Get alerted before dead foam causes shin splints. We track every km against manufacturer limits.</p>
                     </div>
                 </div>
 
                 <!-- SMALL: Run History -->
-                <div class="p-8 rounded-3xl bg-blue-50 border border-blue-100 hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-1 flex flex-col justify-between min-h-[220px]">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-blue-100">
+                <div class="p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300"
+                     style="background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%); box-shadow: 0 4px 20px rgba(59,130,246,0.10), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid #bfdbfe;">
+                    <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-20 group-hover:opacity-30 transition duration-500" style="background: radial-gradient(circle, #3b82f6, transparent)"></div>
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 relative z-10" style="box-shadow: 0 0 0 4px rgba(59,130,246,0.12), 0 2px 8px rgba(59,130,246,0.15);">
                         <i data-lucide="list" class="text-brand-blue w-6 h-6"></i>
                     </div>
-                    <div>
+                    <div class="relative z-10">
                         <h3 class="text-xl font-bold text-brand-navy mb-2">Complete Run History</h3>
                         <p class="text-brand-slate text-sm leading-relaxed">Every run logged with pace, distance, and which shoe you wore. Search and filter in seconds.</p>
                     </div>
                 </div>
 
-                <!-- LARGE: Shoe Deals — spans 2 cols, teal accent -->
-                <div class="md:col-span-2 p-10 rounded-3xl bg-teal-600 text-white border border-teal-600 hover:shadow-xl transition duration-300 group reveal reveal-delay-2 flex flex-col justify-between min-h-[220px]">
-                    <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 border border-white/20">
+                <!-- LARGE: Shoe Deals -->
+                <div class="md:col-span-2 p-10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-2 group cursor-default"
+                     style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); box-shadow: 0 4px 24px rgba(13,148,136,0.22), inset 0 1px 0 rgba(255,255,255,0.1);">
+                    <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 group-hover:opacity-20 transition duration-500" style="background: radial-gradient(circle, #ffffff, transparent)"></div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6 border border-white/20 relative z-10" style="background:rgba(255,255,255,0.08); box-shadow: 0 0 16px rgba(255,255,255,0.15);">
                         <i data-lucide="shopping-bag" class="text-white w-6 h-6"></i>
                     </div>
-                    <div>
-                        <h3 class="text-2xl font-bold mb-3">Shoe Deals</h3>
-                        <p class="text-teal-100 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers across 5 currencies to find the best price for your exact model — right inside the app.</p>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Shoe Deals</h3>
+                        <p class="text-teal-100 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers to find the best price for your exact model — right inside the app.</p>
                     </div>
                 </div>
 
-                <!-- SMALL: Smart Price Finder stat callout -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-3 flex flex-col justify-between min-h-[220px]">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border">
+                <!-- SMALL: Smart Price Finder -->
+                <div class="p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300"
+                     style="background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%); box-shadow: 0 4px 20px rgba(15,23,42,0.07), inset 0 1px 0 rgba(255,255,255,1); border: 1px solid #e2e8f0;">
+                    <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-10 group-hover:opacity-20 transition duration-500" style="background: radial-gradient(circle, #14b8a6, transparent)"></div>
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 relative z-10" style="box-shadow: 0 0 0 4px rgba(20,184,166,0.12), 0 2px 8px rgba(20,184,166,0.15);">
                         <i data-lucide="tag" class="text-brand-teal w-6 h-6"></i>
                     </div>
-                    <div>
+                    <div class="relative z-10">
                         <h3 class="text-xl font-bold text-brand-navy mb-2">Smart Price Finder</h3>
                         <p class="text-brand-slate text-sm leading-relaxed">Instantly compare prices across top retailers when your shoe hits its limit.</p>
                     </div>
