@@ -181,14 +181,24 @@
 
                 <!-- Main Card (App Mockup) -->
                 <div class="relative bg-white rounded-3xl p-8 shadow-2xl shadow-slate-200 border border-brand-border">
+
+                    <!-- Brand Selector Tabs -->
+                    <div class="flex gap-2 mb-6 flex-wrap" id="brand-tabs">
+                        <button onclick="switchBrand(0)" class="brand-tab active-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#0a0a0a">Nike</button>
+                        <button onclick="switchBrand(1)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#e8192c">Brooks</button>
+                        <button onclick="switchBrand(2)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#003da5">ASICS</button>
+                        <button onclick="switchBrand(3)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#5a9e2f">New Balance</button>
+                        <button onclick="switchBrand(4)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#1a1a1a">Saucony</button>
+                    </div>
+
                     <!-- Card Header -->
                     <div class="flex justify-between items-start mb-8">
                         <div class="flex gap-4">
-                            <div class="w-14 h-14 bg-brand-light rounded-2xl flex items-center justify-center border border-brand-border">
-                                <i data-lucide="footprints" class="text-brand-orange w-7 h-7"></i>
+                            <div id="brand-logo" class="w-14 h-14 rounded-2xl flex items-center justify-center border-2 font-black text-lg transition-all duration-300" style="background:#f8fafc; border-color:#0a0a0a; color:#0a0a0a">
+                                NK
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-brand-navy">Brooks Ghost 15</h3>
+                                <h3 id="shoe-name" class="text-lg font-bold text-brand-navy">Nike Pegasus 41</h3>
                                 <p class="text-sm text-brand-slate">Primary Road Shoe</p>
                             </div>
                         </div>
@@ -212,7 +222,7 @@
 
                     <!-- Progress Bar -->
                     <div class="w-full bg-brand-light rounded-full h-3 mb-8 overflow-hidden">
-                        <div class="bg-red-500 h-3 rounded-full w-[97%] shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
+                        <div id="progress-bar" class="h-3 rounded-full w-[97%] shadow-[0_0_10px_rgba(239,68,68,0.5)]" style="background:#ef4444"></div>
                     </div>
 
                     <!-- Action Area -->
@@ -227,6 +237,35 @@
                         </button>
                     </div>
                 </div>
+
+                <script>
+                    const brands = [
+                        { initials: 'NK', name: 'Nike Pegasus 41',        color: '#0a0a0a' },
+                        { initials: 'BR', name: 'Brooks Ghost 15',         color: '#e8192c' },
+                        { initials: 'AS', name: 'ASICS Gel-Kayano 31',     color: '#003da5' },
+                        { initials: 'NB', name: 'New Balance 1080v13',     color: '#5a9e2f' },
+                        { initials: 'SC', name: 'Saucony Ride 17',         color: '#1a1a1a' },
+                    ];
+                    function switchBrand(i) {
+                        const b = brands[i];
+                        document.getElementById('brand-logo').style.borderColor = b.color;
+                        document.getElementById('brand-logo').style.color = b.color;
+                        document.getElementById('brand-logo').textContent = b.initials;
+                        document.getElementById('shoe-name').textContent = b.name;
+                        document.querySelectorAll('.brand-tab').forEach((t, idx) => {
+                            if (idx === i) {
+                                t.style.backgroundColor = b.color;
+                                t.style.borderColor = b.color;
+                                t.style.color = '#fff';
+                            } else {
+                                t.style.backgroundColor = '';
+                                t.style.borderColor = '#e2e8f0';
+                                t.style.color = '#64748b';
+                            }
+                        });
+                    }
+                    switchBrand(0);
+                </script>
 
                 <!-- Floating Toast Notification -->
                 <div class="absolute -right-8 top-1/2 bg-white p-4 rounded-2xl shadow-xl border border-brand-border flex items-center gap-3 animate-bounce">
