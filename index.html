@@ -59,7 +59,7 @@
             background-size: 24px 24px;
         }
         
-        /* Smooth fade in for elements */
+        /* Smooth fade in for elements (hero - runs on load) */
         .fade-in-up {
             animation: fadeInUp 0.8s ease-out forwards;
             opacity: 0;
@@ -71,6 +71,31 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Scroll-triggered reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+
+        /* Sticky mobile CTA */
+        #sticky-cta {
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        #sticky-cta.visible {
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -285,15 +310,15 @@
     <div class="bg-brand-navy py-10">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="stat-item">
+                <div class="stat-item reveal reveal-delay-1">
                     <p class="text-3xl font-bold text-white" data-target="93">0</p>
                     <p class="text-sm text-slate-400 mt-1">Shoe models tracked</p>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item reveal reveal-delay-2">
                     <p class="text-3xl font-bold text-white" data-target="19">0</p>
                     <p class="text-sm text-slate-400 mt-1">Retail partners</p>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item reveal reveal-delay-3">
                     <p class="text-3xl font-bold text-brand-orange">Free</p>
                     <p class="text-sm text-slate-400 mt-1">To download</p>
                 </div>
@@ -355,14 +380,14 @@
     <!-- FEATURES SECTION -->
     <section id="features" class="py-24 bg-white">
         <div class="container mx-auto px-6">
-            <div class="text-center max-w-2xl mx-auto mb-16">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
                 <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">The runner's modern tech stack.</h2>
                 <p class="text-lg text-brand-slate">Don't rely on memory or spreadsheets. Rely on automated data.</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Feature 1: Passive Sync -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
+                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-1">
                     <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-blue/30 transition">
                         <i data-lucide="refresh-cw" class="text-brand-blue w-6 h-6"></i>
                     </div>
@@ -373,7 +398,7 @@
                 </div>
 
                 <!-- Feature 2: Injury Prevention -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
+                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-2">
                     <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-orange/30 transition">
                         <i data-lucide="heart-pulse" class="text-brand-orange w-6 h-6"></i>
                     </div>
@@ -384,7 +409,7 @@
                 </div>
 
                 <!-- Feature 3: Smart Price Finder -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
+                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-3">
                     <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-teal/30 transition">
                         <i data-lucide="tag" class="text-brand-teal w-6 h-6"></i>
                     </div>
@@ -399,7 +424,7 @@
             <!-- Bottom row: 2 cards centered -->
             <div class="grid md:grid-cols-2 gap-8 mt-8 md:w-2/3 mx-auto">
                 <!-- Feature 4: Run History -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
+                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-2">
                     <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-blue/30 transition">
                         <i data-lucide="list" class="text-brand-blue w-6 h-6"></i>
                     </div>
@@ -410,7 +435,7 @@
                 </div>
 
                 <!-- Feature 5: Shoe Deals -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
+                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group reveal reveal-delay-3">
                     <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-orange/30 transition">
                         <i data-lucide="shopping-bag" class="text-brand-orange w-6 h-6"></i>
                     </div>
@@ -498,6 +523,15 @@
         </div>
     </section>
 
+    <!-- STICKY MOBILE CTA -->
+    <div id="sticky-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-brand-border px-4 py-3 shadow-lg">
+        <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener"
+           class="flex items-center justify-center gap-3 w-full py-3 bg-brand-navy text-white font-bold rounded-xl shadow-md active:scale-95 transition">
+            <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <span>Download Free on App Store</span>
+        </a>
+    </div>
+
     <!-- FOOTER -->
     <footer class="bg-white py-12 border-t border-brand-border">
         <div class="container mx-auto px-6 text-center">
@@ -539,6 +573,31 @@
 
     <script>
         lucide.createIcons();
+
+        // Scroll-triggered reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Sticky mobile CTA — show after scrolling past hero
+        const stickyCta = document.getElementById('sticky-cta');
+        const heroSection = document.querySelector('header');
+        const stickyObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    stickyCta.classList.add('visible');
+                } else {
+                    stickyCta.classList.remove('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        if (heroSection) stickyObserver.observe(heroSection);
     </script>
 </body>
 </html>
