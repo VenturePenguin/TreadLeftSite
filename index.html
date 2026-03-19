@@ -149,8 +149,8 @@
                 <span class="text-2xl font-bold tracking-tight text-brand-navy">Tread<span class="text-brand-orange">Left</span></span>
             </div>
             <div class="hidden md:flex gap-8 text-sm font-medium text-brand-slate">
-                <a href="#features" class="hover:text-brand-orange transition">Features</a>
-                <a href="#how-it-works" class="hover:text-brand-orange transition">How it Works</a>
+                <a href="#features" class="nav-link transition-colors duration-200 hover:text-brand-orange" data-section="features">Features</a>
+                <a href="#how-it-works" class="nav-link transition-colors duration-200 hover:text-brand-orange" data-section="how-it-works">How it Works</a>
             </div>
             <!-- CTA -->
             <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-full hover:bg-slate-800 transition shadow-lg shadow-brand-navy/20">
@@ -601,6 +601,30 @@
 
     <script>
         lucide.createIcons();
+
+        // Scroll-spy: highlight active nav link
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = ['features', 'how-it-works'].map(id => document.getElementById(id)).filter(Boolean);
+
+        function updateActiveNav() {
+            const scrollY = window.scrollY + 100;
+            let current = null;
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollY) current = section.id;
+            });
+            navLinks.forEach(link => {
+                if (link.dataset.section === current) {
+                    link.classList.add('text-brand-orange', 'font-semibold');
+                    link.classList.remove('text-brand-slate');
+                } else {
+                    link.classList.remove('text-brand-orange', 'font-semibold');
+                    link.classList.add('text-brand-slate');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav, { passive: true });
+        updateActiveNav();
 
         // Scroll-triggered reveal
         const revealObserver = new IntersectionObserver((entries) => {
