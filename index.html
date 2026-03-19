@@ -551,6 +551,96 @@
         </div>
     </section>
 
+    <!-- FAQ SECTION -->
+    <section id="faq" class="py-24 bg-white">
+        <div class="container mx-auto px-6 max-w-3xl">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">Frequently asked questions</h2>
+                <p class="text-lg text-brand-slate">Everything you need to know before downloading.</p>
+            </div>
+
+            <div class="space-y-3" id="faq-list">
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-1">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>Is TreadLeft free to use?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        Yes — TreadLeft is completely free to download and use. There are no subscriptions, no paywalls, and no hidden fees. Core features including shoe tracking, mileage alerts, and deal finding are all included at no cost.
+                    </div>
+                </div>
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-2">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>Does it work without Strava?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        Strava is the primary way to sync your runs automatically — connect once and every run updates your shoe mileage. You can also log runs manually inside the app if you don't use Strava.
+                    </div>
+                </div>
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-3">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>How accurate is the mileage tracking?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        Mileage is pulled directly from Strava's GPS data, so it's as accurate as your device's GPS. We display distances to one decimal place and match them to whichever shoe you had assigned in Strava at the time of the run.
+                    </div>
+                </div>
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-1">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>How do I know when to replace my shoes?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        TreadLeft tracks each shoe against its manufacturer's recommended mileage limit (typically 500–800 km). You'll receive a push notification as your shoe approaches and reaches its limit — before the foam breaks down and causes injury.
+                    </div>
+                </div>
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-2">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>How does the deal finder work?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        When your shoe nears retirement, TreadLeft automatically searches 19 retail partners across multiple currencies to find the best current price for your exact model. Deals are refreshed nightly so you always see up-to-date prices.
+                    </div>
+                </div>
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-3">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>Is my Strava data secure?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        Yes. We only request read access to your Strava activities and gear — we never write to your account or share your data with third parties. You can revoke access at any time from your Strava settings.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function toggleFaq(btn) {
+            const body = btn.nextElementSibling;
+            const icon = btn.querySelector('.faq-icon');
+            const isOpen = !body.classList.contains('hidden');
+            // Close all
+            document.querySelectorAll('.faq-body').forEach(b => b.classList.add('hidden'));
+            document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = '');
+            // Open clicked if it was closed
+            if (!isOpen) {
+                body.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    </script>
+
     <!-- STICKY MOBILE CTA -->
     <div id="sticky-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-brand-border px-4 py-3 shadow-lg">
         <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener"
