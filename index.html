@@ -242,6 +242,53 @@
         </div>
     </header>
 
+    <!-- STATS BANNER -->
+    <div class="bg-brand-navy py-10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="stat-item">
+                    <p class="text-3xl font-bold text-white" data-target="93">0</p>
+                    <p class="text-sm text-slate-400 mt-1">Shoe models tracked</p>
+                </div>
+                <div class="stat-item">
+                    <p class="text-3xl font-bold text-white" data-target="19">0</p>
+                    <p class="text-sm text-slate-400 mt-1">Retail partners</p>
+                </div>
+                <div class="stat-item">
+                    <p class="text-3xl font-bold text-white" data-target="5">0</p>
+                    <p class="text-sm text-slate-400 mt-1">Currencies supported</p>
+                </div>
+                <div class="stat-item">
+                    <p class="text-3xl font-bold text-brand-orange">Free</p>
+                    <p class="text-sm text-slate-400 mt-1">To download</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate stat counters when they scroll into view
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target.querySelector('[data-target]');
+                if (!el) return;
+                const target = parseInt(el.getAttribute('data-target'));
+                const duration = 1200;
+                const step = target / (duration / 16);
+                let current = 0;
+                const timer = setInterval(() => {
+                    current = Math.min(current + step, target);
+                    el.textContent = Math.floor(current);
+                    if (current >= target) clearInterval(timer);
+                }, 16);
+                statObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.stat-item').forEach(el => statObserver.observe(el));
+    </script>
+
     <!-- PARTNERS LOGO STRIP -->
     <div class="border-y border-brand-border bg-white py-8">
         <div class="container mx-auto px-6">
