@@ -3,34 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TreadLeft - Shoe Discovery Review</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>TreadLeft Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              500: '#f97316',
-              600: '#ea580c',
-            },
-            navy: {
-              600: '#1e293b',
-              700: '#0f172a',
-              800: '#0f172a',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -39,10 +13,8 @@
       color: #1e293b;
       min-height: 100vh;
     }
-    .dot-pattern {
-      background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
+
+    /* ── Login Gate ── */
     #login-gate {
       position: fixed;
       inset: 0;
@@ -53,11 +25,11 @@
       z-index: 1000;
     }
     .login-box {
-      background: #ffffff;
+      background: #fff;
       padding: 40px;
       border-radius: 16px;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
       width: 90%;
       max-width: 400px;
       text-align: center;
@@ -67,18 +39,16 @@
     .password-input {
       width: 100%;
       padding: 12px 16px;
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       color: #1e293b;
       font-size: 16px;
       margin-bottom: 16px;
       transition: border-color 0.2s;
+      font-family: inherit;
     }
-    .password-input:focus {
-      outline: none;
-      border-color: #f97316;
-    }
+    .password-input:focus { outline: none; border-color: #f97316; }
     .login-btn {
       width: 100%;
       padding: 12px;
@@ -89,81 +59,206 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      font-family: inherit;
     }
-    .login-btn:hover { background: #059669; }
+    .login-btn:hover { background: #ea580c; }
     .error-msg { color: #ef4444; font-size: 14px; margin-top: 12px; display: none; }
-    #app {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 24px;
-      display: none;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
+
+    /* ── Admin Shell ── */
+    #admin-shell { display: none; height: 100vh; overflow: hidden; }
+
+    /* Top Bar */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: #fff;
       border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
-    header h1 { font-size: 24px; display: flex; align-items: center; gap: 12px; font-weight: 700; color: #1e293b; }
-    .badge {
-      background: #10b981;
-      color: #fff;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f97316;
     }
+    .topbar-brand span { color: #94a3b8; font-weight: 400; font-size: 14px; }
     .logout-btn {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #e2e8f0;
       color: #64748b;
-      padding: 8px 16px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 56px; left: 0; bottom: 0;
+      width: 220px;
+      background: #fff;
+      border-right: 1px solid #e2e8f0;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .sidebar-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      padding: 8px 12px 4px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 500;
-      transition: all 0.2s;
+      color: #64748b;
+      transition: background 0.15s, color 0.15s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
     }
-    .logout-btn:hover { border-color: #f97316; color: #f97316; }
+    .nav-item:hover { background: #f8fafc; color: #1e293b; }
+    .nav-item.active { background: #fff7ed; color: #ea580c; font-weight: 600; }
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      background: #f97316;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* Main content */
+    .main-content {
+      position: fixed;
+      top: 56px; left: 220px; right: 0; bottom: 0;
+      overflow-y: auto;
+      padding: 28px;
+      background: #f8fafc;
+    }
+
+    /* Views */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* View header */
+    .view-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .view-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1e293b;
+    }
+    .badge {
+      background: #10b981;
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Stats */
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
       margin-bottom: 24px;
     }
     .stat-card {
-      background: #ffffff;
-      padding: 20px;
+      background: #fff;
+      padding: 18px;
       border-radius: 12px;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
-    .stat-value { font-size: 32px; font-weight: 700; color: #10b981; }
-    .stat-value.low { color: #ef4444; }
-    .stat-value.medium { color: #f59e0b; }
-    .stat-label { font-size: 13px; color: #64748b; margin-top: 4px; font-weight: 500; }
-    .shoe-list { display: flex; flex-direction: column; gap: 16px; }
-    .shoe-card {
-      background: #ffffff;
+    .stat-value { font-size: 30px; font-weight: 700; color: #10b981; }
+    .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 500; }
+
+    /* Batch actions */
+    .batch-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      background: #fff;
       border-radius: 12px;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .batch-btn {
+      flex: 1;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      color: #1e293b;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .batch-btn:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
+
+    /* Shoe cards */
+    .shoe-list { display: flex; flex-direction: column; gap: 14px; }
+    .shoe-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
       overflow: hidden;
       transition: box-shadow 0.2s;
     }
-    .shoe-card:hover { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-    .shoe-card.view-mode.high { border-left: 4px solid #10b981; }
+    .shoe-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,.08); }
+    .shoe-card.view-mode.high   { border-left: 4px solid #10b981; }
     .shoe-card.view-mode.medium { border-left: 4px solid #f59e0b; }
-    .shoe-card.view-mode.low { border-left: 4px solid #ef4444; }
+    .shoe-card.view-mode.low    { border-left: 4px solid #ef4444; }
+
     .shoe-header {
-      padding: 20px;
+      padding: 18px 20px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
-    .shoe-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #1e293b; }
+    .shoe-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: #1e293b; }
     .shoe-info .raw { font-size: 12px; color: #94a3b8; font-family: monospace; }
     .confidence-badge {
       padding: 4px 10px;
@@ -171,17 +266,19 @@
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
+      color: #fff;
     }
-    .confidence-badge.high { background: #10b981; }
+    .confidence-badge.high   { background: #10b981; }
     .confidence-badge.medium { background: #f59e0b; }
-    .confidence-badge.low { background: #ef4444; }
-    .shoe-actions { display: flex; gap: 12px; padding: 0 20px 20px; }
+    .confidence-badge.low    { background: #ef4444; }
+
+    .shoe-actions { display: flex; gap: 10px; padding: 0 20px 18px; }
     .btn {
       flex: 1;
-      padding: 10px 16px;
+      padding: 9px 14px;
       border: none;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
       display: flex;
@@ -189,44 +286,59 @@
       justify-content: center;
       gap: 6px;
       transition: all 0.2s;
+      font-family: inherit;
     }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-approve { background: #10b981; color: #fff; }
     .btn-approve:hover:not(:disabled) { background: #059669; }
-    .btn-reject { background: #ef4444; color: #fff; }
-    .btn-reject:hover:not(:disabled) { background: #dc2626; }
-    .btn-edit { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .btn-edit:hover:not(:disabled) { background: #e2e8f0; }
-    .edit-mode { padding: 16px; }
+    .btn-reject  { background: #ef4444; color: #fff; }
+    .btn-reject:hover:not(:disabled)  { background: #dc2626; }
+    .btn-edit    { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-edit:hover:not(:disabled)    { background: #e2e8f0; }
+
+    .edit-mode { padding: 16px 20px; }
     .edit-mode input {
       width: 100%;
-      padding: 12px;
-      background: #ffffff;
+      padding: 11px 12px;
+      background: #fff;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       color: #1e293b;
       font-size: 14px;
       margin-bottom: 12px;
+      font-family: inherit;
     }
+    .edit-mode input:focus { outline: none; border-color: #f97316; }
     .edit-actions { display: flex; gap: 8px; }
+
+    /* Placeholder view */
+    .placeholder-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 55vh;
+      text-align: center;
+      gap: 16px;
+    }
+    .placeholder-icon { font-size: 56px; }
+    .placeholder-view h2 { font-size: 22px; font-weight: 700; color: #1e293b; }
+    .placeholder-view p { font-size: 14px; color: #64748b; max-width: 360px; line-height: 1.6; }
+    .coming-soon-pill {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #94a3b8;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Shared utilities */
     .empty { text-align: center; padding: 60px 20px; color: #64748b; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 16px 20px;
-      border-radius: 12px;
-      display: none;
-      align-items: center;
-      gap: 12px;
-    }
-    .toast.success { border-left: 4px solid #10b981; }
-    .toast.error { border-left: 4px solid #ef4444; }
-    .toast.show { display: flex; }
     .loading { text-align: center; padding: 40px; color: #64748b; }
     .spinner {
       width: 40px;
@@ -238,84 +350,139 @@
       margin: 0 auto 16px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .batch-actions {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding: 16px;
-      background: #ffffff;
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px rgba(0,0,0,.1);
+      padding: 14px 20px;
       border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      animation: slideIn 0.3s ease;
     }
-    .batch-btn {
-      flex: 1;
-      padding: 12px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      color: #1e293b;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
+    @keyframes slideIn {
+      from { transform: translateX(110%); opacity: 0; }
+      to   { transform: translateX(0);   opacity: 1; }
     }
-    .batch-btn:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
+    .toast.success { border-left: 4px solid #10b981; }
+    .toast.error   { border-left: 4px solid #ef4444; }
+    .toast.show    { display: flex; }
   </style>
 </head>
-<body class="dot-pattern">
+<body>
+
+  <!-- LOGIN GATE -->
   <div id="login-gate">
     <div class="login-box">
       <h1>🔐 TreadLeft Admin</h1>
-      <p>Shoe Discovery Review Panel</p>
+      <p>Admin Control Panel</p>
       <input type="password" id="password" class="password-input" placeholder="Enter admin password" autocomplete="off">
       <button class="login-btn" onclick="doLogin()">Access Panel</button>
       <div class="error-msg" id="login-error">Invalid password</div>
     </div>
   </div>
 
-  <div id="app">
-    <header>
-      <h1>
-        🔍 Shoe Discovery Review
-        <span class="badge" id="pending-count">0 pending</span>
-      </h1>
+  <!-- ADMIN SHELL -->
+  <div id="admin-shell">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-brand">
+        🟠 TreadLeft <span>/ Admin</span>
+      </div>
       <button class="logout-btn" onclick="doLogout()">Logout</button>
-    </header>
-
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-value" id="stat-total">0</div>
-        <div class="stat-label">Total Pending</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" style="color: #10b981" id="stat-high">0</div>
-        <div class="stat-label">High Confidence</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" style="color: #f59e0b" id="stat-medium">0</div>
-        <div class="stat-label">Medium Confidence</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" style="color: #ef4444" id="stat-low">0</div>
-        <div class="stat-label">Low Confidence</div>
-      </div>
     </div>
 
-    <div class="batch-actions">
-      <button class="batch-btn" onclick="approveAllHigh()">
-        ✓ Approve All
-      </button>
-      <button class="batch-btn" onclick="refreshData()">
-        🔄 Refresh
-      </button>
-    </div>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section-label">Content</div>
 
-    <div id="shoe-list" class="shoe-list">
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Loading pending discoveries...</p>
+      <button class="nav-item active" data-view="discovery-queue" onclick="navigate('discovery-queue')">
+        <span class="nav-icon">🔍</span>
+        Discovery Queue
+        <span class="nav-badge" id="sidebar-pending-count">0</span>
+      </button>
+
+      <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
+        <span class="nav-icon">🪞</span>
+        Duplicate Detection
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">System</div>
+
+      <button class="nav-item" data-view="system-health" onclick="navigate('system-health')">
+        <span class="nav-icon">❤️</span>
+        System Health
+      </button>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <!-- VIEW: DiscoveryQueue -->
+      <div id="view-discovery-queue" class="view active">
+        <div class="view-header">
+          <h2>🔍 Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total Pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#10b981" id="stat-high">0</div>
+            <div class="stat-label">High Confidence</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#f59e0b" id="stat-medium">0</div>
+            <div class="stat-label">Medium Confidence</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#ef4444" id="stat-low">0</div>
+            <div class="stat-label">Low Confidence</div>
+          </div>
+        </div>
+
+        <div class="batch-actions">
+          <button class="batch-btn" onclick="approveAllHigh()">✓ Approve All</button>
+          <button class="batch-btn" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+
+        <div id="shoe-list" class="shoe-list">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading pending discoveries...</p>
+          </div>
+        </div>
       </div>
+
+      <!-- VIEW: DuplicateResolver (placeholder) -->
+      <div id="view-duplicate-resolver" class="view">
+        <div class="placeholder-view">
+          <div class="placeholder-icon">🪞</div>
+          <h2>Duplicate Detection</h2>
+          <p>Automatically surface shoe entries that may be duplicates based on fuzzy name matching and import source overlap.</p>
+          <div class="coming-soon-pill">Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- VIEW: SystemHealth (placeholder) -->
+      <div id="view-system-health" class="view">
+        <div class="placeholder-view">
+          <div class="placeholder-icon">❤️</div>
+          <h2>System Health</h2>
+          <p>Monitor Edge Function run status, cron job history, error rates, and database queue depths in real time.</p>
+          <div class="coming-soon-pill">Coming Soon</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -325,22 +492,20 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMjY0MDAsImV4cCI6MjA0OTYwMjQwMH0.XdJrRrOluCT31PQbqGttJmZ0MBXjhWpYXsTNduwEePw';
+    const SUPABASE_URL   = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
     const ADMIN_PASSWORD = 'TreadLeft2024!';
-    const ADMIN_TOKEN = 'admin-secret-token-12345';
-    
+    const ADMIN_TOKEN    = 'admin-secret-token-12345';
+
     let pendingData = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-        showApp();
-      }
-      document.getElementById('password').addEventListener('keypress', (e) => {
+      if (sessionStorage.getItem('adminLoggedIn') === 'true') showApp();
+      document.getElementById('password').addEventListener('keypress', e => {
         if (e.key === 'Enter') doLogin();
       });
     });
 
+    /* ── AUTH ── */
     function doLogin() {
       const password = document.getElementById('password').value;
       if (password === ADMIN_PASSWORD) {
@@ -359,45 +524,58 @@
 
     function showApp() {
       document.getElementById('login-gate').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
+      document.getElementById('admin-shell').style.display = 'block';
       loadPending();
     }
 
+    /* ── NAVIGATION ── */
+    function navigate(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.view === viewId);
+      });
+    }
+
+    /* ── DISCOVERY QUEUE — DATA ── */
     async function loadPending() {
       try {
-        console.log('Trying Edge Function...');
         const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'list_pending', token: ADMIN_TOKEN })
         });
-        console.log('Response status:', response.status);
         const result = await response.json();
-        console.log('Response:', result);
         if (!result.success) throw new Error(result.message || result.error || 'Unknown error');
         pendingData = result.discoveries || [];
-        console.log('Loaded:', pendingData.length, 'items');
         renderShoes();
         updateStats();
       } catch (err) {
         console.error('Load error:', err);
         showToast('Error: ' + err.message, 'error');
-        document.getElementById('shoe-list').innerHTML = '<div class="empty"><p>Error loading data</p><p style="font-size: 12px;">' + err.message + '</p></div>';
+        document.getElementById('shoe-list').innerHTML =
+          '<div class="empty"><p>Error loading data</p><p style="font-size:12px;margin-top:8px;">' + err.message + '</p></div>';
       }
     }
 
     function updateStats() {
-      document.getElementById('stat-total').textContent = pendingData.length;
-      document.getElementById('stat-high').textContent = pendingData.filter(s => s.confidence === 'high').length;
-      document.getElementById('stat-medium').textContent = pendingData.filter(s => s.confidence === 'medium').length;
-      document.getElementById('stat-low').textContent = pendingData.filter(s => s.confidence === 'low').length;
-      document.getElementById('pending-count').textContent = `${pendingData.length} pending`;
+      const total  = pendingData.length;
+      const high   = pendingData.filter(s => s.confidence === 'high').length;
+      const medium = pendingData.filter(s => s.confidence === 'medium').length;
+      const low    = pendingData.filter(s => s.confidence === 'low').length;
+      document.getElementById('stat-total').textContent   = total;
+      document.getElementById('stat-high').textContent    = high;
+      document.getElementById('stat-medium').textContent  = medium;
+      document.getElementById('stat-low').textContent     = low;
+      document.getElementById('pending-count').textContent         = `${total} pending`;
+      document.getElementById('sidebar-pending-count').textContent = total;
     }
 
+    /* ── DISCOVERY QUEUE — RENDER ── */
     function renderShoes() {
       const container = document.getElementById('shoe-list');
       if (pendingData.length === 0) {
-        container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p><p style="font-size: 12px; margin-top: 8px;">All caught up!</p></div>';
+        container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
         return;
       }
       container.innerHTML = pendingData.map(shoe => `
@@ -411,36 +589,33 @@
           </div>
           <div class="shoe-actions">
             <button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>
-            <button class="btn btn-reject" onclick="rejectShoe('${shoe.id}')" id="btn-reject-${shoe.id}">✕ Reject</button>
-            <button class="btn btn-edit" onclick="startEdit('${shoe.id}')" id="btn-edit-${shoe.id}">✏️ Edit</button>
+            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
+            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
           </div>
         </div>
-        <div class="shoe-card edit-mode" id="edit-${shoe.id}" style="display: none;">
+        <div class="shoe-card edit-mode" id="edit-${shoe.id}" style="display:none;">
           <input type="text" id="brand-${shoe.id}" value="${escapeHtml(shoe.brand_name)}" placeholder="Brand name">
           <input type="text" id="model-${shoe.id}" value="${escapeHtml(shoe.model_name)}" placeholder="Model name">
           <div class="edit-actions">
             <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save</button>
-            <button class="btn btn-edit" onclick="cancelEdit('${shoe.id}')">Cancel</button>
+            <button class="btn btn-edit"    onclick="cancelEdit('${shoe.id}')">Cancel</button>
           </div>
         </div>
       `).join('');
     }
 
+    /* ── DISCOVERY QUEUE — ACTIONS ── */
     async function approveShoe(id) {
       setLoading(id, true);
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+        const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'approve', discovery_id: id, token: ADMIN_TOKEN })
         });
-        const result = await response.json();
-        if (result.success) {
-          removeShoe(id);
-          showToast('Shoe approved and added to database', 'success');
-        } else {
-          throw new Error(result.message);
-        }
+        const result = await res.json();
+        if (result.success) { removeShoe(id); showToast('Shoe approved and added to database', 'success'); }
+        else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
         setLoading(id, false);
@@ -450,18 +625,14 @@
     async function rejectShoe(id) {
       setLoading(id, true);
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+        const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'reject', discovery_id: id, token: ADMIN_TOKEN })
         });
-        const result = await response.json();
-        if (result.success) {
-          removeShoe(id);
-          showToast('Shoe rejected', 'success');
-        } else {
-          throw new Error(result.message);
-        }
+        const result = await res.json();
+        if (result.success) { removeShoe(id); showToast('Shoe rejected', 'success'); }
+        else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
         setLoading(id, false);
@@ -472,7 +643,6 @@
       document.getElementById(`card-${id}`).style.display = 'none';
       document.getElementById(`edit-${id}`).style.display = 'block';
     }
-
     function cancelEdit(id) {
       document.getElementById(`card-${id}`).style.display = 'block';
       document.getElementById(`edit-${id}`).style.display = 'none';
@@ -482,20 +652,18 @@
       const brand = document.getElementById(`brand-${id}`).value.trim();
       const model = document.getElementById(`model-${id}`).value.trim();
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+        const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'edit', discovery_id: id, brand_name: brand, model_name: model, token: ADMIN_TOKEN })
         });
-        const result = await response.json();
+        const result = await res.json();
         if (result.success) {
           const shoe = pendingData.find(s => s.id === id);
           if (shoe) { shoe.brand_name = brand; shoe.model_name = model; }
           renderShoes();
           showToast('Changes saved', 'success');
-        } else {
-          throw new Error(result.message);
-        }
+        } else throw new Error(result.message);
       } catch (err) {
         showToast('Error saving: ' + err.message, 'error');
       }
@@ -503,52 +671,29 @@
 
     async function approveAllHigh() {
       if (!confirm(`Approve all ${pendingData.length} pending items?`)) return;
-      if (pendingData.length === 0) {
-        showToast('No items to approve', 'error');
-        return;
-      }
-      
+      if (!pendingData.length) { showToast('No items to approve', 'error'); return; }
+
       const btn = document.querySelector('.batch-btn');
       btn.disabled = true;
       btn.textContent = '⏳ Approving...';
-      
-      try {
-        console.log(`Starting batch approval of ${pendingData.length} items...`);
-        let approved = 0;
-        let failed = 0;
-        
-        for (const shoe of pendingData) {
-          console.log(`Approving ${shoe.id}...`);
-          try {
-            const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
-            });
-            const result = await response.json();
-            console.log(`Result for ${shoe.id}:`, result);
-            if (result.success) {
-              approved++;
-            } else {
-              failed++;
-              console.error(`Failed to approve ${shoe.id}:`, result);
-            }
-          } catch (err) {
-            failed++;
-            console.error(`Error approving ${shoe.id}:`, err);
-          }
-        }
-        
-        console.log(`Batch complete: ${approved} approved, ${failed} failed`);
-        showToast(`Approved ${approved} shoes${failed > 0 ? `, ${failed} failed` : ''}`, failed > 0 ? 'error' : 'success');
-        await loadPending();
-      } catch (err) {
-        console.error('Batch approval error:', err);
-        showToast('Error: ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '✓ Approve All';
+
+      let approved = 0, failed = 0;
+      for (const shoe of pendingData) {
+        try {
+          const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
+          });
+          const result = await res.json();
+          result.success ? approved++ : failed++;
+        } catch { failed++; }
       }
+
+      showToast(`Approved ${approved} shoes${failed ? `, ${failed} failed` : ''}`, failed ? 'error' : 'success');
+      await loadPending();
+      btn.disabled = false;
+      btn.textContent = '✓ Approve All';
     }
 
     function removeShoe(id) {
@@ -564,19 +709,15 @@
       });
     }
 
-    function refreshData() {
-      loadPending();
-      showToast('Data refreshed', 'success');
-    }
+    function refreshData() { loadPending(); showToast('Data refreshed', 'success'); }
 
+    /* ── UTILITIES ── */
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
-      const icon = document.getElementById('toast-icon');
-      const msg = document.getElementById('toast-message');
       toast.className = `toast ${type} show`;
-      icon.textContent = type === 'success' ? '✓' : '✕';
-      msg.textContent = message;
-      setTimeout(() => { toast.classList.remove('show'); }, 3000);
+      document.getElementById('toast-icon').textContent    = type === 'success' ? '✓' : '✕';
+      document.getElementById('toast-message').textContent = message;
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function escapeHtml(text) {
