@@ -304,7 +304,7 @@
 
     <div class="batch-actions">
       <button class="batch-btn" onclick="approveAllHigh()">
-        ✓ Approve All High Confidence
+        ✓ Approve All
       </button>
       <button class="batch-btn" onclick="refreshData()">
         🔄 Refresh
@@ -502,25 +502,25 @@
     }
 
     async function approveAllHigh() {
-      if (!confirm('Approve all high-confidence items?')) return;
-      const highConfidence = pendingData.filter(s => s.confidence === 'high');
-      if (highConfidence.length === 0) {
-        showToast('No high-confidence items to approve', 'error');
+      if (!confirm(`Approve all ${pendingData.length} pending items?`)) return;
+      if (pendingData.length === 0) {
+        showToast('No items to approve', 'error');
         return;
       }
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'approve_all_high_confidence', token: ADMIN_TOKEN })
-        });
-        const result = await response.json();
-        if (result.success) {
-          showToast(`Approved ${result.approved} shoes`, 'success');
-          loadPending();
-        } else {
-          throw new Error(result.message);
+        // Approve each item individually since there's no batch approve endpoint
+        let approved = 0;
+        for (const shoe of pendingData) {
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
+          });
+          const result = await response.json();
+          if (result.success) approved++;
         }
+        showToast(`Approved ${approved} shoes`, 'success');
+        loadPending();
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
       }
