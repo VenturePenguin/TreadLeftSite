@@ -14,7 +14,6 @@
       min-height: 100vh;
     }
     
-    /* Login Gate */
     #login-gate {
       position: fixed;
       inset: 0;
@@ -53,10 +52,6 @@
       font-size: 16px;
       margin-bottom: 16px;
     }
-    .password-input:focus {
-      outline: none;
-      border-color: #10b981;
-    }
     .login-btn {
       width: 100%;
       padding: 12px;
@@ -76,7 +71,6 @@
       display: none;
     }
     
-    /* Main App */
     #app {
       max-width: 800px;
       margin: 0 auto;
@@ -119,7 +113,6 @@
       color: #ef4444;
     }
     
-    /* Stats */
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -143,7 +136,6 @@
       margin-top: 4px;
     }
     
-    /* Shoe Cards */
     .shoe-list {
       display: flex;
       flex-direction: column;
@@ -155,12 +147,9 @@
       border: 1px solid #333;
       overflow: hidden;
     }
-    .shoe-card.view-mode {
-      border-left: 4px solid;
-    }
-    .shoe-card.view-mode.high { border-left-color: #10b981; }
-    .shoe-card.view-mode.medium { border-left-color: #f59e0b; }
-    .shoe-card.view-mode.low { border-left-color: #ef4444; }
+    .shoe-card.view-mode.high { border-left: 4px solid #10b981; }
+    .shoe-card.view-mode.medium { border-left: 4px solid #f59e0b; }
+    .shoe-card.view-mode.low { border-left: 4px solid #ef4444; }
     
     .shoe-header {
       padding: 16px;
@@ -207,10 +196,7 @@
       justify-content: center;
       gap: 6px;
     }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-approve { background: #10b981; color: #fff; }
     .btn-approve:hover:not(:disabled) { background: #059669; }
     .btn-reject { background: #ef4444; color: #fff; }
@@ -218,7 +204,6 @@
     .btn-edit { background: #374151; color: #fff; }
     .btn-edit:hover:not(:disabled) { background: #4b5563; }
     
-    /* Edit Mode */
     .edit-mode {
       padding: 16px;
     }
@@ -232,27 +217,18 @@
       font-size: 14px;
       margin-bottom: 12px;
     }
-    .edit-mode input:focus {
-      outline: none;
-      border-color: #10b981;
-    }
     .edit-actions {
       display: flex;
       gap: 8px;
     }
     
-    /* Empty State */
     .empty {
       text-align: center;
       padding: 60px 20px;
       color: #666;
     }
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
     
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -264,17 +240,11 @@
       display: none;
       align-items: center;
       gap: 12px;
-      animation: slideIn 0.3s ease;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
     }
     .toast.success { border-left: 4px solid #10b981; }
     .toast.error { border-left: 4px solid #ef4444; }
     .toast.show { display: flex; }
     
-    /* Loading */
     .loading {
       text-align: center;
       padding: 40px;
@@ -291,7 +261,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Batch Actions */
     .batch-actions {
       display: flex;
       gap: 12px;
@@ -318,7 +287,6 @@
   </style>
 </head>
 <body>
-  <!-- Login Gate -->
   <div id="login-gate">
     <div class="login-box">
       <h1>🔐 TreadLeft Admin</h1>
@@ -329,7 +297,6 @@
     </div>
   </div>
 
-  <!-- Main App -->
   <div id="app">
     <header>
       <h1>
@@ -375,14 +342,13 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast">
     <span id="toast-icon">✓</span>
     <span id="toast-message">Success</span>
   </div>
 
   <script>
-    // Configuration - UPDATE THESE VALUES
+    // Configuration
     const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMjY0MDAsImV4cCI6MjA0OTYwMjQwMH0.XdJrRrOluCT31PQbqGttJmZ0MBXjhWpYXsTNduwEePw';
     const ADMIN_PASSWORD = 'TreadLeft2024!';
@@ -391,16 +357,13 @@
     let supabase;
     let pendingData = [];
 
-    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
-      // Check if already logged in
       if (sessionStorage.getItem('adminLoggedIn') === 'true') {
         showApp();
       }
       
-      // Enter key on password
       document.getElementById('password').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') login();
       });
@@ -581,7 +544,6 @@
         const result = await response.json();
         
         if (result.success) {
-          // Update local data
           const shoe = pendingData.find(s => s.id === id);
           if (shoe) {
             shoe.brand_name = brand;
@@ -620,7 +582,7 @@
         
         if (result.success) {
           showToast(`Approved ${result.approved} shoes`, 'success');
-          loadPending(); // Refresh
+          loadPending();
         } else {
           throw new Error(result.message);
         }
@@ -670,4 +632,3 @@
   </script>
 </body>
 </html>
-<!-- v2 -->
