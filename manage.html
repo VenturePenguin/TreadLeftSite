@@ -507,22 +507,47 @@
         showToast('No items to approve', 'error');
         return;
       }
+      
+      const btn = document.querySelector('.batch-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Approving...';
+      
       try {
-        // Approve each item individually since there's no batch approve endpoint
+        console.log(`Starting batch approval of ${pendingData.length} items...`);
         let approved = 0;
+        let failed = 0;
+        
         for (const shoe of pendingData) {
-          const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
-          });
-          const result = await response.json();
-          if (result.success) approved++;
+          console.log(`Approving ${shoe.id}...`);
+          try {
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
+            });
+            const result = await response.json();
+            console.log(`Result for ${shoe.id}:`, result);
+            if (result.success) {
+              approved++;
+            } else {
+              failed++;
+              console.error(`Failed to approve ${shoe.id}:`, result);
+            }
+          } catch (err) {
+            failed++;
+            console.error(`Error approving ${shoe.id}:`, err);
+          }
         }
-        showToast(`Approved ${approved} shoes`, 'success');
-        loadPending();
+        
+        console.log(`Batch complete: ${approved} approved, ${failed} failed`);
+        showToast(`Approved ${approved} shoes${failed > 0 ? `, ${failed} failed` : ''}`, failed > 0 ? 'error' : 'success');
+        await loadPending();
       } catch (err) {
+        console.error('Batch approval error:', err);
         showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✓ Approve All';
       }
     }
 
