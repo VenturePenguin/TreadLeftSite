@@ -657,6 +657,14 @@
 
     let supabaseClient = null;
 
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (!window.supabase) throw new Error('Supabase library not loaded');
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return supabaseClient;
+    }
+
     let pendingData = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -686,9 +694,6 @@
     function showApp() {
       document.getElementById('login-gate').style.display = 'none';
       document.getElementById('admin-shell').style.display = 'block';
-      if (!supabaseClient && window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
       loadPending();
     }
 
@@ -974,9 +979,9 @@
       document.getElementById('dup-group-count').textContent = '—';
 
       try {
-        if (!supabaseClient) throw new Error('Supabase not initialised');
+        const sb = getSupabase();
 
-        const { data: shoes, error } = await supabaseClient
+        const { data: shoes, error } = await sb
           .from('master_shoe_products')
           .select('id, brand_name, model_name, image_url, created_at')
           .order('brand_name')
@@ -985,7 +990,7 @@
         if (error) throw error;
 
         /* Also fetch cheapest deal per product for price display */
-        const { data: deals } = await supabaseClient
+        const { data: deals } = await sb
           .from('shoe_deals')
           .select('master_product_id, price_cents, currency')
           .eq('is_active', true)
@@ -1128,7 +1133,7 @@
 
       for (const dup of duplicates) {
         try {
-          const { data, error } = await supabaseClient.rpc('merge_duplicate_shoes', {
+          const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
             master_id:    state.masterId,
             duplicate_id: dup.id
           });
