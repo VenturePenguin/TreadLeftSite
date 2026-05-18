@@ -590,6 +590,159 @@
     .status-pill.error   { background: #fee2e2; color: #991b1b; }
     .status-pill.unknown { background: #f1f5f9; color: #64748b; }
 
+    /* ── Strava Sync Monitor ── */
+    .sync-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+    }
+    .sync-toolbar-left { display: flex; align-items: center; gap: 10px; }
+    .sync-filter-btn {
+      padding: 6px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .sync-filter-btn.active { background: #1e293b; color: #fff; border-color: #1e293b; }
+    .sync-filter-btn:hover:not(.active) { border-color: #f97316; color: #f97316; }
+    .sync-refresh-btn {
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sync-refresh-btn:hover { border-color: #f97316; color: #f97316; }
+    .sync-table-wrap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .sync-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .sync-table th {
+      text-align: left;
+      padding: 10px 14px;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+      white-space: nowrap;
+    }
+    .sync-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f8fafc;
+      vertical-align: middle;
+      color: #1e293b;
+    }
+    .sync-table tbody tr:last-child td { border-bottom: none; }
+    .sync-table tbody tr:hover td { background: #fafafa; }
+    .sync-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .sync-badge.ok      { background: #d1fae5; color: #065f46; }
+    .sync-badge.error   { background: #fee2e2; color: #991b1b; }
+    .sync-badge.skipped { background: #f1f5f9; color: #64748b; }
+    .sync-event-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+    .sync-event-pill.delete { background: #fef3c7; color: #92400e; }
+    .sync-event-pill.update { background: #f0fdf4; color: #166534; }
+    .sync-retry-btn {
+      padding: 5px 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .sync-retry-btn:hover { border-color: #f97316; color: #f97316; }
+    .sync-retry-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .sync-payload-btn {
+      padding: 4px 10px;
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .sync-payload-btn:hover { border-color: #94a3b8; color: #64748b; }
+    .payload-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .payload-modal.open { display: flex; }
+    .payload-modal-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 560px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+    .payload-modal-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .payload-modal-box pre {
+      font-size: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #1e293b;
+    }
+    .payload-modal-close {
+      margin-top: 16px;
+      padding: 8px 20px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
     /* Shared utilities */
     .empty { text-align: center; padding: 60px 20px; color: #64748b; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
@@ -673,6 +826,12 @@
       <button class="nav-item" data-view="system-health" onclick="navigate('system-health')">
         <span class="nav-icon">❤️</span>
         System Health
+      </button>
+
+      <button class="nav-item" data-view="strava-monitor" onclick="navigate('strava-monitor')">
+        <span class="nav-icon">🚴</span>
+        Strava Sync Monitor
+        <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
       </button>
     </nav>
 
@@ -805,6 +964,53 @@
         </div>
       </div>
 
+      <!-- VIEW: Strava Sync Monitor -->
+      <div id="view-strava-monitor" class="view">
+        <div class="view-header">
+          <h2>🚴 Strava Sync Monitor <span class="badge" id="sync-error-badge" style="background:#ef4444;display:none;">0 errors</span></h2>
+        </div>
+
+        <div class="sync-toolbar">
+          <div class="sync-toolbar-left">
+            <button class="sync-filter-btn active" data-filter="all"    onclick="setSyncFilter('all')">All</button>
+            <button class="sync-filter-btn"         data-filter="ok"     onclick="setSyncFilter('ok')">✅ OK</button>
+            <button class="sync-filter-btn"         data-filter="error"  onclick="setSyncFilter('error')">❌ Errors</button>
+            <button class="sync-filter-btn"         data-filter="skipped" onclick="setSyncFilter('skipped')">⏭ Skipped</button>
+          </div>
+          <button class="sync-refresh-btn" onclick="fetchWebhookLogs()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="sync-table-wrap">
+          <table class="sync-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event</th>
+                <th>Athlete ID</th>
+                <th>Object ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sync-table-body">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Payload inspector modal -->
+  <div class="payload-modal" id="payload-modal" onclick="closePayloadModal(event)">
+    <div class="payload-modal-box">
+      <h3>📦 Raw Webhook Payload</h3>
+      <pre id="payload-modal-content"></pre>
+      <button class="payload-modal-close" onclick="closePayloadModal()">Close</button>
     </div>
   </div>
 
@@ -876,6 +1082,10 @@
       if (viewId === 'system-health' && !healthLoaded) {
         healthLoaded = true;
         fetchSystemHealth();
+      }
+      if (viewId === 'strava-monitor' && !syncLoaded) {
+        syncLoaded = true;
+        fetchWebhookLogs();
       }
     }
 
@@ -1071,6 +1281,152 @@
     /* ═══════════════════════════════════════════════════
        DUPLICATE DETECTOR
     ═══════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════
+       STRAVA SYNC MONITOR
+    ═══════════════════════════════════════════════════ */
+
+    let syncLoaded = false;
+    let syncFilter = 'all';
+    let syncAllLogs = [];
+
+    const WEBHOOK_FN_URL = `${SUPABASE_URL}/functions/v1/strava-webhook`;
+
+    function setSyncFilter(filter) {
+      syncFilter = filter;
+      document.querySelectorAll('.sync-filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === filter);
+      });
+      renderWebhookLogs(syncAllLogs);
+    }
+
+    async function fetchWebhookLogs() {
+      syncLoaded = true;
+      const tbody = document.getElementById('sync-table-body');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+
+      try {
+        const sb = getSupabase();
+        const { data, error } = await sb
+          .from('strava_webhook_logs')
+          .select('id, created_at, object_type, aspect_type, object_id, owner_id, status, error_message, payload')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+        syncAllLogs = data || [];
+        renderWebhookLogs(syncAllLogs);
+
+        /* Update error badge */
+        const errCount = syncAllLogs.filter(r => r.status === 'error').length;
+        const badge = document.getElementById('sync-error-badge');
+        const sidebarBadge = document.getElementById('sidebar-error-count');
+        if (errCount > 0) {
+          badge.textContent = `${errCount} error${errCount > 1 ? 's' : ''}`;
+          badge.style.display = '';
+          sidebarBadge.textContent = errCount;
+          sidebarBadge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+          sidebarBadge.style.display = 'none';
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        showToast('Error loading webhook logs: ' + err.message, 'error');
+      }
+    }
+
+    function renderWebhookLogs(logs) {
+      const tbody = document.getElementById('sync-table-body');
+      const filtered = syncFilter === 'all' ? logs : logs.filter(r => r.status === syncFilter);
+
+      if (filtered.length === 0) {
+        const msg = syncFilter === 'all'
+          ? 'No webhook events yet. Events will appear here after the next Strava activity.'
+          : `No ${syncFilter} events in the last 50.`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:40px;">${escapeHtml(msg)}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(row => {
+        const ts = fmtDateTime(row.created_at);
+        const ago = timeAgo(row.created_at);
+        const eventClass = row.aspect_type === 'delete' ? 'delete' : row.aspect_type === 'update' ? 'update' : '';
+        const eventLabel = row.object_type && row.aspect_type
+          ? `${row.object_type}.${row.aspect_type}`
+          : row.object_type || '—';
+        const statusClass = row.status === 'ok' ? 'ok' : row.status === 'error' ? 'error' : 'skipped';
+        const statusIcon  = row.status === 'ok' ? '✓' : row.status === 'error' ? '✕' : '⏭';
+        const statusLabel = row.status === 'ok' ? '200 OK' : row.status === 'error' ? 'Error' : 'Skipped';
+
+        const retryBtn = row.status === 'error'
+          ? `<button class="sync-retry-btn" id="retry-${row.id}" onclick="retryStravaSync('${row.id}', ${escapeHtml(JSON.stringify(JSON.stringify(row.payload)))})">↩ Retry</button>`
+          : '';
+        const payloadBtn = `<button class="sync-payload-btn" onclick="showPayload('${row.id}')">{ }</button>`;
+
+        const errTip = row.error_message
+          ? `<div style="font-size:11px;color:#ef4444;margin-top:3px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(row.error_message)}">${escapeHtml(row.error_message)}</div>`
+          : '';
+
+        return `
+          <tr data-id="${row.id}">
+            <td>
+              <div style="font-size:12px;color:#1e293b;">${escapeHtml(ts)}</div>
+              <div style="font-size:11px;color:#94a3b8;">${escapeHtml(ago)}</div>
+            </td>
+            <td><span class="sync-event-pill ${eventClass}">${escapeHtml(eventLabel)}</span></td>
+            <td style="font-family:monospace;font-size:12px;color:#64748b;">${escapeHtml(row.owner_id || '—')}</td>
+            <td style="font-family:monospace;font-size:12px;color:#64748b;">${escapeHtml(row.object_id || '—')}</td>
+            <td>
+              <span class="sync-badge ${statusClass}">${statusIcon} ${statusLabel}</span>
+              ${errTip}
+            </td>
+            <td style="display:flex;gap:6px;align-items:center;">
+              ${retryBtn}
+              ${payloadBtn}
+            </td>
+          </tr>`;
+      }).join('');
+
+      /* Cache payloads for the modal */
+      window._syncPayloads = {};
+      logs.forEach(r => { window._syncPayloads[r.id] = r.payload; });
+    }
+
+    async function retryStravaSync(logId, payloadJson) {
+      const btn = document.getElementById(`retry-${logId}`);
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Retrying…'; }
+
+      let payload;
+      try { payload = JSON.parse(payloadJson); } catch { payload = {}; }
+
+      try {
+        const res = await fetch(WEBHOOK_FN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast('Retry submitted — refreshing logs…', 'success');
+        setTimeout(fetchWebhookLogs, 2000);
+      } catch (err) {
+        showToast('Retry failed: ' + err.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = '↩ Retry'; }
+      }
+    }
+
+    function showPayload(logId) {
+      const payload = window._syncPayloads?.[logId];
+      document.getElementById('payload-modal-content').textContent =
+        JSON.stringify(payload, null, 2);
+      document.getElementById('payload-modal').classList.add('open');
+    }
+
+    function closePayloadModal(e) {
+      if (!e || e.target === document.getElementById('payload-modal')) {
+        document.getElementById('payload-modal').classList.remove('open');
+      }
+    }
 
     /* ═══════════════════════════════════════════════════
        SYSTEM HEALTH
