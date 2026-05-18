@@ -316,15 +316,20 @@
     async function loadPending() {
       try {
         console.log('Fetching data via REST API...');
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/pending_shoe_discoveries?status=eq.pending&order=created_at.desc`, {
+        const url = `${SUPABASE_URL}/rest/v1/pending_shoe_discoveries?status=eq.pending&order=created_at.desc`;
+        console.log('URL:', url);
+        const response = await fetch(url, {
           method: 'GET',
           headers: {
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
           }
         });
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-        pendingData = await response.json();
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${responseText}`);
+        pendingData = JSON.parse(responseText);
         console.log('Loaded:', pendingData.length, 'items');
         renderShoes();
         updateStats();
