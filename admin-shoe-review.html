@@ -393,7 +393,20 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log('Admin panel loading...');
+      
+      try {
+        if (!window.supabase) {
+          console.error('Supabase library not loaded');
+          showToast('Error: Supabase library failed to load', 'error');
+          return;
+        }
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase initialized');
+      } catch (err) {
+        console.error('Supabase init error:', err);
+        showToast('Error initializing: ' + err.message, 'error');
+      }
       
       // Check if already logged in
       if (sessionStorage.getItem('adminLoggedIn') === 'true') {
@@ -407,11 +420,16 @@
     });
 
     function login() {
+      console.log('Login clicked');
       const password = document.getElementById('password').value;
+      console.log('Password entered:', password ? 'yes' : 'no');
+      
       if (password === ADMIN_PASSWORD) {
+        console.log('Password correct');
         sessionStorage.setItem('adminLoggedIn', 'true');
         showApp();
       } else {
+        console.log('Password incorrect');
         document.getElementById('login-error').style.display = 'block';
         document.getElementById('password').value = '';
       }
