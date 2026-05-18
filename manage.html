@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TreadLeft Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -336,6 +337,152 @@
       text-transform: uppercase;
     }
 
+    /* ── Duplicate Detector ── */
+    .dup-empty {
+      text-align: center; padding: 60px 20px; color: #64748b;
+    }
+    .dup-empty .dup-empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .dup-group {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .dup-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .dup-group-header h3 { font-size: 14px; font-weight: 600; color: #1e293b; }
+    .dup-group-header span { font-size: 12px; color: #94a3b8; }
+    .dup-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+    .dup-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+      background: #fff;
+    }
+    .dup-card:hover { border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .dup-card.is-master { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.15); }
+    .dup-card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      background: #f8fafc;
+      padding: 12px;
+      display: block;
+    }
+    .dup-card-img-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .dup-card-body { padding: 12px; }
+    .dup-card-name { font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.3; }
+    .dup-card-brand { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .dup-card-price { font-size: 12px; color: #10b981; font-weight: 600; }
+    .dup-card-id { font-size: 10px; color: #cbd5e1; font-family: monospace; margin-top: 4px; word-break: break-all; }
+    .dup-card-radio {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .dup-card.is-master .dup-card-radio {
+      border-color: #f97316;
+      background: #f97316;
+    }
+    .dup-card.is-master .dup-card-radio::after {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .master-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #f97316;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .dup-group-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-top: 1px solid #f1f5f9;
+      background: #fafafa;
+      gap: 12px;
+    }
+    .dup-group-footer p { font-size: 12px; color: #94a3b8; }
+    .merge-btn {
+      padding: 9px 20px;
+      background: #1e293b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .merge-btn:hover { background: #0f172a; }
+    .merge-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .dup-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    .dup-toolbar-info { font-size: 13px; color: #64748b; }
+    .dup-refresh-btn {
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .dup-refresh-btn:hover { border-color: #f97316; color: #f97316; }
+
     /* Shared utilities */
     .empty { text-align: center; padding: 60px 20px; color: #64748b; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
@@ -463,13 +610,24 @@
         </div>
       </div>
 
-      <!-- VIEW: DuplicateResolver (placeholder) -->
+      <!-- VIEW: DuplicateResolver -->
       <div id="view-duplicate-resolver" class="view">
-        <div class="placeholder-view">
-          <div class="placeholder-icon">🪞</div>
-          <h2>Duplicate Detection</h2>
-          <p>Automatically surface shoe entries that may be duplicates based on fuzzy name matching and import source overlap.</p>
-          <div class="coming-soon-pill">Coming Soon</div>
+        <div class="view-header">
+          <h2>🪞 Duplicate Detection <span class="badge" id="dup-group-count" style="background:#64748b;">—</span></h2>
+        </div>
+
+        <div class="dup-toolbar">
+          <p class="dup-toolbar-info">
+            Shoes are grouped by identical brand + highly similar name. Select the <strong>master</strong> to keep, then merge the rest.
+          </p>
+          <button class="dup-refresh-btn" onclick="loadDuplicates()">🔄 Refresh</button>
+        </div>
+
+        <div id="dup-list">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Scanning for duplicates…</p>
+          </div>
         </div>
       </div>
 
@@ -492,9 +650,12 @@
   </div>
 
   <script>
-    const SUPABASE_URL   = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+    const SUPABASE_URL      = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMjY0MDAsImV4cCI6MjA0OTYwMjQwMH0.XdJrRrOluCT31PQbqGttJmZ0MBXjhWpYXsTNduwEePw';
     const ADMIN_PASSWORD = 'TreadLeft2024!';
     const ADMIN_TOKEN    = 'admin-secret-token-12345';
+
+    let supabaseClient = null;
 
     let pendingData = [];
 
@@ -525,16 +686,24 @@
     function showApp() {
       document.getElementById('login-gate').style.display = 'none';
       document.getElementById('admin-shell').style.display = 'block';
+      if (!supabaseClient && window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
       loadPending();
     }
 
     /* ── NAVIGATION ── */
+    let dupLoaded = false;
     function navigate(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById('view-' + viewId).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.toggle('active', item.dataset.view === viewId);
       });
+      if (viewId === 'duplicate-resolver' && !dupLoaded) {
+        dupLoaded = true;
+        loadDuplicates();
+      }
     }
 
     /* ── DISCOVERY QUEUE — DATA ── */
@@ -724,6 +893,283 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DUPLICATE DETECTOR
+    ═══════════════════════════════════════════════════ */
+
+    /* State: groupKey → { shoes[], masterId } */
+    const dupState = {};
+
+    /* ── Similarity helpers ── */
+
+    /** Normalise a model name for comparison */
+    function normaliseName(name) {
+      return name
+        .toLowerCase()
+        .replace(/\bv\d+\b/g, '')          // strip version suffixes (v2, v3…)
+        .replace(/[^a-z0-9\s]/g, '')       // strip punctuation
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    /** Levenshtein distance – O(m*n) */
+    function levenshtein(a, b) {
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, (_, i) =>
+        Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+      );
+      for (let i = 1; i <= m; i++)
+        for (let j = 1; j <= n; j++)
+          dp[i][j] = a[i-1] === b[j-1]
+            ? dp[i-1][j-1]
+            : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+      return dp[m][n];
+    }
+
+    /** Similarity ratio 0–1 (1 = identical) */
+    function similarity(a, b) {
+      const na = normaliseName(a), nb = normaliseName(b);
+      if (na === nb) return 1;
+      const maxLen = Math.max(na.length, nb.length);
+      if (maxLen === 0) return 1;
+      return 1 - levenshtein(na, nb) / maxLen;
+    }
+
+    const SIM_THRESHOLD = 0.80; // ≥80% similar → suspected duplicate
+
+    /** Group shoes into suspect clusters */
+    function groupDuplicates(shoes) {
+      const groups = [];
+      const assigned = new Set();
+
+      for (let i = 0; i < shoes.length; i++) {
+        if (assigned.has(i)) continue;
+        const group = [shoes[i]];
+        assigned.add(i);
+
+        for (let j = i + 1; j < shoes.length; j++) {
+          if (assigned.has(j)) continue;
+          if (
+            shoes[i].brand_name.toLowerCase() === shoes[j].brand_name.toLowerCase() &&
+            similarity(shoes[i].model_name, shoes[j].model_name) >= SIM_THRESHOLD
+          ) {
+            group.push(shoes[j]);
+            assigned.add(j);
+          }
+        }
+
+        if (group.length >= 2) groups.push(group);
+      }
+      return groups;
+    }
+
+    /* ── Data fetching ── */
+
+    async function loadDuplicates() {
+      dupLoaded = true;
+      const container = document.getElementById('dup-list');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Scanning for duplicates…</p></div>';
+      document.getElementById('dup-group-count').textContent = '—';
+
+      try {
+        if (!supabaseClient) throw new Error('Supabase not initialised');
+
+        const { data: shoes, error } = await supabaseClient
+          .from('master_shoe_products')
+          .select('id, brand_name, model_name, image_url, created_at')
+          .order('brand_name')
+          .order('model_name');
+
+        if (error) throw error;
+
+        /* Also fetch cheapest deal per product for price display */
+        const { data: deals } = await supabaseClient
+          .from('shoe_deals')
+          .select('master_product_id, price_cents, currency')
+          .eq('is_active', true)
+          .order('price_cents');
+
+        const cheapestDeal = {};
+        (deals || []).forEach(d => {
+          if (!cheapestDeal[d.master_product_id]) cheapestDeal[d.master_product_id] = d;
+        });
+
+        const groups = groupDuplicates(shoes);
+        renderDuplicates(groups, cheapestDeal);
+      } catch (err) {
+        console.error('Dup load error:', err);
+        container.innerHTML = `<div class="dup-empty"><div class="dup-empty-icon">⚠️</div><p>Error: ${escapeHtml(err.message)}</p></div>`;
+        showToast('Error loading duplicates: ' + err.message, 'error');
+      }
+    }
+
+    /* ── Rendering ── */
+
+    function renderDuplicates(groups, cheapestDeal) {
+      const container = document.getElementById('dup-list');
+      const badge = document.getElementById('dup-group-count');
+
+      if (groups.length === 0) {
+        badge.textContent = '0';
+        badge.style.background = '#10b981';
+        container.innerHTML = `
+          <div class="dup-empty">
+            <div class="dup-empty-icon">✅</div>
+            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">No duplicates found</p>
+            <p>All ${escapeHtml(String(document.title))} shoe records appear to be unique.</p>
+          </div>`;
+        return;
+      }
+
+      badge.textContent = groups.length;
+      badge.style.background = '#ef4444';
+
+      container.innerHTML = groups.map((group, gi) => {
+        const key = `group-${gi}`;
+        /* Default master = first shoe (oldest created_at) */
+        const defaultMaster = group.reduce((a, b) =>
+          new Date(a.created_at) < new Date(b.created_at) ? a : b
+        );
+        dupState[key] = { shoes: group, masterId: defaultMaster.id };
+
+        const cardsHtml = group.map(shoe => {
+          const isMaster = shoe.id === defaultMaster.id;
+          const deal = cheapestDeal[shoe.id];
+          const priceStr = deal
+            ? `${deal.currency} ${(deal.price_cents / 100).toFixed(2)}`
+            : 'No deals';
+          const img = shoe.image_url
+            ? `<img class="dup-card-img" src="${escapeHtml(shoe.image_url)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : '';
+          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}>👟</div>`;
+
+          return `
+            <div class="dup-card ${isMaster ? 'is-master' : ''}"
+                 id="card-${key}-${shoe.id}"
+                 onclick="selectMaster('${key}','${shoe.id}')">
+              ${isMaster ? '<div class="master-label">Master</div>' : ''}
+              <div class="dup-card-radio"></div>
+              ${img}${placeholder}
+              <div class="dup-card-body">
+                <div class="dup-card-name">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
+                <div class="dup-card-brand">${escapeHtml(shoe.brand_name)}</div>
+                <div class="dup-card-price">${escapeHtml(priceStr)}</div>
+                <div class="dup-card-id">${shoe.id}</div>
+              </div>
+            </div>`;
+        }).join('');
+
+        const dupCount = group.length - 1;
+        return `
+          <div class="dup-group" id="${key}">
+            <div class="dup-group-header">
+              <h3>${escapeHtml(group[0].brand_name)} — ${escapeHtml(group[0].model_name)}</h3>
+              <span>${group.length} variants · ${dupCount} to remove</span>
+            </div>
+            <div class="dup-cards">${cardsHtml}</div>
+            <div class="dup-group-footer">
+              <p>Click a card to set it as the master record. All child data (wear logs, deals, alerts) will be migrated.</p>
+              <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                🔀 Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    /* ── Interaction ── */
+
+    function selectMaster(groupKey, shoeId) {
+      const state = dupState[groupKey];
+      if (!state) return;
+      state.masterId = shoeId;
+
+      state.shoes.forEach(shoe => {
+        const card = document.getElementById(`card-${groupKey}-${shoe.id}`);
+        if (!card) return;
+        const isMaster = shoe.id === shoeId;
+        card.classList.toggle('is-master', isMaster);
+
+        /* Update master label */
+        const existing = card.querySelector('.master-label');
+        if (isMaster && !existing) {
+          const label = document.createElement('div');
+          label.className = 'master-label';
+          label.textContent = 'Master';
+          card.prepend(label);
+        } else if (!isMaster && existing) {
+          existing.remove();
+        }
+      });
+    }
+
+    async function mergeDuplicates(groupKey) {
+      const state = dupState[groupKey];
+      if (!state) return;
+
+      const duplicates = state.shoes.filter(s => s.id !== state.masterId);
+      if (!duplicates.length) { showToast('No duplicates to merge', 'error'); return; }
+
+      const masterName = state.shoes.find(s => s.id === state.masterId);
+      const masterLabel = masterName
+        ? `${masterName.brand_name} ${masterName.model_name}`
+        : state.masterId;
+
+      if (!confirm(`Keep "${masterLabel}" as master and delete ${duplicates.length} duplicate(s)? This cannot be undone.`)) return;
+
+      const btn = document.getElementById(`merge-btn-${groupKey}`);
+      btn.disabled = true;
+      btn.textContent = '⏳ Merging…';
+
+      let successCount = 0;
+      const errors = [];
+
+      for (const dup of duplicates) {
+        try {
+          const { data, error } = await supabaseClient.rpc('merge_duplicate_shoes', {
+            master_id:    state.masterId,
+            duplicate_id: dup.id
+          });
+          if (error) throw error;
+          if (!data) throw new Error('RPC returned false');
+          successCount++;
+        } catch (err) {
+          console.error('Merge error for', dup.id, err);
+          errors.push(`${dup.brand_name} ${dup.model_name}: ${err.message}`);
+        }
+      }
+
+      if (errors.length === 0) {
+        /* Optimistic removal */
+        const groupEl = document.getElementById(groupKey);
+        if (groupEl) {
+          groupEl.style.transition = 'opacity 0.3s, max-height 0.4s';
+          groupEl.style.opacity = '0';
+          setTimeout(() => groupEl.remove(), 350);
+        }
+        delete dupState[groupKey];
+
+        /* Update badge */
+        const remaining = Object.keys(dupState).length;
+        const badge = document.getElementById('dup-group-count');
+        badge.textContent = remaining;
+        if (remaining === 0) {
+          badge.style.background = '#10b981';
+          document.getElementById('dup-list').innerHTML = `
+            <div class="dup-empty">
+              <div class="dup-empty-icon">✅</div>
+              <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
+              <p>Great work — the catalog is clean.</p>
+            </div>`;
+        }
+        showToast(`Merged ${successCount} duplicate${successCount > 1 ? 's' : ''} into master`, 'success');
+      } else {
+        btn.disabled = false;
+        btn.textContent = `🔀 Retry merge`;
+        showToast(`${errors.length} merge(s) failed: ${errors[0]}`, 'error');
+      }
     }
   </script>
 </body>
