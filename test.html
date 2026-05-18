@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>Admin Test</h1>
+  <input type="password" id="pwd" placeholder="Password">
+  <button onclick="doLogin()">Login</button>
+  <div id="error" style="color:red;display:none">Wrong password</div>
+  
+  <script>
+    console.log('Script loaded');
+    const ADMIN_PASSWORD = 'TreadLeft2024!';
+    
+    function doLogin() {
+      console.log('doLogin called');
+      const pwd = document.getElementById('pwd').value;
+      if (pwd === ADMIN_PASSWORD) {
+        alert('Success!');
+      } else {
+        document.getElementById('error').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
