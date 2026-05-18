@@ -382,6 +382,7 @@
   </div>
 
   <script>
+    console.log('Script starting...');
     // Configuration - UPDATE THESE VALUES
     const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMjY0MDAsImV4cCI6MjA0OTYwMjQwMH0.XdJrRrOluCT31PQbqGttJmZ0MBXjhWpYXsTNduwEePw';
@@ -420,7 +421,7 @@
     });
 
     function login() {
-      console.log('Login clicked');
+      console.log('Login function called');
       const password = document.getElementById('password').value;
       console.log('Password entered:', password ? 'yes' : 'no');
       
