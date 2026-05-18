@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TreadLeft - Shoe Discovery Review</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -281,11 +280,9 @@
     const ADMIN_PASSWORD = 'TreadLeft2024!';
     const ADMIN_TOKEN = 'admin-secret-token-12345';
     
-    let sb;
     let pendingData = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       if (sessionStorage.getItem('adminLoggedIn') === 'true') {
         showApp();
       }
@@ -318,14 +315,17 @@
 
     async function loadPending() {
       try {
-        console.log('Fetching data via Supabase...');
-        const { data, error } = await sb
-          .from('pending_shoe_discoveries')
-          .select('*')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        pendingData = data || [];
+        console.log('Fetching data via REST API...');
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/pending_shoe_discoveries?status=eq.pending&order=created_at.desc`, {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        pendingData = await response.json();
+        console.log('Loaded:', pendingData.length, 'items');
         renderShoes();
         updateStats();
       } catch (err) {
