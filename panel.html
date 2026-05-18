@@ -318,17 +318,19 @@
 
     async function loadPending() {
       try {
-        const { data, error } = await sb
-          .from('pending_shoe_discoveries')
-          .select('*')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        pendingData = data || [];
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list_pending', token: ADMIN_TOKEN })
+        });
+        const result = await response.json();
+        if (!result.success) throw new Error(result.message);
+        pendingData = result.discoveries || [];
         renderShoes();
         updateStats();
       } catch (err) {
         showToast('Error loading data: ' + err.message, 'error');
+        document.getElementById('shoe-list').innerHTML = '<div class="empty"><p>Error loading data</p><p style="font-size: 12px;">' + err.message + '</p></div>';
       }
     }
 
