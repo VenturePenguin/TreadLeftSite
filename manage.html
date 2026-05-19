@@ -888,6 +888,107 @@
     .brand-result-box.ok    { background: #d1fae5; color: #065f46; display: block; }
     .brand-result-box.error { background: #fee2e2; color: #991b1b; display: block; }
 
+    /* ── Deal Engine Monitor ── */
+    .deal-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 700px) { .deal-metric-grid { grid-template-columns: 1fr; } }
+    .deal-metric-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .deal-metric-icon {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .deal-metric-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e293b;
+      line-height: 1;
+    }
+    .deal-metric-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .deal-metric-val.orange { color: #f97316; }
+    .deal-metric-val.green  { color: #10b981; }
+    .deal-metric-val.blue   { color: #3b82f6; }
+    .deal-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .deal-table-wrap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .deal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .deal-table th {
+      text-align: left;
+      padding: 9px 14px;
+      font-size: 11px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+      white-space: nowrap;
+    }
+    .deal-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f8fafc;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+    .deal-table tbody tr:last-child td { border-bottom: none; }
+    .deal-table tbody tr:hover td { background: #fafafa; }
+    .deal-shoe-thumb {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+    }
+    .deal-shoe-thumb-placeholder {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .deal-discount-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .deal-discount-pill.hot { background: #fee2e2; color: #991b1b; }
+    .deal-discount-pill.warm { background: #fef3c7; color: #92400e; }
+
     /* ── User Support Console ── */
     .support-search-bar {
       display: flex; gap: 10px; align-items: center;
@@ -1087,6 +1188,11 @@
       <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
         <span class="nav-icon">👤</span>
         User Support
+      </button>
+
+      <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
+        <span class="nav-icon">💰</span>
+        Deal Engine
       </button>
     </nav>
 
@@ -1395,6 +1501,88 @@
         </div>
       </div>
 
+      <!-- VIEW: Deal Engine Monitor -->
+      <div id="view-deal-engine" class="view">
+        <div class="view-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <h2>💰 Deal Engine Monitor</h2>
+          <button class="health-refresh-btn" onclick="fetchDealMetrics()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Refresh
+          </button>
+        </div>
+
+        <!-- Summary metric cards -->
+        <div class="deal-metric-grid">
+          <div class="deal-metric-card">
+            <div class="deal-metric-icon">📦</div>
+            <div>
+              <div class="deal-metric-val orange" id="dm-active-deals">&mdash;</div>
+              <div class="deal-metric-label">Active Deals (vs MSRP)</div>
+            </div>
+          </div>
+          <div class="deal-metric-card">
+            <div class="deal-metric-icon">🔔</div>
+            <div>
+              <div class="deal-metric-val blue" id="dm-alerts-today">&mdash;</div>
+              <div class="deal-metric-label">Alerts Triggered (last 24h)</div>
+            </div>
+          </div>
+          <div class="deal-metric-card">
+            <div class="deal-metric-icon">🔥</div>
+            <div>
+              <div class="deal-metric-val green" id="dm-deepest">&mdash;</div>
+              <div class="deal-metric-label">Deepest Discount Active</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table 1: Top Active Deals -->
+        <div class="deal-section-title">
+          <span>🏷️ Top Active Deals</span>
+          <span id="dm-deals-count" style="font-weight:400;color:#94a3b8;"></span>
+        </div>
+        <div class="deal-table-wrap">
+          <table class="deal-table">
+            <thead>
+              <tr>
+                <th>Shoe</th>
+                <th>Retailer</th>
+                <th>MSRP</th>
+                <th>Current Price</th>
+                <th>Discount</th>
+                <th>Last Updated</th>
+              </tr>
+            </thead>
+            <tbody id="dm-deals-tbody">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table 2: Recent User Alerts -->
+        <div class="deal-section-title">
+          <span>🔔 Recent User Alerts Triggered</span>
+          <span id="dm-alerts-count" style="font-weight:400;color:#94a3b8;"></span>
+        </div>
+        <div class="deal-table-wrap">
+          <table class="deal-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Shoe</th>
+                <th>Target Price</th>
+                <th>Currency</th>
+                <th>Alert Set</th>
+                <th>Last Alerted</th>
+              </tr>
+            </thead>
+            <tbody id="dm-alerts-tbody">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1483,6 +1671,10 @@
       if (viewId === 'brand-normalization' && !brandLoaded) {
         brandLoaded = true;
         loadBrands();
+      }
+      if (viewId === 'deal-engine' && !dealEngineLoaded) {
+        dealEngineLoaded = true;
+        fetchDealMetrics();
       }
     }
 
@@ -1678,6 +1870,149 @@
     /* ═══════════════════════════════════════════════════
        DUPLICATE DETECTOR
     ═══════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════
+       DEAL ENGINE MONITOR
+    ═══════════════════════════════════════════════════ */
+
+    let dealEngineLoaded = false;
+
+    function fmtCents(cents, currency) {
+      if (cents == null) return '—';
+      const sym = { USD:'$', GBP:'£', EUR:'€', AUD:'A$', CAD:'C$' }[currency] || (currency + ' ');
+      return sym + (cents / 100).toFixed(2);
+    }
+
+    function discountPct(price, msrp) {
+      if (!msrp || msrp <= 0) return null;
+      return Math.round(((msrp - price) / msrp) * 100);
+    }
+
+    function discountPillClass(pct) {
+      if (pct >= 30) return 'hot';
+      if (pct >= 15) return 'warm';
+      return '';
+    }
+
+    async function fetchDealMetrics() {
+      dealEngineLoaded = true;
+      /* Loading state */
+      const loadingRow = (cols) => `<tr><td colspan="${cols}" style="text-align:center;color:#94a3b8;padding:28px;"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</td></tr>`;
+      document.getElementById('dm-deals-tbody').innerHTML  = loadingRow(6);
+      document.getElementById('dm-alerts-tbody').innerHTML = loadingRow(6);
+      ['dm-active-deals','dm-alerts-today','dm-deepest'].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;display:inline-block;"></div>';
+      });
+
+      try {
+        const sb = getSupabase();
+        const yesterday = new Date(Date.now() - 864e5).toISOString();
+
+        /* Parallel queries */
+        const [dealsRes, alertsRes] = await Promise.all([
+
+          /* All active discounted deals, sorted by largest % drop */
+          sb.from('shoe_deals')
+            .select('id, price_cents, msrp_cents, currency, retailer_name, updated_at, master_shoe_products(brand_name, model_name, image_url)')
+            .eq('is_active', true)
+            .not('msrp_cents', 'is', null)
+            .gt('msrp_cents', 0)
+            .order('price_cents', { ascending: true })
+            .limit(100),  /* fetch 100, sort by discount % client-side */
+
+          /* Triggered alerts: is_active=false + last_alerted_at set, most recent 20 */
+          sb.from('user_price_alerts')
+            .select('id, target_price_cents, currency, created_at, last_alerted_at, master_shoe_products(brand_name, model_name), users(email, first_name, last_name)')
+            .not('last_alerted_at', 'is', null)
+            .order('last_alerted_at', { ascending: false })
+            .limit(20),
+        ]);
+
+        if (dealsRes.error)  throw dealsRes.error;
+        if (alertsRes.error) throw alertsRes.error;
+
+        /* ─ Process deals ─ */
+        const allDeals = (dealsRes.data || [])
+          .filter(d => d.price_cents < d.msrp_cents)
+          .map(d => ({ ...d, pct: discountPct(d.price_cents, d.msrp_cents) }))
+          .sort((a, b) => b.pct - a.pct);
+
+        const topDeals   = allDeals.slice(0, 20);
+        const deepest    = allDeals[0]?.pct ?? null;
+
+        /* ─ Process alerts ─ */
+        const allAlerts  = alertsRes.data || [];
+        const alertsToday = allAlerts.filter(a => a.last_alerted_at >= yesterday).length;
+
+        /* ─ Update metric cards ─ */
+        document.getElementById('dm-active-deals').textContent  = allDeals.length;
+        document.getElementById('dm-alerts-today').textContent  = alertsToday;
+        document.getElementById('dm-deepest').textContent       = deepest != null ? deepest + '%' : '—';
+
+        /* ─ Render deals table ─ */
+        document.getElementById('dm-deals-count').textContent = `· ${topDeals.length} of ${allDeals.length} shown`;
+        if (topDeals.length === 0) {
+          document.getElementById('dm-deals-tbody').innerHTML =
+            '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
+        } else {
+          document.getElementById('dm-deals-tbody').innerHTML = topDeals.map(d => {
+            const prod  = d.master_shoe_products;
+            const name  = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
+            const thumb = prod?.image_url
+              ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
+              : `<div class="deal-shoe-thumb-placeholder">👟</div>`;
+            const pillCls = discountPillClass(d.pct);
+            return `<tr>
+              <td style="display:flex;align-items:center;gap:10px;">
+                ${thumb}
+                <span style="font-weight:500;">${escapeHtml(name)}</span>
+              </td>
+              <td>${escapeHtml(d.retailer_name)}</td>
+              <td style="color:#94a3b8;text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
+              <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
+              <td><span class="deal-discount-pill ${pillCls}">↓${d.pct}%</span></td>
+              <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
+            </tr>`;
+          }).join('');
+        }
+
+        /* ─ Render alerts table ─ */
+        document.getElementById('dm-alerts-count').textContent = `· ${allAlerts.length} shown`;
+        if (allAlerts.length === 0) {
+          document.getElementById('dm-alerts-tbody').innerHTML =
+            '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No triggered alerts found.</td></tr>';
+        } else {
+          document.getElementById('dm-alerts-tbody').innerHTML = allAlerts.map(a => {
+            const prod   = a.master_shoe_products;
+            const shoeName = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
+            const user   = a.users;
+            const userLabel = user?.email
+              ? escapeHtml(user.email)
+              : user?.first_name
+              ? escapeHtml(`${user.first_name} ${user.last_name||''}`.trim())
+              : `<span style="color:#94a3b8;font-family:monospace;font-size:11px;">${escapeHtml(a.id.slice(0,8))}…</span>`;
+            const isToday = a.last_alerted_at >= yesterday;
+            return `<tr>
+              <td>${userLabel}</td>
+              <td style="font-weight:500;">${escapeHtml(shoeName)}</td>
+              <td style="font-weight:600;color:#10b981;">${fmtCents(a.target_price_cents, a.currency)}</td>
+              <td style="color:#64748b;">${escapeHtml(a.currency || 'USD')}</td>
+              <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(fmtDateTime(a.created_at))}</td>
+              <td style="white-space:nowrap;">
+                <span style="font-size:12px;">${escapeHtml(fmtDateTime(a.last_alerted_at))}</span>
+                ${isToday ? '<span style="margin-left:5px;font-size:10px;background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:10px;font-weight:600;">TODAY</span>' : ''}
+              </td>
+            </tr>`;
+          }).join('');
+        }
+
+      } catch(err) {
+        ['dm-deals-tbody','dm-alerts-tbody'].forEach(id => {
+          document.getElementById(id).innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:28px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        });
+        showToast('Deal Engine error: ' + err.message, 'error');
+      }
+    }
 
     /* ═══════════════════════════════════════════════════
        USER SUPPORT CONSOLE
