@@ -743,6 +743,151 @@
       font-weight: 500;
     }
 
+    /* ── Brand Normalization ── */
+    .brand-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 780px) {
+      .brand-layout { grid-template-columns: 1fr; }
+    }
+    .brand-list-panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .brand-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .brand-list-header span { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .brand-search {
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      background: #fff;
+    }
+    .brand-search:focus { background: #fffbf7; }
+    .brand-scroll {
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f8fafc;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .brand-row:last-child { border-bottom: none; }
+    .brand-row:hover { background: #fafafa; }
+    .brand-row.selected { background: #fff7ed; }
+    .brand-row input[type=checkbox] { accent-color: #f97316; width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+    .brand-row-name { flex: 1; font-size: 13px; color: #1e293b; font-weight: 500; }
+    .brand-row-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .brand-action-panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 22px;
+      position: sticky;
+      top: 20px;
+    }
+    .brand-action-panel h3 { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+    .brand-action-panel p  { font-size: 12px; color: #64748b; margin-bottom: 18px; line-height: 1.5; }
+    .brand-selected-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 36px;
+      padding: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #c2410c;
+    }
+    .brand-chip-remove {
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .brand-chip-remove:hover { opacity: 1; }
+    .brand-chips-placeholder { font-size: 12px; color: #cbd5e1; padding: 2px 4px; }
+    .brand-master-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .brand-master-input:focus { border-color: #f97316; }
+    .brand-normalize-btn {
+      width: 100%;
+      padding: 11px;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .brand-normalize-btn:hover:not(:disabled) { background: #ea6c0a; }
+    .brand-normalize-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .brand-result-box {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      display: none;
+    }
+    .brand-result-box.ok    { background: #d1fae5; color: #065f46; display: block; }
+    .brand-result-box.error { background: #fee2e2; color: #991b1b; display: block; }
+
     /* Shared utilities */
     .empty { text-align: center; padding: 60px 20px; color: #64748b; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
@@ -832,6 +977,13 @@
         <span class="nav-icon">🚴</span>
         Strava Sync Monitor
         <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">Data Quality</div>
+
+      <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
+        <span class="nav-icon">🏷️</span>
+        Brand Normalization
       </button>
     </nav>
 
@@ -1002,6 +1154,61 @@
         </div>
       </div>
 
+      <!-- VIEW: Brand Normalization -->
+      <div id="view-brand-normalization" class="view">
+        <div class="view-header">
+          <h2>🏷️ Brand Normalization</h2>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <p style="font-size:13px;color:#64748b;margin:0;">Check messy aliases on the left, type the canonical name on the right, then normalize.</p>
+          <button class="health-refresh-btn" onclick="loadBrands()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="brand-layout">
+          <!-- Left: brand list -->
+          <div class="brand-list-panel">
+            <div class="brand-list-header">
+              <span id="brand-list-title">All Brands</span>
+              <span id="brand-list-meta" style="color:#94a3b8;"></span>
+            </div>
+            <input class="brand-search" id="brand-search" type="text" placeholder="Search brands…" oninput="filterBrands()">
+            <div class="brand-scroll" id="brand-scroll">
+              <div class="loading"><div class="spinner"></div><p>Loading brands…</p></div>
+            </div>
+          </div>
+
+          <!-- Right: action panel -->
+          <div class="brand-action-panel">
+            <h3>Normalize Selected</h3>
+            <p>Select one or more aliases from the list, then enter the canonical brand name to replace them all.</p>
+
+            <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Selected Aliases</div>
+            <div class="brand-selected-chips" id="brand-chips">
+              <span class="brand-chips-placeholder">No brands selected</span>
+            </div>
+
+            <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Master Brand Name</div>
+            <input
+              class="brand-master-input"
+              id="brand-master-input"
+              type="text"
+              placeholder="e.g. ASICS"
+              oninput="updateNormalizeBtn()"
+            >
+
+            <button class="brand-normalize-btn" id="brand-normalize-btn" onclick="normalizeBrands()" disabled>
+              Normalize Selected
+            </button>
+
+            <div class="brand-result-box" id="brand-result-box"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1086,6 +1293,10 @@
       if (viewId === 'strava-monitor' && !syncLoaded) {
         syncLoaded = true;
         fetchWebhookLogs();
+      }
+      if (viewId === 'brand-normalization' && !brandLoaded) {
+        brandLoaded = true;
+        loadBrands();
       }
     }
 
@@ -1281,6 +1492,168 @@
     /* ═══════════════════════════════════════════════════
        DUPLICATE DETECTOR
     ═══════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════
+       BRAND NORMALIZATION
+    ═══════════════════════════════════════════════════ */
+
+    let brandLoaded  = false;
+    let brandAllRows = [];     /* [{ brand_name, count }] */
+    let brandSelected = new Set(); /* selected brand_name strings */
+
+    async function loadBrands() {
+      brandLoaded = true;
+      const scroll = document.getElementById('brand-scroll');
+      scroll.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading brands…</p></div>';
+      brandSelected.clear();
+      renderChips();
+      updateNormalizeBtn();
+
+      try {
+        const sb = getSupabase();
+        /* Fetch every brand_name from master_shoe_products, group by brand */
+        const { data, error } = await sb
+          .from('master_shoe_products')
+          .select('brand_name');
+
+        if (error) throw error;
+
+        /* Count occurrences client-side */
+        const counts = {};
+        (data || []).forEach(r => {
+          const b = r.brand_name?.trim() || '(unknown)';
+          counts[b] = (counts[b] || 0) + 1;
+        });
+
+        brandAllRows = Object.entries(counts)
+          .map(([brand_name, count]) => ({ brand_name, count }))
+          .sort((a, b) => a.brand_name.localeCompare(b.brand_name));
+
+        document.getElementById('brand-list-meta').textContent = `${brandAllRows.length} brands`;
+        renderBrandList(brandAllRows);
+      } catch (err) {
+        scroll.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>${escapeHtml(err.message)}</p></div>`;
+        showToast('Error loading brands: ' + err.message, 'error');
+      }
+    }
+
+    function filterBrands() {
+      const q = document.getElementById('brand-search').value.toLowerCase();
+      const filtered = q ? brandAllRows.filter(r => r.brand_name.toLowerCase().includes(q)) : brandAllRows;
+      renderBrandList(filtered);
+    }
+
+    function renderBrandList(rows) {
+      const scroll = document.getElementById('brand-scroll');
+      if (rows.length === 0) {
+        scroll.innerHTML = '<div class="empty"><p>No brands match.</p></div>';
+        return;
+      }
+      scroll.innerHTML = rows.map(r => {
+        const checked = brandSelected.has(r.brand_name);
+        return `
+          <label class="brand-row${checked ? ' selected' : ''}" data-brand="${escapeHtml(r.brand_name)}">
+            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleBrand('${escapeHtml(r.brand_name.replace(/'/g, "\\'"))}', this.checked)">
+            <span class="brand-row-name">${escapeHtml(r.brand_name)}</span>
+            <span class="brand-row-count">${r.count} shoe${r.count !== 1 ? 's' : ''}</span>
+          </label>`;
+      }).join('');
+    }
+
+    function toggleBrand(name, checked) {
+      if (checked) brandSelected.add(name);
+      else         brandSelected.delete(name);
+
+      /* Update row highlight without full re-render */
+      document.querySelectorAll('.brand-row').forEach(el => {
+        if (el.dataset.brand === name) el.classList.toggle('selected', checked);
+      });
+
+      /* Auto-fill master input when exactly one brand is selected */
+      if (brandSelected.size === 1) {
+        const input = document.getElementById('brand-master-input');
+        if (!input.value) input.value = [...brandSelected][0];
+      }
+
+      renderChips();
+      updateNormalizeBtn();
+    }
+
+    function renderChips() {
+      const container = document.getElementById('brand-chips');
+      if (brandSelected.size === 0) {
+        container.innerHTML = '<span class="brand-chips-placeholder">No brands selected</span>';
+        return;
+      }
+      container.innerHTML = [...brandSelected].map(name => `
+        <span class="brand-chip">
+          ${escapeHtml(name)}
+          <span class="brand-chip-remove" onclick="removeChip('${escapeHtml(name.replace(/'/g, "\\'"))}')">&times;</span>
+        </span>`).join('');
+    }
+
+    function removeChip(name) {
+      brandSelected.delete(name);
+      /* Uncheck the checkbox if visible */
+      document.querySelectorAll('.brand-row').forEach(el => {
+        if (el.dataset.brand === name) {
+          el.classList.remove('selected');
+          const cb = el.querySelector('input[type=checkbox]');
+          if (cb) cb.checked = false;
+        }
+      });
+      renderChips();
+      updateNormalizeBtn();
+    }
+
+    function updateNormalizeBtn() {
+      const master = document.getElementById('brand-master-input').value.trim();
+      const btn = document.getElementById('brand-normalize-btn');
+      btn.disabled = brandSelected.size === 0 || !master;
+    }
+
+    async function normalizeBrands() {
+      const master = document.getElementById('brand-master-input').value.trim();
+      const aliases = [...brandSelected];
+      if (!aliases.length || !master) return;
+
+      const btn = document.getElementById('brand-normalize-btn');
+      const resultBox = document.getElementById('brand-result-box');
+      btn.disabled = true;
+      btn.textContent = 'Normalizing…';
+      resultBox.className = 'brand-result-box';
+
+      try {
+        const sb = getSupabase();
+        const { data, error } = await sb
+          .rpc('normalize_brand_name', { aliases, master_name: master });
+
+        if (error) throw error;
+
+        const updated = data ?? 0;
+        resultBox.className = 'brand-result-box ok';
+        resultBox.textContent = `✓ ${updated} row${updated !== 1 ? 's' : ''} updated — "${aliases.join('", "')}" → "${master}"`;
+
+        showToast(`Normalized ${updated} rows to "${master}"`, 'success');
+
+        /* Reset selection & reload list */
+        brandSelected.clear();
+        document.getElementById('brand-master-input').value = '';
+        document.getElementById('brand-search').value = '';
+        renderChips();
+        updateNormalizeBtn();
+        loadBrands();
+
+      } catch (err) {
+        resultBox.className = 'brand-result-box error';
+        resultBox.textContent = '⚠️ ' + err.message;
+        showToast('Normalization failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Normalize Selected';
+        updateNormalizeBtn();
+      }
+    }
 
     /* ═══════════════════════════════════════════════════
        STRAVA SYNC MONITOR
