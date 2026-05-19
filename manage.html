@@ -888,6 +888,102 @@
     .brand-result-box.ok    { background: #d1fae5; color: #065f46; display: block; }
     .brand-result-box.error { background: #fee2e2; color: #991b1b; display: block; }
 
+    /* ── User Support Console ── */
+    .support-search-bar {
+      display: flex; gap: 10px; align-items: center;
+      margin-bottom: 24px;
+    }
+    .support-search-input {
+      flex: 1;
+      padding: 11px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #fff;
+    }
+    .support-search-input:focus { border-color: #f97316; }
+    .support-search-btn {
+      padding: 11px 22px;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .support-search-btn:hover:not(:disabled) { background: #ea6c0a; }
+    .support-search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .support-results { display: none; }
+    .support-results.visible { display: block; }
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .support-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .support-card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .support-card-header-icon { font-size: 18px; }
+    .support-card-title { font-size: 13px; font-weight: 700; color: #1e293b; }
+    .support-card-body { padding: 16px; }
+    .support-kv { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .support-kv:last-child { margin-bottom: 0; }
+    .support-kv-label { color: #94a3b8; font-weight: 500; min-width: 110px; flex-shrink: 0; }
+    .support-kv-val   { color: #1e293b; word-break: break-all; }
+    .support-kv-val.mono { font-family: monospace; font-size: 12px; }
+    .support-kv-val.pill-ok    { color: #065f46; background: #d1fae5; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .support-kv-val.pill-worn  { color: #92400e; background: #fef3c7; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .support-kv-val.pill-dead  { color: #991b1b; background: #fee2e2; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .support-full-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .support-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .support-table th {
+      text-align: left; padding: 9px 14px;
+      font-size: 11px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .support-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f8fafc;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+    .support-table tbody tr:last-child td { border-bottom: none; }
+    .support-table tbody tr:hover td { background: #fafafa; }
+    .support-not-found {
+      text-align: center;
+      padding: 48px 20px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
     /* Shared utilities */
     .empty { text-align: center; padding: 60px 20px; color: #64748b; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
@@ -984,6 +1080,13 @@
       <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
         <span class="nav-icon">🏷️</span>
         Brand Normalization
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">Support</div>
+
+      <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
+        <span class="nav-icon">👤</span>
+        User Support
       </button>
     </nav>
 
@@ -1205,6 +1308,89 @@
             </button>
 
             <div class="brand-result-box" id="brand-result-box"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: User Support Console -->
+      <div id="view-user-support" class="view">
+        <div class="view-header">
+          <h2>👤 User Support Console</h2>
+        </div>
+
+        <!-- Search -->
+        <div class="support-search-bar">
+          <input
+            class="support-search-input"
+            id="support-search-input"
+            type="text"
+            placeholder="Email address or Strava Athlete ID…"
+            onkeydown="if(event.key==='Enter') lookupUser()"
+          >
+          <button class="support-search-btn" id="support-search-btn" onclick="lookupUser()">
+            🔍 Look Up User
+          </button>
+        </div>
+
+        <!-- Results (hidden until search) -->
+        <div id="support-results" class="support-results">
+
+          <!-- Not-found state -->
+          <div id="support-not-found" class="support-not-found" style="display:none;">
+            <div style="font-size:40px;margin-bottom:12px;">🕵️</div>
+            No user found matching that email or Athlete ID.
+          </div>
+
+          <!-- Cards row -->
+          <div id="support-cards" style="display:none;">
+            <div class="support-grid">
+
+              <!-- Card 1: Profile -->
+              <div class="support-card">
+                <div class="support-card-header">
+                  <span class="support-card-header-icon">👤</span>
+                  <span class="support-card-title">User Profile</span>
+                </div>
+                <div class="support-card-body" id="sc-profile">
+                  <div class="loading"><div class="spinner"></div></div>
+                </div>
+              </div>
+
+              <!-- Card 2: Active Rotation -->
+              <div class="support-card">
+                <div class="support-card-header">
+                  <span class="support-card-header-icon">👟</span>
+                  <span class="support-card-title">Active Rotation</span>
+                </div>
+                <div class="support-card-body" id="sc-rotation">
+                  <div class="loading"><div class="spinner"></div></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Card 3: Recent Activity Log -->
+            <div class="support-full-card">
+              <div class="support-card-header">
+                <span class="support-card-header-icon">🏃</span>
+                <span class="support-card-title">Recent Activity Log <span id="sc-act-count" style="font-weight:400;color:#94a3b8;"></span></span>
+              </div>
+              <div id="sc-activities">
+                <div class="loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+
+            <!-- Card 4: Webhook Audit Trail -->
+            <div class="support-full-card">
+              <div class="support-card-header">
+                <span class="support-card-header-icon">📡</span>
+                <span class="support-card-title">Webhook Audit Trail <span id="sc-wh-count" style="font-weight:400;color:#94a3b8;"></span></span>
+              </div>
+              <div id="sc-webhooks">
+                <div class="loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1492,6 +1678,202 @@
     /* ═══════════════════════════════════════════════════
        DUPLICATE DETECTOR
     ═══════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════
+       USER SUPPORT CONSOLE
+    ═══════════════════════════════════════════════════ */
+
+    function fmtDist(metres) {
+      if (metres == null) return '—';
+      return (metres / 1000).toFixed(1) + ' km';
+    }
+
+    function fmtMinSec(seconds) {
+      if (!seconds) return '—';
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}m ${String(s).padStart(2,'0')}s`;
+    }
+
+    function wearPill(current, max) {
+      const pct = max ? Math.round((current / max) * 100) : 0;
+      const cls = pct >= 100 ? 'pill-dead' : pct >= 80 ? 'pill-worn' : 'pill-ok';
+      return `<span class="support-kv-val ${cls}">${pct}%</span>`;
+    }
+
+    function weeksLeft(current, max) {
+      if (!max || current >= max) return '—';
+      const weeklyKm = 40; /* rough average */
+      const remaining = (max - current) / 1000;
+      const weeks = Math.round(remaining / weeklyKm);
+      return `~${weeks}w`;
+    }
+
+    async function lookupUser() {
+      const query = document.getElementById('support-search-input').value.trim();
+      if (!query) return;
+
+      const btn = document.getElementById('support-search-btn');
+      btn.disabled = true;
+      btn.textContent = 'Looking up…';
+
+      /* Show results area, reset state */
+      const results = document.getElementById('support-results');
+      results.classList.add('visible');
+      document.getElementById('support-not-found').style.display = 'none';
+      const cards = document.getElementById('support-cards');
+      cards.style.display = 'none';
+
+      /* Reset card bodies to loading spinners */
+      ['sc-profile','sc-rotation'].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      });
+      ['sc-activities','sc-webhooks'].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      });
+
+      try {
+        const sb = getSupabase();
+
+        /* Step 1: resolve user by email OR strava_athlete_id */
+        const isAthleteId = /^\d+$/.test(query);
+        const userQuery = isAthleteId
+          ? sb.from('users').select('id,email,first_name,last_name,avatar_url,strava_athlete_id,preferred_units,created_at,strava_tokens').eq('strava_athlete_id', query).maybeSingle()
+          : sb.from('users').select('id,email,first_name,last_name,avatar_url,strava_athlete_id,preferred_units,created_at,strava_tokens').ilike('email', query).maybeSingle();
+
+        const { data: user, error: userErr } = await userQuery;
+
+        if (userErr) throw userErr;
+        if (!user) {
+          document.getElementById('support-not-found').style.display = 'block';
+          return;
+        }
+
+        cards.style.display = 'block';
+
+        /* Step 2: parallel fetch of all card data */
+        const [gearRes, actRes, whRes] = await Promise.all([
+
+          /* Rotation: active shoes with product join */
+          sb.from('user_gear_items')
+            .select('id,nickname,current_distance,true_wear_distance,max_distance_limit,is_active,master_shoe_products(brand_name,model_name)')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('current_distance', { ascending: false })
+            .limit(10),
+
+          /* Activity log: last 10 */
+          sb.from('user_activities')
+            .select('id,name,type,start_date,distance,true_wear_distance,moving_time,total_elevation_gain')
+            .eq('user_id', user.id)
+            .order('start_date', { ascending: false })
+            .limit(10),
+
+          /* Webhook audit trail: last 10 by athlete ID */
+          user.strava_athlete_id
+            ? sb.from('strava_webhook_logs')
+                .select('id,created_at,object_type,aspect_type,object_id,status,error_message')
+                .eq('owner_id', user.strava_athlete_id)
+                .order('created_at', { ascending: false })
+                .limit(10)
+            : Promise.resolve({ data: [], error: null }),
+        ]);
+
+        /* ─ Card 1: Profile ─ */
+        const lastSync = user.strava_tokens?.expires_at
+          ? fmtDateTime(new Date(user.strava_tokens.expires_at * 1000).toISOString())
+          : '—';
+        const totalDist = actRes.data
+          ? actRes.data.reduce((s, a) => s + (a.distance || 0), 0)
+          : 0;
+        document.getElementById('sc-profile').innerHTML = `
+          <div class="support-kv"><span class="support-kv-label">Name</span><span class="support-kv-val">${escapeHtml((user.first_name||'') + ' ' + (user.last_name||'')) || '—'}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Email</span><span class="support-kv-val">${escapeHtml(user.email || '—')}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Athlete ID</span><span class="support-kv-val mono">${escapeHtml(user.strava_athlete_id || '—')}</span></div>
+          <div class="support-kv"><span class="support-kv-label">User UUID</span><span class="support-kv-val mono" style="font-size:11px;">${escapeHtml(user.id)}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Units</span><span class="support-kv-val">${escapeHtml(user.preferred_units || 'km')}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Token Expiry</span><span class="support-kv-val">${escapeHtml(lastSync)}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Total Distance</span><span class="support-kv-val">${fmtDist(totalDist)} (last 10 runs)</span></div>
+          <div class="support-kv"><span class="support-kv-label">Member Since</span><span class="support-kv-val">${escapeHtml(fmtDateTime(user.created_at))}</span></div>`;
+
+        /* ─ Card 2: Rotation ─ */
+        if (gearRes.error) throw gearRes.error;
+        const shoes = gearRes.data || [];
+        if (shoes.length === 0) {
+          document.getElementById('sc-rotation').innerHTML = '<p style="color:#94a3b8;font-size:13px;">No active shoes.</p>';
+        } else {
+          document.getElementById('sc-rotation').innerHTML = shoes.map(s => {
+            const product = s.master_shoe_products;
+            const name = s.nickname || (product ? `${product.brand_name} ${product.model_name}` : 'Unknown');
+            const wear = s.true_wear_distance ?? s.current_distance ?? 0;
+            return `
+              <div class="support-kv"><span class="support-kv-label" style="max-width:none;flex:1;">${escapeHtml(name)}</span>${wearPill(wear, s.max_distance_limit)}</div>
+              <div class="support-kv" style="padding-left:0;margin-bottom:12px;">
+                <span class="support-kv-label">True wear</span>
+                <span class="support-kv-val">${fmtDist(wear)} / ${fmtDist(s.max_distance_limit)} · ${weeksLeft(wear, s.max_distance_limit)} left</span>
+              </div>`;
+          }).join('');
+        }
+
+        /* ─ Card 3: Activities ─ */
+        if (actRes.error) throw actRes.error;
+        const acts = actRes.data || [];
+        document.getElementById('sc-act-count').textContent = `· ${acts.length} shown`;
+        if (acts.length === 0) {
+          document.getElementById('sc-activities').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No activities found.</p>';
+        } else {
+          document.getElementById('sc-activities').innerHTML = `
+            <table class="support-table">
+              <thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Raw Dist</th><th>True Wear</th><th>Time</th><th>Elev</th></tr></thead>
+              <tbody>${acts.map(a => `
+                <tr>
+                  <td style="white-space:nowrap;">${escapeHtml(fmtDateTime(a.start_date))}</td>
+                  <td>${escapeHtml(a.name || '—')}</td>
+                  <td><span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:600;">${escapeHtml(a.type || '—')}</span></td>
+                  <td>${fmtDist(a.distance)}</td>
+                  <td>${fmtDist(a.true_wear_distance)}</td>
+                  <td style="white-space:nowrap;">${fmtMinSec(a.moving_time)}</td>
+                  <td>${a.total_elevation_gain != null ? Math.round(a.total_elevation_gain) + 'm' : '—'}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>`;
+        }
+
+        /* ─ Card 4: Webhooks ─ */
+        const whs = whRes.data || [];
+        document.getElementById('sc-wh-count').textContent = `· ${whs.length} shown`;
+        if (!user.strava_athlete_id) {
+          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No Strava Athlete ID — cannot query webhook logs.</p>';
+        } else if (whs.length === 0) {
+          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No webhook events found for this athlete.</p>';
+        } else {
+          document.getElementById('sc-webhooks').innerHTML = `
+            <table class="support-table">
+              <thead><tr><th>Timestamp</th><th>Event</th><th>Object ID</th><th>Status</th><th>Error</th></tr></thead>
+              <tbody>${whs.map(w => {
+                const statusCls = w.status === 'ok' ? 'ok' : w.status === 'error' ? 'error' : 'unknown';
+                return `<tr>
+                  <td style="white-space:nowrap;font-size:12px;">${escapeHtml(fmtDateTime(w.created_at))}<br><span style="color:#94a3b8;font-size:11px;">${escapeHtml(timeAgo(w.created_at))}</span></td>
+                  <td><span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:600;">${escapeHtml((w.object_type||'') + '.' + (w.aspect_type||''))}</span></td>
+                  <td style="font-family:monospace;font-size:12px;">${escapeHtml(w.object_id || '—')}</td>
+                  <td><span class="sync-badge ${statusCls}">${w.status === 'ok' ? '✓ OK' : w.status === 'error' ? '✕ Error' : w.status}</span></td>
+                  <td style="font-size:12px;color:#ef4444;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(w.error_message||'')}">${escapeHtml(w.error_message || '—')}</td>
+                </tr>`;
+              }).join('')}
+              </tbody>
+            </table>`;
+        }
+
+      } catch(err) {
+        document.getElementById('support-not-found').style.display = 'block';
+        document.getElementById('support-not-found').innerHTML = `<div style="font-size:32px;margin-bottom:10px;">⚠️</div>${escapeHtml(err.message)}`;
+        cards.style.display = 'none';
+        showToast('Lookup error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔍 Look Up User';
+      }
+    }
 
     /* ═══════════════════════════════════════════════════
        BRAND NORMALIZATION
