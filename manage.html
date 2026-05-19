@@ -1729,7 +1729,12 @@
             </div>
             <span class="confidence-badge ${shoe.confidence}">${shoe.confidence}</span>
           </div>
-          <div class="shoe-actions">
+          <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;">
+            <select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#1e293b;cursor:pointer;flex-shrink:0;">
+              <option value="EVA"   selected>🟡 EVA (Default)</option>
+              <option value="PEBAX"        >⚡ PEBAX (Supershoe)</option>
+              <option value="TPU"          >🔵 TPU (High Durability)</option>
+            </select>
             <button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>
             <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
             <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
@@ -1749,14 +1754,16 @@
     /* ── DISCOVERY QUEUE — ACTIONS ── */
     async function approveShoe(id) {
       setLoading(id, true);
+      const foamEl = document.getElementById(`foam-${id}`);
+      const foam_material = foamEl ? foamEl.value : 'EVA';
       try {
         const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'approve', discovery_id: id, token: ADMIN_TOKEN })
+          body: JSON.stringify({ action: 'approve', discovery_id: id, foam_material, token: ADMIN_TOKEN })
         });
         const result = await res.json();
-        if (result.success) { removeShoe(id); showToast('Shoe approved and added to database', 'success'); }
+        if (result.success) { removeShoe(id); showToast(`Shoe approved (${foam_material}) and added to database`, 'success'); }
         else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
