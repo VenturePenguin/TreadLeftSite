@@ -1143,14 +1143,15 @@
     <!-- Top Bar -->
     <div class="topbar">
       <div class="topbar-brand">
-        🟠 TreadLeft <span>/ Admin</span>
+        <img src="/favicon.png" alt="TreadLeft" style="width:22px;height:22px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.18);flex-shrink:0;">
+        TreadLeft <span>/ Admin</span>
       </div>
       <button class="logout-btn" onclick="doLogout()">Logout</button>
     </div>
 
     <!-- Sidebar -->
     <nav class="sidebar">
-      <div class="sidebar-section-label">Content</div>
+      <div class="sidebar-section-label">Catalog</div>
 
       <button class="nav-item active" data-view="discovery-queue" onclick="navigate('discovery-queue')">
         <span class="nav-icon">🔍</span>
@@ -1158,9 +1159,21 @@
         <span class="nav-badge" id="sidebar-pending-count">0</span>
       </button>
 
+      <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
+        <span class="nav-icon">💰</span>
+        Deal Engine
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">Data Governance</div>
+
       <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
-        <span class="nav-icon">🪞</span>
+        <span class="nav-icon">🪤</span>
         Duplicate Detection
+      </button>
+
+      <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
+        <span class="nav-icon">🏷️</span>
+        Brand Normalization
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">System</div>
@@ -1176,23 +1189,11 @@
         <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
       </button>
 
-      <div class="sidebar-section-label" style="margin-top:12px;">Data Quality</div>
-
-      <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
-        <span class="nav-icon">🏷️</span>
-        Brand Normalization
-      </button>
-
       <div class="sidebar-section-label" style="margin-top:12px;">Support</div>
 
       <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
         <span class="nav-icon">👤</span>
         User Support
-      </button>
-
-      <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
-        <span class="nav-icon">💰</span>
-        Deal Engine
       </button>
     </nav>
 
