@@ -1439,6 +1439,12 @@
           <h2>🔍 Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
         </div>
 
+        <!-- Queue source tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;">
+          <button id="dq-tab-catalog" class="deal-btn-primary" style="font-size:12px;padding:7px 16px;" onclick="switchDQTab('catalog')">Shoe Catalog</button>
+          <button id="dq-tab-aliases" class="deal-btn-secondary" style="font-size:12px;padding:7px 16px;" onclick="switchDQTab('aliases')">Affiliate Aliases</button>
+        </div>
+
         <div class="stats">
           <div class="stat-card">
             <div class="stat-value" id="stat-total">0</div>
@@ -1459,7 +1465,7 @@
         </div>
 
         <div class="batch-actions">
-          <button class="batch-btn" onclick="approveAllHigh()">✓ Approve All</button>
+          <button class="batch-btn" id="dq-approve-all-btn" onclick="approveAllHigh()">✓ Approve All</button>
           <button class="batch-btn" onclick="refreshData()">🔄 Refresh</button>
         </div>
 
@@ -2203,7 +2209,162 @@
       });
     }
 
-    function refreshData() { loadPending(); showToast('Data refreshed', 'success'); }
+    /* ── DISCOVERY QUEUE — TAB STATE ── */
+    let dqActiveTab = 'catalog'; // 'catalog' | 'aliases'
+    let aliasData   = [];        // cache for alias rows
+
+    function switchDQTab(tab) {
+      dqActiveTab = tab;
+      document.getElementById('dq-tab-catalog').className = tab === 'catalog' ? 'deal-btn-primary'   : 'deal-btn-secondary';
+      document.getElementById('dq-tab-aliases').className = tab === 'aliases' ? 'deal-btn-primary'   : 'deal-btn-secondary';
+      document.getElementById('dq-tab-catalog').style.cssText = 'font-size:12px;padding:7px 16px;';
+      document.getElementById('dq-tab-aliases').style.cssText = 'font-size:12px;padding:7px 16px;';
+      if (tab === 'catalog') { loadPending(); }
+      else                   { loadDiscoveryQueue(); }
+    }
+
+    function refreshData() {
+      if (dqActiveTab === 'aliases') loadDiscoveryQueue();
+      else                           loadPending();
+      showToast('Data refreshed', 'success');
+    }
+
+    /* ── ALIAS QUEUE — FETCH ── */
+    async function loadDiscoveryQueue() {
+      document.getElementById('shoe-list').innerHTML =
+        '<div class="loading"><div class="spinner"></div><p>Loading alias queue…</p></div>';
+      try {
+        const { data, error } = await getSupabase()
+          .from('retailer_product_aliases')
+          .select('*, master_shoe_products(brand_name, model_name)')
+          .eq('status', 'pending')
+          .order('confidence_score', { ascending: false });
+
+        if (error) throw error;
+        aliasData = data || [];
+        renderAliasQueue();
+        updateAliasStats();
+      } catch (err) {
+        document.getElementById('shoe-list').innerHTML =
+          `<div class="empty"><p>Error loading alias queue</p><p style="font-size:12px;margin-top:8px;">${escapeHtml(err.message)}</p></div>`;
+        showToast('Alias queue error: ' + err.message, 'error');
+      }
+    }
+
+    function updateAliasStats() {
+      const total  = aliasData.length;
+      const high   = aliasData.filter(r => r.confidence_score >= 0.80).length;
+      const medium = aliasData.filter(r => r.confidence_score >= 0.70 && r.confidence_score < 0.80).length;
+      const low    = aliasData.filter(r => r.confidence_score < 0.70).length;
+      document.getElementById('stat-total').textContent          = total;
+      document.getElementById('stat-high').textContent           = high;
+      document.getElementById('stat-medium').textContent         = medium;
+      document.getElementById('stat-low').textContent            = low;
+      document.getElementById('pending-count').textContent       = `${total} pending`;
+      document.getElementById('sidebar-pending-count').textContent = total;
+    }
+
+    function renderAliasQueue() {
+      const container = document.getElementById('shoe-list');
+      if (aliasData.length === 0) {
+        container.innerHTML =
+          '<div class="empty"><div class="empty-icon">🎉</div><p>No pending affiliate aliases</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
+        return;
+      }
+      container.innerHTML = `
+        <table class="deal-table" style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;">
+          <thead>
+            <tr>
+              <th>Raw Retailer String</th>
+              <th>Suggested Match</th>
+              <th>Confidence</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${aliasData.map(row => {
+              const prod    = row.master_shoe_products;
+              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:#94a3b8">No match</span>';
+              const score   = row.confidence_score != null ? Math.round(row.confidence_score * 100) + '%' : '—';
+              const scoreCol = row.confidence_score >= 0.80
+                ? 'color:#10b981;font-weight:700;'
+                : row.confidence_score >= 0.70
+                  ? 'color:#f59e0b;font-weight:700;'
+                  : 'color:#ef4444;font-weight:700;';
+              return `<tr id="alias-row-${row.id}">
+                <td style="font-family:monospace;font-size:12px;max-width:260px;word-break:break-all;">${escapeHtml(row.raw_string)}</td>
+                <td>${match}</td>
+                <td><span style="${scoreCol}">${score}</span></td>
+                <td style="white-space:nowrap;">
+                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')">✓ Approve</button>
+                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')">✕ Reject</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    /* ── ALIAS QUEUE — RESOLVE ── */
+    async function resolveAlias(aliasId, newStatus) {
+      const row = document.getElementById(`alias-row-${aliasId}`);
+      if (row) { row.style.opacity = '0.4'; row.querySelectorAll('button').forEach(b => b.disabled = true); }
+      const { error } = await getSupabase()
+        .from('retailer_product_aliases')
+        .update({ status: newStatus })
+        .eq('id', aliasId);
+      if (error) {
+        showToast('Update failed: ' + error.message, 'error');
+        if (row) { row.style.opacity = '1'; row.querySelectorAll('button').forEach(b => b.disabled = false); }
+        return;
+      }
+      showToast(newStatus === 'approved' ? 'Alias approved ✓' : 'Alias rejected', 'success');
+      aliasData = aliasData.filter(r => r.id !== aliasId);
+      if (row) row.remove();
+      updateAliasStats();
+      if (aliasData.length === 0) renderAliasQueue();
+    }
+
+    /* ── OVERRIDE approveAllHigh to handle both tabs ── */
+    async function approveAllHigh() {
+      if (dqActiveTab === 'aliases') {
+        const eligible = aliasData.filter(r => r.confidence_score >= 0.60);
+        if (!eligible.length) { showToast('No alias rows to approve', 'error'); return; }
+        if (!confirm(`Approve all ${eligible.length} pending alias rows?`)) return;
+        const btn = document.getElementById('dq-approve-all-btn');
+        btn.disabled = true; btn.textContent = '⏳ Approving…';
+        const ids = eligible.map(r => r.id);
+        const { error } = await getSupabase()
+          .from('retailer_product_aliases')
+          .update({ status: 'approved' })
+          .in('id', ids);
+        if (error) { showToast('Batch approve failed: ' + error.message, 'error'); }
+        else { showToast(`Approved ${ids.length} aliases`, 'success'); }
+        btn.disabled = false; btn.textContent = '✓ Approve All';
+        loadDiscoveryQueue();
+        return;
+      }
+      /* original catalog flow */
+      if (!confirm(`Approve all ${pendingData.length} pending items?`)) return;
+      if (!pendingData.length) { showToast('No items to approve', 'error'); return; }
+      const btn = document.getElementById('dq-approve-all-btn');
+      btn.disabled = true; btn.textContent = '⏳ Approving...';
+      let approved = 0, failed = 0;
+      for (const shoe of pendingData) {
+        try {
+          const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
+          });
+          const result = await res.json();
+          result.success ? approved++ : failed++;
+        } catch { failed++; }
+      }
+      showToast(`Approved ${approved} shoes${failed ? `, ${failed} failed` : ''}`, failed ? 'error' : 'success');
+      await loadPending();
+      btn.disabled = false; btn.textContent = '✓ Approve All';
+    }
 
     /* ── UTILITIES ── */
     function showToast(message, type = 'success') {
