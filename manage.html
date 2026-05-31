@@ -195,6 +195,61 @@
       font-weight: 600;
     }
 
+    /* Platform Pulse */
+    .pulse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .pulse-card {
+      background: #fff;
+      padding: 18px 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .pulse-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent, #10b981);
+    }
+    .pulse-value { font-size: 32px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 6px; }
+    .pulse-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .pulse-sub   { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+    /* Funnel */
+    .funnel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .funnel-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 20px;
+    }
+    .funnel-steps { display: flex; align-items: stretch; }
+    .funnel-step {
+      flex: 1; text-align: center; padding: 16px 12px;
+      background: #f8fafc; border-radius: 10px;
+    }
+    .funnel-step-num  { font-size: 26px; font-weight: 800; color: #10b981; margin-bottom: 4px; }
+    .funnel-step-name { font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 500; }
+    .funnel-step-pct  { font-size: 11px; color: #94a3b8; }
+    .funnel-conv {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 0 8px;
+    }
+    .funnel-conv-pct   { font-size: 13px; font-weight: 700; color: #f59e0b; }
+    .funnel-conv-label { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+
     /* Stats */
     .stats {
       display: grid;
@@ -1151,7 +1206,14 @@
 
     <!-- Sidebar -->
     <nav class="sidebar">
-      <div class="sidebar-section-label">Catalog</div>
+      <div class="sidebar-section-label">Analytics</div>
+
+      <button class="nav-item" data-view="platform-pulse" onclick="navigate('platform-pulse')">
+        <span class="nav-icon">📡</span>
+        Platform Pulse
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">Catalog</div>
 
       <button class="nav-item active" data-view="discovery-queue" onclick="navigate('discovery-queue')">
         <span class="nav-icon">🔍</span>
@@ -1199,6 +1261,72 @@
 
     <!-- Main Content -->
     <div class="main-content">
+
+      <!-- VIEW: Platform Pulse -->
+      <div id="view-platform-pulse" class="view">
+        <div class="view-header">
+          <h2>📡 Platform Pulse</h2>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
+        </div>
+
+        <div class="pulse-grid">
+          <div class="pulse-card" style="--accent:#10b981">
+            <div class="pulse-value" id="pulse-total-users">—</div>
+            <div class="pulse-label">Total Users</div>
+            <div class="pulse-sub">All-time accounts</div>
+          </div>
+          <div class="pulse-card" style="--accent:#6366f1">
+            <div class="pulse-value" id="pulse-active-lockers">—</div>
+            <div class="pulse-label">Active Lockers</div>
+            <div class="pulse-sub">Users with ≥1 active shoe</div>
+          </div>
+          <div class="pulse-card" style="--accent:#f97316">
+            <div class="pulse-value" id="pulse-retired-24h">—</div>
+            <div class="pulse-label">Data Engine Feed</div>
+            <div class="pulse-sub">Shoes retired last 24h</div>
+          </div>
+          <div class="pulse-card" style="--accent:#f59e0b">
+            <div class="pulse-value" id="pulse-activities-24h">—</div>
+            <div class="pulse-label">Syncs Today</div>
+            <div class="pulse-sub">Activities logged last 24h</div>
+          </div>
+        </div>
+
+        <div class="funnel">
+          <div class="funnel-title">Activation Funnel</div>
+          <div class="funnel-steps">
+            <div class="funnel-step">
+              <div class="funnel-step-num" id="funnel-accounts">—</div>
+              <div class="funnel-step-name">Accounts Created</div>
+              <div class="funnel-step-pct">100%</div>
+            </div>
+            <div class="funnel-conv">
+              <div style="color:#cbd5e1;font-size:20px">›</div>
+              <div class="funnel-conv-pct" id="funnel-conv-1">—%</div>
+              <div class="funnel-conv-label">connection rate</div>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-step-num" id="funnel-strava">—</div>
+              <div class="funnel-step-name">Strava Connected</div>
+              <div class="funnel-step-pct" id="funnel-strava-pct">—</div>
+            </div>
+            <div class="funnel-conv">
+              <div style="color:#cbd5e1;font-size:20px">›</div>
+              <div class="funnel-conv-pct" id="funnel-conv-2">—%</div>
+              <div class="funnel-conv-label">shoe add rate</div>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-step-num" id="funnel-lockers">—</div>
+              <div class="funnel-step-name">First Shoe Added</div>
+              <div class="funnel-step-pct" id="funnel-lockers-pct">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="pulse-loading" style="display:none;text-align:center;padding:40px;color:#94a3b8">
+          Loading telemetry…
+        </div>
+      </div>
 
       <!-- VIEW: DiscoveryQueue -->
       <div id="view-discovery-queue" class="view active">
@@ -1676,6 +1804,39 @@
       if (viewId === 'deal-engine' && !dealEngineLoaded) {
         dealEngineLoaded = true;
         fetchDealMetrics();
+      }
+      if (viewId === 'platform-pulse') loadTelemetry();
+    }
+
+    /* ── PLATFORM PULSE — TELEMETRY ── */
+    async function loadTelemetry() {
+      document.getElementById('pulse-loading').style.display = 'block';
+      try {
+        const { data, error } = await supabase.rpc('get_platform_telemetry');
+        if (error) throw error;
+        const t = data;
+        const fmt = n => Number(n).toLocaleString();
+        const pct = (a, b) => b > 0 ? Math.round((a / b) * 100) + '%' : '—%';
+
+        document.getElementById('pulse-total-users').textContent    = fmt(t.total_users);
+        document.getElementById('pulse-active-lockers').textContent = fmt(t.total_active_lockers);
+        document.getElementById('pulse-retired-24h').textContent    = fmt(t.shoes_retired_24h);
+        document.getElementById('pulse-activities-24h').textContent = fmt(t.total_activities_24h);
+
+        document.getElementById('funnel-accounts').textContent  = fmt(t.total_users);
+        document.getElementById('funnel-strava').textContent    = fmt(t.strava_connected);
+        document.getElementById('funnel-lockers').textContent   = fmt(t.total_active_lockers);
+
+        const conv1 = t.total_users > 0 ? Math.round((t.strava_connected / t.total_users) * 100) : 0;
+        const conv2 = t.strava_connected > 0 ? Math.round((t.total_active_lockers / t.strava_connected) * 100) : 0;
+        document.getElementById('funnel-conv-1').textContent     = conv1 + '%';
+        document.getElementById('funnel-conv-2').textContent     = conv2 + '%';
+        document.getElementById('funnel-strava-pct').textContent = pct(t.strava_connected, t.total_users) + ' of accounts';
+        document.getElementById('funnel-lockers-pct').textContent= pct(t.total_active_lockers, t.strava_connected) + ' of connected';
+      } catch (err) {
+        showToast('Telemetry error: ' + err.message, 'error');
+      } finally {
+        document.getElementById('pulse-loading').style.display = 'none';
       }
     }
 
