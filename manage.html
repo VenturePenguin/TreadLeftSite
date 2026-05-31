@@ -222,6 +222,7 @@
     .pulse-value { font-size: 32px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 6px; }
     .pulse-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
     .pulse-sub   { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .pulse-delta { font-size: 11px; font-weight: 600; color: #10b981; margin-top: 5px; }
 
     /* Funnel */
     .funnel {
@@ -1275,11 +1276,13 @@
             <div class="pulse-value" id="pulse-total-users">—</div>
             <div class="pulse-label">Total Users</div>
             <div class="pulse-sub">All-time accounts</div>
+            <div class="pulse-delta" id="pulse-users-delta"></div>
           </div>
           <div class="pulse-card" style="--accent:#6366f1">
             <div class="pulse-value" id="pulse-active-lockers">—</div>
             <div class="pulse-label">Active Lockers</div>
             <div class="pulse-sub">Users with ≥1 active shoe</div>
+            <div class="pulse-delta" id="pulse-lockers-delta"></div>
           </div>
           <div class="pulse-card" style="--accent:#f97316">
             <div class="pulse-value" id="pulse-retired-24h">—</div>
@@ -1321,6 +1324,21 @@
               <div class="funnel-step-name">First Shoe Added</div>
               <div class="funnel-step-pct" id="funnel-lockers-pct">—</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Revenue Pipeline & Engagement -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;">Revenue Pipeline &amp; Engagement</div>
+        <div class="pulse-grid" style="margin-bottom:0">
+          <div class="pulse-card" style="--accent:#ef4444">
+            <div class="pulse-value" id="pulse-high-intent">—</div>
+            <div class="pulse-label">High-Intent Cohort</div>
+            <div class="pulse-sub">Active shoes &gt;90% worn</div>
+          </div>
+          <div class="pulse-card" style="--accent:#8b5cf6">
+            <div class="pulse-value" id="pulse-avg-shoes">—</div>
+            <div class="pulse-label">Engagement Depth</div>
+            <div class="pulse-sub">Avg active shoes per user</div>
           </div>
         </div>
 
@@ -1823,6 +1841,14 @@
         document.getElementById('pulse-active-lockers').textContent = fmt(t.total_active_lockers);
         document.getElementById('pulse-retired-24h').textContent    = fmt(t.shoes_retired_24h);
         document.getElementById('pulse-activities-24h').textContent = fmt(t.total_activities_24h);
+
+        const u24 = t.users_24h || 0;
+        const l24 = t.lockers_24h || 0;
+        document.getElementById('pulse-users-delta').textContent   = u24 > 0 ? `+${fmt(u24)} in last 24h` : '';
+        document.getElementById('pulse-lockers-delta').textContent = l24 > 0 ? `+${fmt(l24)} in last 24h` : '';
+
+        document.getElementById('pulse-high-intent').textContent = fmt(t.high_intent_shoes || 0);
+        document.getElementById('pulse-avg-shoes').textContent   = t.avg_shoes_per_locker != null ? Number(t.avg_shoes_per_locker).toFixed(1) : '—';
 
         document.getElementById('funnel-accounts').textContent  = fmt(t.total_users);
         document.getElementById('funnel-strava').textContent    = fmt(t.strava_connected);
