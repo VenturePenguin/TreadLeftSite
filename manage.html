@@ -1812,7 +1812,7 @@
     async function loadTelemetry() {
       document.getElementById('pulse-loading').style.display = 'block';
       try {
-        const { data, error } = await supabase.rpc('get_platform_telemetry');
+        const { data, error } = await getSupabase().rpc('get_platform_telemetry');
         if (error) throw error;
         const t = data;
         const fmt = n => Number(n).toLocaleString();
