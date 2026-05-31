@@ -1210,14 +1210,14 @@
     <nav class="sidebar">
       <div class="sidebar-section-label">Analytics</div>
 
-      <button class="nav-item" data-view="platform-pulse" onclick="navigate('platform-pulse')">
+      <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
         <span class="nav-icon">📡</span>
         Platform Pulse
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Catalog</div>
 
-      <button class="nav-item active" data-view="discovery-queue" onclick="navigate('discovery-queue')">
+      <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
         <span class="nav-icon">🔍</span>
         Discovery Queue
         <span class="nav-badge" id="sidebar-pending-count">0</span>
@@ -1265,7 +1265,7 @@
     <div class="main-content">
 
       <!-- VIEW: Platform Pulse -->
-      <div id="view-platform-pulse" class="view">
+      <div id="view-platform-pulse" class="view active">
         <div class="view-header">
           <h2>📡 Platform Pulse</h2>
           <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
@@ -1353,7 +1353,7 @@
       </div>
 
       <!-- VIEW: DiscoveryQueue -->
-      <div id="view-discovery-queue" class="view active">
+      <div id="view-discovery-queue" class="view">
         <div class="view-header">
           <h2>🔍 Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
         </div>
@@ -1798,6 +1798,7 @@
     function showApp() {
       document.getElementById('login-gate').style.display = 'none';
       document.getElementById('admin-shell').style.display = 'block';
+      loadTelemetry();
       loadPending();
     }
 
