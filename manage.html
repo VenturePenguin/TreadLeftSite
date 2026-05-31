@@ -1340,6 +1340,11 @@
             <div class="pulse-label">Engagement Depth</div>
             <div class="pulse-sub">Avg active shoes per user</div>
           </div>
+          <div class="pulse-card" style="--accent:#0ea5e9">
+            <div class="pulse-value" id="pulse-affiliate-24h">—</div>
+            <div class="pulse-label">Affiliate Clicks (24h)</div>
+            <div class="pulse-sub">Outbound retailer taps</div>
+          </div>
         </div>
 
         <div id="pulse-loading" style="display:none;text-align:center;padding:40px;color:#94a3b8">
@@ -1847,8 +1852,9 @@
         document.getElementById('pulse-users-delta').textContent   = u24 > 0 ? `+${fmt(u24)} in last 24h` : '';
         document.getElementById('pulse-lockers-delta').textContent = l24 > 0 ? `+${fmt(l24)} in last 24h` : '';
 
-        document.getElementById('pulse-high-intent').textContent = fmt(t.high_intent_shoes || 0);
-        document.getElementById('pulse-avg-shoes').textContent   = t.avg_shoes_per_locker != null ? Number(t.avg_shoes_per_locker).toFixed(1) : '—';
+        document.getElementById('pulse-high-intent').textContent   = fmt(t.high_intent_shoes || 0);
+        document.getElementById('pulse-avg-shoes').textContent     = t.avg_shoes_per_locker != null ? Number(t.avg_shoes_per_locker).toFixed(1) : '—';
+        document.getElementById('pulse-affiliate-24h').textContent = fmt(t.affiliate_clicks_24h || 0);
 
         document.getElementById('funnel-accounts').textContent  = fmt(t.total_users);
         document.getElementById('funnel-strava').textContent    = fmt(t.strava_connected);
