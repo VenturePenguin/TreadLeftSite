@@ -1046,6 +1046,87 @@
     .deal-discount-pill.hot { background: #fee2e2; color: #991b1b; }
     .deal-discount-pill.warm { background: #fef3c7; color: #92400e; }
 
+    /* ── Deal CRUD Modal ── */
+    .deal-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.55);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+    }
+    .deal-modal-overlay.open { display: flex; }
+    .deal-modal {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      padding: 28px 28px 24px;
+      width: 560px;
+      max-width: 96vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .deal-modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; color: #1e293b; }
+    .deal-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .deal-form-grid .full { grid-column: 1 / -1; }
+    .deal-form-group { display: flex; flex-direction: column; gap: 5px; }
+    .deal-form-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+    .deal-form-group input, .deal-form-group select {
+      padding: 9px 11px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #f8fafc;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .deal-form-group input:focus, .deal-form-group select:focus { border-color: #f97316; background: #fff; }
+    .deal-form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .deal-btn-primary {
+      padding: 10px 22px;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .deal-btn-primary:hover { background: #ea580c; }
+    .deal-btn-secondary {
+      padding: 10px 18px;
+      background: #fff;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .deal-action-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      margin-right: 4px;
+    }
+    .deal-action-btn.verify     { background: #d1fae5; color: #065f46; }
+    .deal-action-btn.deactivate { background: #fee2e2; color: #991b1b; }
+    .deal-action-btn:hover { opacity: .8; }
+
     /* ── User Support Console ── */
     .support-search-bar {
       display: flex; gap: 10px; align-items: center;
@@ -1657,11 +1738,14 @@
       <!-- VIEW: Deal Engine Monitor -->
       <div id="view-deal-engine" class="view">
         <div class="view-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <h2>💰 Deal Engine Monitor</h2>
-          <button class="health-refresh-btn" onclick="fetchDealMetrics()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            Refresh
-          </button>
+          <h2>💰 Deal Engine</h2>
+          <div style="display:flex;gap:10px;">
+            <button class="deal-btn-primary" onclick="openDealModal()">+ Create New Deal</button>
+            <button class="health-refresh-btn" onclick="fetchDealMetrics()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              Refresh
+            </button>
+          </div>
         </div>
 
         <!-- Summary metric cards -->
@@ -1704,10 +1788,11 @@
                 <th>Current Price</th>
                 <th>Discount</th>
                 <th>Last Updated</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="dm-deals-tbody">
-              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
             </tbody>
           </table>
         </div>
@@ -1736,6 +1821,71 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Deal CRUD Modal -->
+  <div class="deal-modal-overlay" id="deal-modal-overlay" onclick="closeDealModalOnOverlay(event)">
+    <div class="deal-modal">
+      <h3>➕ Create New Deal</h3>
+      <div class="deal-form-grid">
+        <div class="deal-form-group full">
+          <label>Master Product ID <span style="color:#94a3b8;font-weight:400;text-transform:none;">(UUID from master_shoe_products)</span></label>
+          <input id="df-master-id" type="text" placeholder="e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6">
+        </div>
+        <div class="deal-form-group">
+          <label>Retailer Name</label>
+          <input id="df-retailer" type="text" placeholder="e.g. Running Warehouse">
+        </div>
+        <div class="deal-form-group">
+          <label>Retailer Logo URL</label>
+          <input id="df-logo" type="url" placeholder="https://...">
+        </div>
+        <div class="deal-form-group full">
+          <label>Affiliate URL</label>
+          <input id="df-url" type="url" placeholder="https://...">
+        </div>
+        <div class="deal-form-group">
+          <label>Price (cents)</label>
+          <input id="df-price" type="number" min="0" placeholder="e.g. 9999">
+        </div>
+        <div class="deal-form-group">
+          <label>MSRP (cents)</label>
+          <input id="df-msrp" type="number" min="0" placeholder="e.g. 14999">
+        </div>
+        <div class="deal-form-group">
+          <label>Currency</label>
+          <select id="df-currency">
+            <option value="USD" selected>USD</option>
+            <option value="GBP">GBP</option>
+            <option value="EUR">EUR</option>
+            <option value="CAD">CAD</option>
+            <option value="AUD">AUD</option>
+          </select>
+        </div>
+        <div class="deal-form-group">
+          <label>Market</label>
+          <select id="df-market">
+            <option value="usd_en" selected>usd_en (US)</option>
+            <option value="gbp_en">gbp_en (UK)</option>
+            <option value="eur_en">eur_en (EU)</option>
+            <option value="cad_en">cad_en (CA)</option>
+            <option value="aud_en">aud_en (AU)</option>
+          </select>
+        </div>
+        <div class="deal-form-group">
+          <label>Label <span style="color:#94a3b8;font-weight:400;text-transform:none;">(optional)</span></label>
+          <input id="df-label" type="text" placeholder="e.g. Flash Sale">
+        </div>
+        <div class="deal-form-group">
+          <label>Rank <span style="color:#94a3b8;font-weight:400;text-transform:none;">(display order)</span></label>
+          <input id="df-rank" type="number" min="1" value="1">
+        </div>
+      </div>
+      <div class="deal-form-actions">
+        <button class="deal-btn-secondary" onclick="closeDealModal()">Cancel</button>
+        <button class="deal-btn-primary" onclick="submitDeal()">Save Deal</button>
+      </div>
     </div>
   </div>
 
@@ -2101,7 +2251,7 @@
       dealEngineLoaded = true;
       /* Loading state */
       const loadingRow = (cols) => `<tr><td colspan="${cols}" style="text-align:center;color:#94a3b8;padding:28px;"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</td></tr>`;
-      document.getElementById('dm-deals-tbody').innerHTML  = loadingRow(6);
+      document.getElementById('dm-deals-tbody').innerHTML  = loadingRow(7);
       document.getElementById('dm-alerts-tbody').innerHTML = loadingRow(6);
       ['dm-active-deals','dm-alerts-today','dm-deepest'].forEach(id => {
         document.getElementById(id).innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;display:inline-block;"></div>';
@@ -2156,14 +2306,14 @@
         document.getElementById('dm-deals-count').textContent = `· ${topDeals.length} of ${allDeals.length} shown`;
         if (topDeals.length === 0) {
           document.getElementById('dm-deals-tbody').innerHTML =
-            '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
+            '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
         } else {
           document.getElementById('dm-deals-tbody').innerHTML = topDeals.map(d => {
             const prod  = d.master_shoe_products;
             const name  = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
             const thumb = prod?.image_url
               ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
-              : `<div class="deal-shoe-thumb-placeholder">👟</div>`;
+              : `<div class="deal-shoe-thumb-placeholder">💟</div>`;
             const pillCls = discountPillClass(d.pct);
             return `<tr>
               <td style="display:flex;align-items:center;gap:10px;">
@@ -2175,6 +2325,10 @@
               <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
               <td><span class="deal-discount-pill ${pillCls}">↓${d.pct}%</span></td>
               <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
+              <td style="white-space:nowrap;">
+                <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)">✓ Verify</button>
+                <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)">✕ Deactivate</button>
+              </td>
             </tr>`;
           }).join('');
         }
@@ -2211,10 +2365,97 @@
 
       } catch(err) {
         ['dm-deals-tbody','dm-alerts-tbody'].forEach(id => {
-          document.getElementById(id).innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:28px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+          document.getElementById(id).innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:28px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
         });
         showToast('Deal Engine error: ' + err.message, 'error');
       }
+    }
+
+    /* ── DEAL CRUD ── */
+    function openDealModal() {
+      document.getElementById('deal-modal-overlay').classList.add('open');
+    }
+    function closeDealModal() {
+      document.getElementById('deal-modal-overlay').classList.remove('open');
+    }
+    function closeDealModalOnOverlay(e) {
+      if (e.target === document.getElementById('deal-modal-overlay')) closeDealModal();
+    }
+
+    async function submitDeal() {
+      const masterId  = document.getElementById('df-master-id').value.trim();
+      const retailer  = document.getElementById('df-retailer').value.trim();
+      const logoUrl   = document.getElementById('df-logo').value.trim();
+      const url       = document.getElementById('df-url').value.trim();
+      const price     = parseInt(document.getElementById('df-price').value, 10);
+      const msrp      = parseInt(document.getElementById('df-msrp').value, 10);
+      const currency  = document.getElementById('df-currency').value;
+      const market    = document.getElementById('df-market').value;
+      const label     = document.getElementById('df-label').value.trim() || null;
+      const rank      = parseInt(document.getElementById('df-rank').value, 10) || 1;
+
+      if (!masterId || !retailer || !url || isNaN(price)) {
+        showToast('Master Product ID, Retailer, URL and Price are required.', 'error');
+        return;
+      }
+
+      const payload = {
+        master_product_id:  masterId,
+        retailer_name:      retailer,
+        retailer_logo_url:  logoUrl || null,
+        url,
+        price_cents:        price,
+        msrp_cents:         isNaN(msrp) ? null : msrp,
+        currency,
+        market,
+        label,
+        rank,
+        is_active:          true,
+        last_verified_at:   new Date().toISOString(),
+      };
+
+      const { error } = await getSupabase().from('shoe_deals').insert(payload);
+      if (error) { showToast('Insert failed: ' + error.message, 'error'); return; }
+
+      showToast('Deal created successfully!', 'success');
+      closeDealModal();
+      /* Reset form */
+      ['df-master-id','df-retailer','df-logo','df-url','df-price','df-msrp','df-label'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('df-rank').value = '1';
+      document.getElementById('df-currency').value = 'USD';
+      document.getElementById('df-market').value = 'usd_en';
+      /* Reload table */
+      dealEngineLoaded = false;
+      fetchDealMetrics();
+    }
+
+    async function verifyDeal(dealId, btn) {
+      btn.disabled = true;
+      btn.textContent = '…';
+      const { error } = await getSupabase()
+        .from('shoe_deals')
+        .update({ last_verified_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq('id', dealId);
+      if (error) { showToast('Verify failed: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✓ Verify'; return; }
+      showToast('Deal verified — staleness cleared.', 'success');
+      dealEngineLoaded = false;
+      fetchDealMetrics();
+    }
+
+    async function deactivateDeal(dealId, btn) {
+      if (!confirm('Deactivate this deal? It will no longer appear in the app.')) return;
+      btn.disabled = true;
+      btn.textContent = '…';
+      const { error } = await getSupabase()
+        .from('shoe_deals')
+        .update({ is_active: false })
+        .eq('id', dealId);
+      if (error) { showToast('Deactivate failed: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✕ Deactivate'; return; }
+      showToast('Deal deactivated.', 'success');
+      dealEngineLoaded = false;
+      fetchDealMetrics();
     }
 
     /* ═══════════════════════════════════════════════════
