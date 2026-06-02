@@ -1377,6 +1377,36 @@
           </div>
         </div>
 
+        <!-- Engagement & Activity Quality -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Engagement &amp; Activity Quality</div>
+        <div class="pulse-grid" style="margin-bottom:24px">
+          <div class="pulse-card" style="--accent:#10b981">
+            <div class="pulse-value" id="pulse-dau">—</div>
+            <div class="pulse-label">Daily Active Users</div>
+            <div class="pulse-sub">Users who synced today</div>
+          </div>
+          <div class="pulse-card" style="--accent:#14b8a6">
+            <div class="pulse-value" id="pulse-retention-7d">—%</div>
+            <div class="pulse-label">7-Day Retention</div>
+            <div class="pulse-sub">New users who synced again</div>
+          </div>
+          <div class="pulse-card" style="--accent:#f59e0b">
+            <div class="pulse-value" id="pulse-orphans">—</div>
+            <div class="pulse-label">Orphan Activities</div>
+            <div class="pulse-sub">Runs without shoes assigned</div>
+          </div>
+          <div class="pulse-card" style="--accent:#3b82f6">
+            <div class="pulse-value" id="pulse-km-7d">—</div>
+            <div class="pulse-label">KM Tracked (7d)</div>
+            <div class="pulse-sub">Total distance logged</div>
+          </div>
+          <div class="pulse-card" style="--accent:#8b5cf6">
+            <div class="pulse-value" id="pulse-avg-distance">—</div>
+            <div class="pulse-label">Avg Run Distance</div>
+            <div class="pulse-sub">KM per run (last 7 days)</div>
+          </div>
+        </div>
+
         <div class="funnel">
           <div class="funnel-title">Activation Funnel</div>
           <div class="funnel-steps">
@@ -1425,6 +1455,23 @@
             <div class="pulse-value" id="pulse-affiliate-24h">—</div>
             <div class="pulse-label">Affiliate Clicks (24h)</div>
             <div class="pulse-sub">Outbound retailer taps</div>
+          </div>
+        </div>
+
+        <!-- Product Intelligence -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Product Intelligence</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏆 Top Shoe Models</div>
+            <div id="top-shoes-list" style="display:flex;flex-direction:column;gap:8px">
+              <div style="color:#94a3b8;font-size:13px">Loading…</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏷️ Brand Distribution</div>
+            <div id="brand-distribution-list" style="display:flex;flex-direction:column;gap:8px">
+              <div style="color:#94a3b8;font-size:13px">Loading…</div>
+            </div>
           </div>
         </div>
 
@@ -2023,11 +2070,63 @@
         document.getElementById('funnel-conv-2').textContent     = conv2 + '%';
         document.getElementById('funnel-strava-pct').textContent = pct(t.strava_connected, t.total_users) + ' of accounts';
         document.getElementById('funnel-lockers-pct').textContent= pct(t.total_active_lockers, t.strava_connected) + ' of connected';
+
+        // ── NEW: Engagement & Activity Quality ──
+        document.getElementById('pulse-dau').textContent         = fmt(t.dau || 0);
+        document.getElementById('pulse-retention-7d').textContent  = (t.retention_7d || 0) + '%';
+        document.getElementById('pulse-orphans').textContent       = fmt(t.orphan_activities || 0);
+        document.getElementById('pulse-km-7d').textContent         = (t.total_km_7d || 0) + 'km';
+        document.getElementById('pulse-avg-distance').textContent  = (t.avg_distance_per_run || 0) + 'km';
+
+        // ── NEW: Product Intelligence ──
+        renderTopShoes(t.top_shoe_models || []);
+        renderBrandDistribution(t.brand_distribution || []);
       } catch (err) {
         showToast('Telemetry error: ' + err.message, 'error');
       } finally {
         document.getElementById('pulse-loading').style.display = 'none';
       }
+    }
+
+    /* ── PRODUCT INTELLIGENCE RENDERERS ── */
+    function renderTopShoes(models) {
+      const container = document.getElementById('top-shoes-list');
+      if (!models || models.length === 0) {
+        container.innerHTML = '<div style="color:#94a3b8;font-size:13px">No data available</div>';
+        return;
+      }
+      container.innerHTML = models.map((m, i) => `
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:20px;height:20px;border-radius:50%;background:${i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#b45309' : '#e2e8f0'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i < 3 ? '#fff' : '#64748b'}">${i + 1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.brand)} ${escapeHtml(m.model)}</div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#10b981">${Number(m.active_lockers).toLocaleString()}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderBrandDistribution(brands) {
+      const container = document.getElementById('brand-distribution-list');
+      if (!brands || brands.length === 0) {
+        container.innerHTML = '<div style="color:#94a3b8;font-size:13px">No data available</div>';
+        return;
+      }
+      const max = Math.max(...brands.map(b => b.count));
+      container.innerHTML = brands.map(b => {
+        const pct = Math.round((b.count / max) * 100);
+        return `
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:#1e293b">${escapeHtml(b.brand)}</div>
+          </div>
+          <div style="width:80px;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:#f97316;border-radius:3px"></div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#64748b;width:30px;text-align:right">${Number(b.count).toLocaleString()}</div>
+        </div>
+        `;
+      }).join('');
     }
 
     /* ── DISCOVERY QUEUE — DATA ── */
