@@ -1375,6 +1375,37 @@
             <div class="pulse-label">Syncs Today</div>
             <div class="pulse-sub">Activities logged last 24h</div>
           </div>
+          <div class="pulse-card" style="--accent:#22c55e">
+            <div class="pulse-value" id="pulse-healthkit-users">—</div>
+            <div class="pulse-label">Apple Health Users</div>
+            <div class="pulse-sub" id="pulse-healthkit-pct">— % of accounts</div>
+          </div>
+          <div class="pulse-card" style="--accent:#a78bfa">
+            <div class="pulse-value" id="pulse-healthkit-acts-24h">—</div>
+            <div class="pulse-label">HK Syncs Today</div>
+            <div class="pulse-sub" id="pulse-healthkit-acts-total">— total</div>
+          </div>
+        </div>
+
+        <!-- Sync Source Breakdown -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Sync Source Breakdown</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+          <div style="text-align:center">
+            <div style="font-size:26px;font-weight:800;color:#f97316" id="breakdown-strava">—</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Strava</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:26px;font-weight:800;color:#22c55e" id="breakdown-healthkit">—</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Apple Health</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:26px;font-weight:800;color:#6366f1" id="breakdown-manual">—</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Manual</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:26px;font-weight:800;color:#cbd5e1" id="breakdown-none">—</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Not connected</div>
+          </div>
         </div>
 
         <!-- Engagement & Activity Quality -->
@@ -1420,10 +1451,17 @@
               <div class="funnel-conv-pct" id="funnel-conv-1">—%</div>
               <div class="funnel-conv-label">connection rate</div>
             </div>
-            <div class="funnel-step">
-              <div class="funnel-step-num" id="funnel-strava">—</div>
-              <div class="funnel-step-name">Strava Connected</div>
-              <div class="funnel-step-pct" id="funnel-strava-pct">—</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="funnel-step" style="border-top:2px solid #f97316">
+                <div class="funnel-step-num" id="funnel-strava" style="color:#f97316">—</div>
+                <div class="funnel-step-name">Strava</div>
+                <div class="funnel-step-pct" id="funnel-strava-pct">—</div>
+              </div>
+              <div class="funnel-step" style="border-top:2px solid #22c55e">
+                <div class="funnel-step-num" id="funnel-healthkit" style="color:#22c55e">—</div>
+                <div class="funnel-step-name">Apple Health</div>
+                <div class="funnel-step-pct" id="funnel-healthkit-pct2">—</div>
+              </div>
             </div>
             <div class="funnel-conv">
               <div style="color:#cbd5e1;font-size:20px">›</div>
@@ -2060,16 +2098,30 @@
         document.getElementById('pulse-avg-shoes').textContent     = t.avg_shoes_per_locker != null ? Number(t.avg_shoes_per_locker).toFixed(1) : '—';
         document.getElementById('pulse-affiliate-24h').textContent = fmt(t.affiliate_clicks_24h || 0);
 
-        document.getElementById('funnel-accounts').textContent  = fmt(t.total_users);
-        document.getElementById('funnel-strava').textContent    = fmt(t.strava_connected);
-        document.getElementById('funnel-lockers').textContent   = fmt(t.total_active_lockers);
+        document.getElementById('pulse-healthkit-users').textContent    = fmt(t.healthkit_connected || 0);
+        document.getElementById('pulse-healthkit-pct').textContent      = pct(t.healthkit_connected || 0, t.total_users) + ' of accounts';
+        document.getElementById('pulse-healthkit-acts-24h').textContent  = fmt(t.healthkit_activities_24h || 0);
+        document.getElementById('pulse-healthkit-acts-total').textContent = fmt(t.healthkit_activities_total || 0) + ' total HK activities';
 
-        const conv1 = t.total_users > 0 ? Math.round((t.strava_connected / t.total_users) * 100) : 0;
-        const conv2 = t.strava_connected > 0 ? Math.round((t.total_active_lockers / t.strava_connected) * 100) : 0;
-        document.getElementById('funnel-conv-1').textContent     = conv1 + '%';
-        document.getElementById('funnel-conv-2').textContent     = conv2 + '%';
-        document.getElementById('funnel-strava-pct').textContent = pct(t.strava_connected, t.total_users) + ' of accounts';
-        document.getElementById('funnel-lockers-pct').textContent= pct(t.total_active_lockers, t.strava_connected) + ' of connected';
+        const bd = t.sync_source_breakdown || {};
+        document.getElementById('breakdown-strava').textContent    = fmt(bd.strava    || 0);
+        document.getElementById('breakdown-healthkit').textContent = fmt(bd.healthkit || 0);
+        document.getElementById('breakdown-manual').textContent    = fmt(bd.manual    || 0);
+        document.getElementById('breakdown-none').textContent      = fmt(bd.none      || 0);
+
+        document.getElementById('funnel-accounts').textContent     = fmt(t.total_users);
+        document.getElementById('funnel-strava').textContent       = fmt(t.strava_connected || 0);
+        document.getElementById('funnel-healthkit').textContent    = fmt(t.healthkit_connected || 0);
+        document.getElementById('funnel-lockers').textContent      = fmt(t.total_active_lockers);
+
+        const totalConnected = (t.strava_connected || 0) + (t.healthkit_connected || 0);
+        const conv1 = t.total_users > 0 ? Math.round((totalConnected / t.total_users) * 100) : 0;
+        const conv2 = totalConnected > 0 ? Math.round((t.total_active_lockers / totalConnected) * 100) : 0;
+        document.getElementById('funnel-conv-1').textContent        = conv1 + '%';
+        document.getElementById('funnel-conv-2').textContent        = conv2 + '%';
+        document.getElementById('funnel-strava-pct').textContent    = pct(t.strava_connected || 0,    t.total_users) + ' of accounts';
+        document.getElementById('funnel-healthkit-pct2').textContent = pct(t.healthkit_connected || 0, t.total_users) + ' of accounts';
+        document.getElementById('funnel-lockers-pct').textContent   = pct(t.total_active_lockers, totalConnected) + ' of connected';
 
         // ── NEW: Engagement & Activity Quality ──
         document.getElementById('pulse-dau').textContent         = fmt(t.dau || 0);
