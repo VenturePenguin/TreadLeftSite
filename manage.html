@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TreadLeft Admin</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ── Reset ── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f0f0f;
-      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
       min-height: 100vh;
     }
 
@@ -19,97 +20,99 @@
     #login-gate {
       position: fixed;
       inset: 0;
-      background: linear-gradient(135deg, #1a1a2e 0%, #0f0f0f 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
     }
     .login-box {
-      background: #1a1a1a;
+      background: #fff;
       padding: 40px;
       border-radius: 16px;
-      border: 1px solid #333;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
       width: 90%;
       max-width: 400px;
       text-align: center;
     }
-    .login-box h1 { font-size: 24px; margin-bottom: 8px; color: #10b981; }
-    .login-box p { color: #888; margin-bottom: 24px; font-size: 14px; }
+    .login-box h1 { font-size: 24px; margin-bottom: 8px; color: #ea580c; font-weight: 700; }
+    .login-box p { color: #64748b; margin-bottom: 24px; font-size: 14px; }
     .password-input {
       width: 100%;
       padding: 12px 16px;
-      background: #0f0f0f;
-      border: 1px solid #333;
+      background: #fff;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      color: #fff;
+      color: #1e293b;
       font-size: 16px;
       margin-bottom: 16px;
+      transition: border-color 0.2s;
+      font-family: inherit;
     }
-    .password-input:focus { outline: none; border-color: #10b981; }
+    .password-input:focus { outline: none; border-color: #f97316; }
     .login-btn {
       width: 100%;
       padding: 12px;
-      background: #10b981;
+      background: #f97316;
       color: #fff;
       border: none;
       border-radius: 8px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      font-family: inherit;
     }
-    .login-btn:hover { background: #059669; }
+    .login-btn:hover { background: #ea580c; }
     .error-msg { color: #ef4444; font-size: 14px; margin-top: 12px; display: none; }
 
-    /* ── Admin Shell (layout) ── */
-    #admin-shell {
-      display: none;
-      height: 100vh;
-      overflow: hidden;
-    }
+    /* ── Admin Shell ── */
+    #admin-shell { display: none; height: 100vh; overflow: hidden; }
 
-    /* Top bar */
+    /* Top Bar */
     .topbar {
       position: fixed;
       top: 0; left: 0; right: 0;
       height: 56px;
-      background: #111;
-      border-bottom: 1px solid #222;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 20px;
       z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
     .topbar-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       font-size: 16px;
       font-weight: 700;
-      color: #10b981;
+      color: #f97316;
     }
-    .topbar-brand span { color: #fff; font-weight: 400; font-size: 14px; }
+    .topbar-brand span { color: #94a3b8; font-weight: 400; font-size: 14px; }
     .logout-btn {
-      background: transparent;
-      border: 1px solid #333;
-      color: #888;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
       padding: 6px 14px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: all 0.2s;
     }
     .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
 
     /* Sidebar */
     .sidebar {
       position: fixed;
-      top: 56px;
-      left: 0;
-      bottom: 0;
+      top: 56px; left: 0; bottom: 0;
       width: 220px;
-      background: #111;
-      border-right: 1px solid #222;
+      background: #fff;
+      border-right: 1px solid #e2e8f0;
       padding: 20px 12px;
       display: flex;
       flex-direction: column;
@@ -120,7 +123,7 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #555;
+      color: #94a3b8;
       padding: 8px 12px 4px;
       font-weight: 600;
     }
@@ -132,19 +135,21 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
-      color: #aaa;
+      font-weight: 500;
+      color: #64748b;
       transition: background 0.15s, color 0.15s;
       border: none;
       background: transparent;
       width: 100%;
       text-align: left;
+      font-family: inherit;
     }
-    .nav-item:hover { background: #1a1a1a; color: #fff; }
-    .nav-item.active { background: #10b98120; color: #10b981; font-weight: 600; }
+    .nav-item:hover { background: #f8fafc; color: #1e293b; }
+    .nav-item.active { background: #fff7ed; color: #ea580c; font-weight: 600; }
     .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
     .nav-badge {
       margin-left: auto;
-      background: #10b981;
+      background: #f97316;
       color: #fff;
       font-size: 10px;
       font-weight: 700;
@@ -154,103 +159,20 @@
       text-align: center;
     }
 
-    /* Main content area */
+    /* Main content */
     .main-content {
       position: fixed;
-      top: 56px;
-      left: 220px;
-      right: 0;
-      bottom: 0;
+      top: 56px; left: 220px; right: 0; bottom: 0;
       overflow-y: auto;
       padding: 28px;
-      background: #0f0f0f;
+      background: #f8fafc;
     }
 
-    /* ── View: hidden by default ── */
+    /* Views */
     .view { display: none; }
     .view.active { display: block; }
 
-    /* ── Platform Pulse ── */
-    .pulse-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    .pulse-card {
-      background: #1a1a1a;
-      padding: 18px 16px;
-      border-radius: 12px;
-      border: 1px solid #222;
-      position: relative;
-      overflow: hidden;
-    }
-    .pulse-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--accent, #10b981);
-    }
-    .pulse-value { font-size: 32px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 6px; }
-    .pulse-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
-    .pulse-sub   { font-size: 11px; color: #444; margin-top: 4px; }
-
-    /* Funnel */
-    .funnel {
-      background: #1a1a1a;
-      border: 1px solid #222;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 28px;
-    }
-    .funnel-title {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #555;
-      margin-bottom: 20px;
-    }
-    .funnel-steps {
-      display: flex;
-      align-items: stretch;
-      gap: 0;
-    }
-    .funnel-step {
-      flex: 1;
-      text-align: center;
-      padding: 16px 12px;
-      background: #111;
-      border-radius: 10px;
-    }
-    .funnel-step-num  { font-size: 26px; font-weight: 800; color: #10b981; margin-bottom: 4px; }
-    .funnel-step-name { font-size: 12px; color: #aaa; margin-bottom: 6px; font-weight: 500; }
-    .funnel-step-pct  { font-size: 11px; color: #555; }
-    .funnel-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 8px;
-      color: #333;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .funnel-conv {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0 4px;
-    }
-    .funnel-conv-pct {
-      font-size: 13px;
-      font-weight: 700;
-      color: #f59e0b;
-    }
-    .funnel-conv-label { font-size: 10px; color: #555; margin-top: 2px; }
-
-    /* ── DiscoveryQueue styles ── */
+    /* View header */
     .view-header {
       display: flex;
       align-items: center;
@@ -263,6 +185,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      color: #1e293b;
     }
     .badge {
       background: #10b981;
@@ -273,21 +196,78 @@
       font-weight: 600;
     }
 
+    /* Platform Pulse */
+    .pulse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .pulse-card {
+      background: #fff;
+      padding: 18px 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .pulse-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent, #10b981);
+    }
+    .pulse-value { font-size: 32px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 6px; }
+    .pulse-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .pulse-sub   { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .pulse-delta { font-size: 11px; font-weight: 600; color: #10b981; margin-top: 5px; }
+
+    /* Funnel */
+    .funnel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .funnel-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 20px;
+    }
+    .funnel-steps { display: flex; align-items: stretch; }
+    .funnel-step {
+      flex: 1; text-align: center; padding: 16px 12px;
+      background: #f8fafc; border-radius: 10px;
+    }
+    .funnel-step-num  { font-size: 26px; font-weight: 800; color: #10b981; margin-bottom: 4px; }
+    .funnel-step-name { font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 500; }
+    .funnel-step-pct  { font-size: 11px; color: #94a3b8; }
+    .funnel-conv {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 0 8px;
+    }
+    .funnel-conv-pct   { font-size: 13px; font-weight: 700; color: #f59e0b; }
+    .funnel-conv-label { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+
     /* Stats */
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
       margin-bottom: 24px;
     }
     .stat-card {
-      background: #1a1a1a;
-      padding: 16px;
+      background: #fff;
+      padding: 18px;
       border-radius: 12px;
-      border: 1px solid #222;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
-    .stat-value { font-size: 28px; font-weight: 700; color: #10b981; }
-    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+    .stat-value { font-size: 30px; font-weight: 700; color: #10b981; }
+    .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 500; }
 
     /* Batch actions */
     .batch-actions {
@@ -295,92 +275,101 @@
       gap: 12px;
       margin-bottom: 20px;
       padding: 14px 16px;
-      background: #1a1a1a;
+      background: #fff;
       border-radius: 12px;
-      border: 1px solid #222;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
     .batch-btn {
       flex: 1;
       padding: 10px;
-      background: #0f0f0f;
-      border: 1px solid #333;
+      background: #fff;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      color: #fff;
+      color: #1e293b;
       cursor: pointer;
       font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: all 0.2s;
     }
-    .batch-btn:hover { border-color: #10b981; color: #10b981; }
+    .batch-btn:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
 
     /* Shoe cards */
-    .shoe-list { display: flex; flex-direction: column; gap: 12px; }
+    .shoe-list { display: flex; flex-direction: column; gap: 14px; }
     .shoe-card {
-      background: #1a1a1a;
+      background: #fff;
       border-radius: 12px;
-      border: 1px solid #222;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
       overflow: hidden;
+      transition: box-shadow 0.2s;
     }
-    .shoe-card.view-mode { border-left: 4px solid; }
-    .shoe-card.view-mode.high { border-left-color: #10b981; }
-    .shoe-card.view-mode.medium { border-left-color: #f59e0b; }
-    .shoe-card.view-mode.low { border-left-color: #ef4444; }
+    .shoe-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,.08); }
+    .shoe-card.view-mode.high   { border-left: 4px solid #10b981; }
+    .shoe-card.view-mode.medium { border-left: 4px solid #f59e0b; }
+    .shoe-card.view-mode.low    { border-left: 4px solid #ef4444; }
 
     .shoe-header {
-      padding: 16px;
+      padding: 18px 20px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
-    .shoe-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .shoe-info .raw { font-size: 12px; color: #666; font-family: monospace; }
+    .shoe-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: #1e293b; }
+    .shoe-info .raw { font-size: 12px; color: #94a3b8; font-family: monospace; }
     .confidence-badge {
       padding: 4px 10px;
       border-radius: 4px;
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
+      color: #fff;
     }
-    .confidence-badge.high { background: #10b981; }
+    .confidence-badge.high   { background: #10b981; }
     .confidence-badge.medium { background: #f59e0b; }
-    .confidence-badge.low { background: #ef4444; }
+    .confidence-badge.low    { background: #ef4444; }
 
-    .shoe-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+    .shoe-actions { display: flex; gap: 10px; padding: 0 20px 18px; }
     .btn {
       flex: 1;
-      padding: 10px;
+      padding: 9px 14px;
       border: none;
       border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
+      transition: all 0.2s;
+      font-family: inherit;
     }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-approve { background: #10b981; color: #fff; }
     .btn-approve:hover:not(:disabled) { background: #059669; }
-    .btn-reject { background: #ef4444; color: #fff; }
-    .btn-reject:hover:not(:disabled) { background: #dc2626; }
-    .btn-edit { background: #374151; color: #fff; }
-    .btn-edit:hover:not(:disabled) { background: #4b5563; }
+    .btn-reject  { background: #ef4444; color: #fff; }
+    .btn-reject:hover:not(:disabled)  { background: #dc2626; }
+    .btn-edit    { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-edit:hover:not(:disabled)    { background: #e2e8f0; }
 
-    /* Edit mode */
-    .edit-mode { padding: 16px; }
+    .edit-mode { padding: 16px 20px; }
     .edit-mode input {
       width: 100%;
-      padding: 12px;
-      background: #0f0f0f;
-      border: 1px solid #333;
+      padding: 11px 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      color: #fff;
+      color: #1e293b;
       font-size: 14px;
       margin-bottom: 12px;
+      font-family: inherit;
     }
-    .edit-mode input:focus { outline: none; border-color: #10b981; }
+    .edit-mode input:focus { outline: none; border-color: #f97316; }
     .edit-actions { display: flex; gap: 8px; }
 
-    /* ── Placeholder view ── */
+    /* Placeholder view */
     .placeholder-view {
       display: flex;
       flex-direction: column;
@@ -391,12 +380,12 @@
       gap: 16px;
     }
     .placeholder-icon { font-size: 56px; }
-    .placeholder-view h2 { font-size: 22px; font-weight: 700; color: #fff; }
-    .placeholder-view p { font-size: 14px; color: #666; max-width: 360px; line-height: 1.6; }
+    .placeholder-view h2 { font-size: 22px; font-weight: 700; color: #1e293b; }
+    .placeholder-view p { font-size: 14px; color: #64748b; max-width: 360px; line-height: 1.6; }
     .coming-soon-pill {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      color: #888;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #94a3b8;
       padding: 6px 18px;
       border-radius: 20px;
       font-size: 12px;
@@ -405,15 +394,844 @@
       text-transform: uppercase;
     }
 
-    /* ── Shared utilities ── */
-    .empty { text-align: center; padding: 60px 20px; color: #666; }
+    /* ── Duplicate Detector ── */
+    .dup-empty {
+      text-align: center; padding: 60px 20px; color: #64748b;
+    }
+    .dup-empty .dup-empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .dup-group {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .dup-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .dup-group-header h3 { font-size: 14px; font-weight: 600; color: #1e293b; }
+    .dup-group-header span { font-size: 12px; color: #94a3b8; }
+    .dup-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+    .dup-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+      background: #fff;
+    }
+    .dup-card:hover { border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .dup-card.is-master { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.15); }
+    .dup-card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      background: #f8fafc;
+      padding: 12px;
+      display: block;
+    }
+    .dup-card-img-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .dup-card-body { padding: 12px; }
+    .dup-card-name { font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.3; }
+    .dup-card-brand { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .dup-card-price { font-size: 12px; color: #10b981; font-weight: 600; }
+    .dup-card-id { font-size: 10px; color: #cbd5e1; font-family: monospace; margin-top: 4px; word-break: break-all; }
+    .dup-card-radio {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .dup-card.is-master .dup-card-radio {
+      border-color: #f97316;
+      background: #f97316;
+    }
+    .dup-card.is-master .dup-card-radio::after {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .master-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #f97316;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .dup-group-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-top: 1px solid #f1f5f9;
+      background: #fafafa;
+      gap: 12px;
+    }
+    .dup-group-footer p { font-size: 12px; color: #94a3b8; }
+    .merge-btn {
+      padding: 9px 20px;
+      background: #1e293b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .merge-btn:hover { background: #0f172a; }
+    .merge-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .dup-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    .dup-toolbar-info { font-size: 13px; color: #64748b; }
+    .dup-refresh-btn {
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .dup-refresh-btn:hover { border-color: #f97316; color: #f97316; }
+
+    /* ── System Health ── */
+    .health-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .health-toolbar p { font-size: 13px; color: #64748b; }
+    .health-refresh-btn {
+      padding: 8px 18px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .health-refresh-btn:hover { border-color: #f97316; color: #f97316; }
+    .health-refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .health-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 22px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .health-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent, #e2e8f0);
+      border-radius: 14px 14px 0 0;
+    }
+    .health-card.accent-orange { --accent: #f97316; }
+    .health-card.accent-red    { --accent: #ef4444; }
+    .health-card.accent-green  { --accent: #10b981; }
+    .health-card.accent-blue   { --accent: #3b82f6; }
+    .health-card-icon  { font-size: 28px; margin-bottom: 12px; }
+    .health-card-label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .health-card-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .health-card-value.loading-val { font-size: 24px; color: #cbd5e1; }
+    .health-card-sub  { font-size: 12px; color: #94a3b8; }
+    .health-card.warn .health-card-value { color: #ef4444; }
+    .health-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 12px;
+    }
+    .health-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .health-table th {
+      text-align: left;
+      padding: 8px 12px;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .health-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f8fafc;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+    .health-table tr:last-child td { border-bottom: none; }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-pill.ok      { background: #d1fae5; color: #065f46; }
+    .status-pill.warn    { background: #fef3c7; color: #92400e; }
+    .status-pill.error   { background: #fee2e2; color: #991b1b; }
+    .status-pill.unknown { background: #f1f5f9; color: #64748b; }
+
+    /* ── Strava Sync Monitor ── */
+    .sync-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+    }
+    .sync-toolbar-left { display: flex; align-items: center; gap: 10px; }
+    .sync-filter-btn {
+      padding: 6px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .sync-filter-btn.active { background: #1e293b; color: #fff; border-color: #1e293b; }
+    .sync-filter-btn:hover:not(.active) { border-color: #f97316; color: #f97316; }
+    .sync-refresh-btn {
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sync-refresh-btn:hover { border-color: #f97316; color: #f97316; }
+    .sync-table-wrap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .sync-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .sync-table th {
+      text-align: left;
+      padding: 10px 14px;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+      white-space: nowrap;
+    }
+    .sync-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f8fafc;
+      vertical-align: middle;
+      color: #1e293b;
+    }
+    .sync-table tbody tr:last-child td { border-bottom: none; }
+    .sync-table tbody tr:hover td { background: #fafafa; }
+    .sync-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .sync-badge.ok      { background: #d1fae5; color: #065f46; }
+    .sync-badge.error   { background: #fee2e2; color: #991b1b; }
+    .sync-badge.skipped { background: #f1f5f9; color: #64748b; }
+    .sync-event-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+    .sync-event-pill.delete { background: #fef3c7; color: #92400e; }
+    .sync-event-pill.update { background: #f0fdf4; color: #166534; }
+    .sync-retry-btn {
+      padding: 5px 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .sync-retry-btn:hover { border-color: #f97316; color: #f97316; }
+    .sync-retry-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .sync-payload-btn {
+      padding: 4px 10px;
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .sync-payload-btn:hover { border-color: #94a3b8; color: #64748b; }
+    .payload-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .payload-modal.open { display: flex; }
+    .payload-modal-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 560px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+    .payload-modal-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .payload-modal-box pre {
+      font-size: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #1e293b;
+    }
+    .payload-modal-close {
+      margin-top: 16px;
+      padding: 8px 20px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* ── Brand Normalization ── */
+    .brand-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 780px) {
+      .brand-layout { grid-template-columns: 1fr; }
+    }
+    .brand-list-panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .brand-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .brand-list-header span { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .brand-search {
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      background: #fff;
+    }
+    .brand-search:focus { background: #fffbf7; }
+    .brand-scroll {
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f8fafc;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .brand-row:last-child { border-bottom: none; }
+    .brand-row:hover { background: #fafafa; }
+    .brand-row.selected { background: #fff7ed; }
+    .brand-row input[type=checkbox] { accent-color: #f97316; width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+    .brand-row-name { flex: 1; font-size: 13px; color: #1e293b; font-weight: 500; }
+    .brand-row-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .brand-action-panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 22px;
+      position: sticky;
+      top: 20px;
+    }
+    .brand-action-panel h3 { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+    .brand-action-panel p  { font-size: 12px; color: #64748b; margin-bottom: 18px; line-height: 1.5; }
+    .brand-selected-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 36px;
+      padding: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #c2410c;
+    }
+    .brand-chip-remove {
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .brand-chip-remove:hover { opacity: 1; }
+    .brand-chips-placeholder { font-size: 12px; color: #cbd5e1; padding: 2px 4px; }
+    .brand-master-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .brand-master-input:focus { border-color: #f97316; }
+    .brand-normalize-btn {
+      width: 100%;
+      padding: 11px;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .brand-normalize-btn:hover:not(:disabled) { background: #ea6c0a; }
+    .brand-normalize-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .brand-result-box {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      display: none;
+    }
+    .brand-result-box.ok    { background: #d1fae5; color: #065f46; display: block; }
+    .brand-result-box.error { background: #fee2e2; color: #991b1b; display: block; }
+
+    /* ── Deal Engine Monitor ── */
+    .deal-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 700px) { .deal-metric-grid { grid-template-columns: 1fr; } }
+    .deal-metric-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .deal-metric-icon {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .deal-metric-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e293b;
+      line-height: 1;
+    }
+    .deal-metric-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .deal-metric-val.orange { color: #f97316; }
+    .deal-metric-val.green  { color: #10b981; }
+    .deal-metric-val.blue   { color: #3b82f6; }
+    .deal-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .deal-table-wrap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .deal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .deal-table th {
+      text-align: left;
+      padding: 9px 14px;
+      font-size: 11px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+      white-space: nowrap;
+    }
+    .deal-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f8fafc;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+    .deal-table tbody tr:last-child td { border-bottom: none; }
+    .deal-table tbody tr:hover td { background: #fafafa; }
+    .deal-shoe-thumb {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+    }
+    .deal-shoe-thumb-placeholder {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .deal-discount-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .deal-discount-pill.hot { background: #fee2e2; color: #991b1b; }
+    .deal-discount-pill.warm { background: #fef3c7; color: #92400e; }
+
+    /* ── Deal CRUD Modal ── */
+    .deal-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.55);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+    }
+    .deal-modal-overlay.open { display: flex; }
+    .deal-modal {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      padding: 28px 28px 24px;
+      width: 560px;
+      max-width: 96vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .deal-modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; color: #1e293b; }
+    .deal-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .deal-form-grid .full { grid-column: 1 / -1; }
+    .deal-form-group { display: flex; flex-direction: column; gap: 5px; }
+    .deal-form-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+    .deal-form-group input, .deal-form-group select {
+      padding: 9px 11px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #f8fafc;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .deal-form-group input:focus, .deal-form-group select:focus { border-color: #f97316; background: #fff; }
+    .deal-form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .deal-btn-primary {
+      padding: 10px 22px;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .deal-btn-primary:hover { background: #ea580c; }
+    .deal-btn-secondary {
+      padding: 10px 18px;
+      background: #fff;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .deal-action-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      margin-right: 4px;
+    }
+    .deal-action-btn.verify     { background: #d1fae5; color: #065f46; }
+    .deal-action-btn.deactivate { background: #fee2e2; color: #991b1b; }
+    .deal-action-btn:hover { opacity: .8; }
+
+    /* ── User Support Console ── */
+    .support-search-bar {
+      display: flex; gap: 10px; align-items: center;
+      margin-bottom: 24px;
+    }
+    .support-search-input {
+      flex: 1;
+      padding: 11px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #fff;
+    }
+    .support-search-input:focus { border-color: #f97316; }
+    .support-search-btn {
+      padding: 11px 22px;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .support-search-btn:hover:not(:disabled) { background: #ea6c0a; }
+    .support-search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .support-results { display: none; }
+    .support-results.visible { display: block; }
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .support-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .support-card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .support-card-header-icon { font-size: 18px; }
+    .support-card-title { font-size: 13px; font-weight: 700; color: #1e293b; }
+    .support-card-body { padding: 16px; }
+    .support-kv { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .support-kv:last-child { margin-bottom: 0; }
+    .support-kv-label { color: #94a3b8; font-weight: 500; min-width: 110px; flex-shrink: 0; }
+    .support-kv-val   { color: #1e293b; word-break: break-all; }
+    .support-kv-val.mono { font-family: monospace; font-size: 12px; }
+    .support-kv-val.pill-ok    { color: #065f46; background: #d1fae5; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .support-kv-val.pill-worn  { color: #92400e; background: #fef3c7; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .support-kv-val.pill-dead  { color: #991b1b; background: #fee2e2; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .support-full-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .support-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .support-table th {
+      text-align: left; padding: 9px 14px;
+      font-size: 11px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .support-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f8fafc;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+    .support-table tbody tr:last-child td { border-bottom: none; }
+    .support-table tbody tr:hover td { background: #fafafa; }
+    .support-not-found {
+      text-align: center;
+      padding: 48px 20px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    /* Shared utilities */
+    .empty { text-align: center; padding: 60px 20px; color: #64748b; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
-    .loading { text-align: center; padding: 40px; color: #666; }
+    .loading { text-align: center; padding: 40px; color: #64748b; }
     .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #333;
-      border-top-color: #10b981;
+      border: 3px solid #e2e8f0;
+      border-top-color: #f97316;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto 16px;
@@ -423,10 +1241,10 @@
     /* Toast */
     .toast {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #1a1a1a;
-      border: 1px solid #333;
+      bottom: 20px; right: 20px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px rgba(0,0,0,.1);
       padding: 14px 20px;
       border-radius: 12px;
       display: none;
@@ -446,52 +1264,61 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════
-       LOGIN GATE
-  ═══════════════════════════════════════════ -->
+  <!-- LOGIN GATE -->
   <div id="login-gate">
     <div class="login-box">
       <h1>🔐 TreadLeft Admin</h1>
       <p>Admin Control Panel</p>
       <input type="password" id="password" class="password-input" placeholder="Enter admin password" autocomplete="off">
-      <button class="login-btn" onclick="login()">Access Panel</button>
+      <button class="login-btn" onclick="doLogin()">Access Panel</button>
       <div class="error-msg" id="login-error">Invalid password</div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       ADMIN SHELL
-  ═══════════════════════════════════════════ -->
+  <!-- ADMIN SHELL -->
   <div id="admin-shell">
 
     <!-- Top Bar -->
     <div class="topbar">
       <div class="topbar-brand">
-        🟢 TreadLeft <span>/ Admin</span>
+        <img src="/favicon.png" alt="TreadLeft" style="width:22px;height:22px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.18);flex-shrink:0;">
+        TreadLeft <span>/ Admin</span>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
     </div>
 
     <!-- Sidebar -->
     <nav class="sidebar">
       <div class="sidebar-section-label">Analytics</div>
 
-      <button class="nav-item" data-view="platform-pulse" onclick="navigate('platform-pulse')">
+      <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
         <span class="nav-icon">📡</span>
         Platform Pulse
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Catalog</div>
 
-      <button class="nav-item active" data-view="discovery-queue" onclick="navigate('discovery-queue')">
+      <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
         <span class="nav-icon">🔍</span>
         Discovery Queue
         <span class="nav-badge" id="sidebar-pending-count">0</span>
       </button>
 
+      <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
+        <span class="nav-icon">💰</span>
+        Deal Engine
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">Data Governance</div>
+
       <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
-        <span class="nav-icon">🪞</span>
+        <span class="nav-icon">🪤</span>
         Duplicate Detection
+      </button>
+
+      <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
+        <span class="nav-icon">🏷️</span>
+        Brand Normalization
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">System</div>
@@ -500,31 +1327,43 @@
         <span class="nav-icon">❤️</span>
         System Health
       </button>
+
+      <button class="nav-item" data-view="strava-monitor" onclick="navigate('strava-monitor')">
+        <span class="nav-icon">🚴</span>
+        Strava Sync Monitor
+        <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
+      </button>
+
+      <div class="sidebar-section-label" style="margin-top:12px;">Support</div>
+
+      <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
+        <span class="nav-icon">👤</span>
+        User Support
+      </button>
     </nav>
 
     <!-- Main Content -->
     <div class="main-content">
 
-      <!-- ─────────────────────────────────────
-           VIEW: Platform Pulse
-      ───────────────────────────────────── -->
-      <div id="view-platform-pulse" class="view">
+      <!-- VIEW: Platform Pulse -->
+      <div id="view-platform-pulse" class="view active">
         <div class="view-header">
           <h2>📡 Platform Pulse</h2>
-          <button class="batch-btn" style="width:auto;padding:8px 16px" onclick="loadTelemetry()">🔄 Refresh</button>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
         </div>
 
-        <!-- Velocity Ticker -->
         <div class="pulse-grid">
           <div class="pulse-card" style="--accent:#10b981">
             <div class="pulse-value" id="pulse-total-users">—</div>
             <div class="pulse-label">Total Users</div>
             <div class="pulse-sub">All-time accounts</div>
+            <div class="pulse-delta" id="pulse-users-delta"></div>
           </div>
           <div class="pulse-card" style="--accent:#6366f1">
             <div class="pulse-value" id="pulse-active-lockers">—</div>
             <div class="pulse-label">Active Lockers</div>
             <div class="pulse-sub">Users with ≥1 active shoe</div>
+            <div class="pulse-delta" id="pulse-lockers-delta"></div>
           </div>
           <div class="pulse-card" style="--accent:#f97316">
             <div class="pulse-value" id="pulse-retired-24h">—</div>
@@ -536,42 +1375,38 @@
             <div class="pulse-label">Syncs Today</div>
             <div class="pulse-sub">Activities logged last 24h</div>
           </div>
-          <div class="pulse-card" style="--accent:#22c55e">
-            <div class="pulse-value" id="pulse-healthkit-users">—</div>
-            <div class="pulse-label">Apple Health Users</div>
-            <div class="pulse-sub" id="pulse-healthkit-pct">— % of accounts</div>
+        </div>
+
+        <!-- Engagement & Activity Quality -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Engagement &amp; Activity Quality</div>
+        <div class="pulse-grid" style="margin-bottom:24px">
+          <div class="pulse-card" style="--accent:#10b981">
+            <div class="pulse-value" id="pulse-dau">—</div>
+            <div class="pulse-label">Daily Active Users</div>
+            <div class="pulse-sub">Users who synced today</div>
           </div>
-          <div class="pulse-card" style="--accent:#a78bfa">
-            <div class="pulse-value" id="pulse-healthkit-acts-24h">—</div>
-            <div class="pulse-label">HK Syncs Today</div>
-            <div class="pulse-sub" id="pulse-healthkit-acts-total">— total HK activities</div>
+          <div class="pulse-card" style="--accent:#14b8a6">
+            <div class="pulse-value" id="pulse-retention-7d">—%</div>
+            <div class="pulse-label">7-Day Retention</div>
+            <div class="pulse-sub">New users who synced again</div>
+          </div>
+          <div class="pulse-card" style="--accent:#f59e0b">
+            <div class="pulse-value" id="pulse-orphans">—</div>
+            <div class="pulse-label">Orphan Activities</div>
+            <div class="pulse-sub">Runs without shoes assigned</div>
+          </div>
+          <div class="pulse-card" style="--accent:#3b82f6">
+            <div class="pulse-value" id="pulse-km-7d">—</div>
+            <div class="pulse-label">KM Tracked (7d)</div>
+            <div class="pulse-sub">Total distance logged</div>
+          </div>
+          <div class="pulse-card" style="--accent:#8b5cf6">
+            <div class="pulse-value" id="pulse-avg-distance">—</div>
+            <div class="pulse-label">Avg Run Distance</div>
+            <div class="pulse-sub">KM per run (last 7 days)</div>
           </div>
         </div>
 
-        <!-- Sync Source Breakdown -->
-        <div style="background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:28px">
-          <div style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px">Sync Source Breakdown</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800;color:#f97316" id="breakdown-strava">—</div>
-              <div style="font-size:11px;color:#666;margin-top:4px">Strava</div>
-            </div>
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800;color:#22c55e" id="breakdown-healthkit">—</div>
-              <div style="font-size:11px;color:#666;margin-top:4px">Apple Health</div>
-            </div>
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800;color:#6366f1" id="breakdown-manual">—</div>
-              <div style="font-size:11px;color:#666;margin-top:4px">Manual</div>
-            </div>
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800;color:#444" id="breakdown-none">—</div>
-              <div style="font-size:11px;color:#666;margin-top:4px">Not connected</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Activation Funnel -->
         <div class="funnel">
           <div class="funnel-title">Activation Funnel</div>
           <div class="funnel-steps">
@@ -581,24 +1416,17 @@
               <div class="funnel-step-pct">100%</div>
             </div>
             <div class="funnel-conv">
-              <div class="funnel-arrow">›</div>
+              <div style="color:#cbd5e1;font-size:20px">›</div>
               <div class="funnel-conv-pct" id="funnel-conv-1">—%</div>
               <div class="funnel-conv-label">connection rate</div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div class="funnel-step" style="border-top:2px solid #f97316">
-                <div class="funnel-step-num" id="funnel-strava" style="color:#f97316">—</div>
-                <div class="funnel-step-name">Strava</div>
-                <div class="funnel-step-pct" id="funnel-strava-pct">—</div>
-              </div>
-              <div class="funnel-step" style="border-top:2px solid #22c55e">
-                <div class="funnel-step-num" id="funnel-healthkit" style="color:#22c55e">—</div>
-                <div class="funnel-step-name">Apple Health</div>
-                <div class="funnel-step-pct" id="funnel-healthkit-pct2">—</div>
-              </div>
+            <div class="funnel-step">
+              <div class="funnel-step-num" id="funnel-strava">—</div>
+              <div class="funnel-step-name">Strava Connected</div>
+              <div class="funnel-step-pct" id="funnel-strava-pct">—</div>
             </div>
             <div class="funnel-conv">
-              <div class="funnel-arrow">›</div>
+              <div style="color:#cbd5e1;font-size:20px">›</div>
               <div class="funnel-conv-pct" id="funnel-conv-2">—%</div>
               <div class="funnel-conv-label">shoe add rate</div>
             </div>
@@ -610,21 +1438,58 @@
           </div>
         </div>
 
-        <div id="pulse-loading" class="loading" style="display:none">
-          <div class="spinner"></div>
-          <p>Fetching telemetry...</p>
+        <!-- Revenue Pipeline & Engagement -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;">Revenue Pipeline &amp; Engagement</div>
+        <div class="pulse-grid" style="margin-bottom:0">
+          <div class="pulse-card" style="--accent:#ef4444">
+            <div class="pulse-value" id="pulse-high-intent">—</div>
+            <div class="pulse-label">High-Intent Cohort</div>
+            <div class="pulse-sub">Active shoes &gt;90% worn</div>
+          </div>
+          <div class="pulse-card" style="--accent:#8b5cf6">
+            <div class="pulse-value" id="pulse-avg-shoes">—</div>
+            <div class="pulse-label">Engagement Depth</div>
+            <div class="pulse-sub">Avg active shoes per user</div>
+          </div>
+          <div class="pulse-card" style="--accent:#0ea5e9">
+            <div class="pulse-value" id="pulse-affiliate-24h">—</div>
+            <div class="pulse-label">Affiliate Clicks (24h)</div>
+            <div class="pulse-sub">Outbound retailer taps</div>
+          </div>
+        </div>
+
+        <!-- Product Intelligence -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Product Intelligence</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏆 Top Shoe Models</div>
+            <div id="top-shoes-list" style="display:flex;flex-direction:column;gap:8px">
+              <div style="color:#94a3b8;font-size:13px">Loading…</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏷️ Brand Distribution</div>
+            <div id="brand-distribution-list" style="display:flex;flex-direction:column;gap:8px">
+              <div style="color:#94a3b8;font-size:13px">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="pulse-loading" style="display:none;text-align:center;padding:40px;color:#94a3b8">
+          Loading telemetry…
         </div>
       </div>
 
-      <!-- ─────────────────────────────────────
-           VIEW: DiscoveryQueue
-      ───────────────────────────────────── -->
-      <div id="view-discovery-queue" class="view active">
+      <!-- VIEW: DiscoveryQueue -->
+      <div id="view-discovery-queue" class="view">
         <div class="view-header">
-          <h2>
-            🔍 Discovery Queue
-            <span class="badge" id="pending-count">0 pending</span>
-          </h2>
+          <h2>🔍 Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
+        </div>
+
+        <!-- Queue source tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;">
+          <button id="dq-tab-catalog" class="deal-btn-primary" style="font-size:12px;padding:7px 16px;" onclick="switchDQTab('catalog')">Shoe Catalog</button>
+          <button id="dq-tab-aliases" class="deal-btn-secondary" style="font-size:12px;padding:7px 16px;" onclick="switchDQTab('aliases')">Affiliate Aliases</button>
         </div>
 
         <div class="stats">
@@ -647,12 +1512,8 @@
         </div>
 
         <div class="batch-actions">
-          <button class="batch-btn" onclick="approveAllHighConfidence()">
-            ✓ Approve All High Confidence
-          </button>
-          <button class="batch-btn" onclick="refreshData()">
-            🔄 Refresh
-          </button>
+          <button class="batch-btn" id="dq-approve-all-btn" onclick="approveAllHigh()">✓ Approve All</button>
+          <button class="batch-btn" onclick="refreshData()">🔄 Refresh</button>
         </div>
 
         <div id="shoe-list" class="shoe-list">
@@ -663,76 +1524,465 @@
         </div>
       </div>
 
-      <!-- ─────────────────────────────────────
-           VIEW: DuplicateResolver (placeholder)
-      ───────────────────────────────────── -->
+      <!-- VIEW: DuplicateResolver -->
       <div id="view-duplicate-resolver" class="view">
-        <div class="placeholder-view">
-          <div class="placeholder-icon">🪞</div>
-          <h2>Duplicate Detection</h2>
-          <p>Automatically surface shoe entries that may be duplicates based on fuzzy name matching and import source overlap.</p>
-          <div class="coming-soon-pill">Coming Soon</div>
+        <div class="view-header">
+          <h2>🪞 Duplicate Detection <span class="badge" id="dup-group-count" style="background:#64748b;">—</span></h2>
+        </div>
+
+        <div class="dup-toolbar">
+          <p class="dup-toolbar-info">
+            Shoes are grouped by identical brand + highly similar name. Select the <strong>master</strong> to keep, then merge the rest.
+          </p>
+          <button class="dup-refresh-btn" onclick="loadDuplicates()">🔄 Refresh</button>
+        </div>
+
+        <div id="dup-list">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Scanning for duplicates…</p>
+          </div>
         </div>
       </div>
 
-      <!-- ─────────────────────────────────────
-           VIEW: SystemHealth (placeholder)
-      ───────────────────────────────────── -->
+      <!-- VIEW: SystemHealth -->
       <div id="view-system-health" class="view">
-        <div class="placeholder-view">
-          <div class="placeholder-icon">❤️</div>
-          <h2>System Health</h2>
-          <p>Monitor Edge Function run status, cron job history, error rates, and database queue depths in real time.</p>
-          <div class="coming-soon-pill">Coming Soon</div>
+        <div class="view-header">
+          <h2>❤️ System Health</h2>
+        </div>
+
+        <div class="health-toolbar">
+          <p>Live snapshot of queue depths, data quality, and cron activity.</p>
+          <button class="health-refresh-btn" id="health-refresh-btn" onclick="fetchSystemHealth()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            Refresh
+          </button>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="health-grid">
+          <div class="health-card accent-orange">
+            <div class="health-card-icon">🔍</div>
+            <div class="health-card-label">Pending Discovery Queue</div>
+            <div class="health-card-value loading-val" id="h-queue-val">—</div>
+            <div class="health-card-sub" id="h-queue-sub">shoes awaiting review</div>
+          </div>
+
+          <div class="health-card accent-red" id="h-orphan-card">
+            <div class="health-card-icon">🏃</div>
+            <div class="health-card-label">Orphaned Runs</div>
+            <div class="health-card-value loading-val" id="h-orphan-val">—</div>
+            <div class="health-card-sub">activities with no shoe assigned</div>
+          </div>
+
+          <div class="health-card accent-green">
+            <div class="health-card-icon">⏰</div>
+            <div class="health-card-label">Last Scraper Run</div>
+            <div class="health-card-value loading-val" id="h-cron-val" style="font-size:18px;line-height:1.3;">—</div>
+            <div class="health-card-sub" id="h-cron-sub">based on last deal update</div>
+          </div>
+
+          <div class="health-card accent-blue">
+            <div class="health-card-icon">👟</div>
+            <div class="health-card-label">Total Master Shoes</div>
+            <div class="health-card-value loading-val" id="h-total-val">—</div>
+            <div class="health-card-sub">in product catalog</div>
+          </div>
+        </div>
+
+        <!-- Cron jobs table -->
+        <div class="health-section-title">Recent Cron Activity</div>
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+          <table class="health-table">
+            <thead>
+              <tr>
+                <th>Job</th>
+                <th>Last Run</th>
+                <th>Status</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody id="h-cron-table">
+              <tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;">Loading…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-    </div><!-- /.main-content -->
-  </div><!-- /#admin-shell -->
+      <!-- VIEW: Strava Sync Monitor -->
+      <div id="view-strava-monitor" class="view">
+        <div class="view-header">
+          <h2>🚴 Strava Sync Monitor <span class="badge" id="sync-error-badge" style="background:#ef4444;display:none;">0 errors</span></h2>
+        </div>
 
-  <!-- Toast -->
+        <div class="sync-toolbar">
+          <div class="sync-toolbar-left">
+            <button class="sync-filter-btn active" data-filter="all"    onclick="setSyncFilter('all')">All</button>
+            <button class="sync-filter-btn"         data-filter="ok"     onclick="setSyncFilter('ok')">✅ OK</button>
+            <button class="sync-filter-btn"         data-filter="error"  onclick="setSyncFilter('error')">❌ Errors</button>
+            <button class="sync-filter-btn"         data-filter="skipped" onclick="setSyncFilter('skipped')">⏭ Skipped</button>
+          </div>
+          <button class="sync-refresh-btn" onclick="fetchWebhookLogs()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="sync-table-wrap">
+          <table class="sync-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event</th>
+                <th>Athlete ID</th>
+                <th>Object ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sync-table-body">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW: Brand Normalization -->
+      <div id="view-brand-normalization" class="view">
+        <div class="view-header">
+          <h2>🏷️ Brand Normalization</h2>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <p style="font-size:13px;color:#64748b;margin:0;">Check messy aliases on the left, type the canonical name on the right, then normalize.</p>
+          <button class="health-refresh-btn" onclick="loadBrands()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="brand-layout">
+          <!-- Left: brand list -->
+          <div class="brand-list-panel">
+            <div class="brand-list-header">
+              <span id="brand-list-title">All Brands</span>
+              <span id="brand-list-meta" style="color:#94a3b8;"></span>
+            </div>
+            <input class="brand-search" id="brand-search" type="text" placeholder="Search brands…" oninput="filterBrands()">
+            <div class="brand-scroll" id="brand-scroll">
+              <div class="loading"><div class="spinner"></div><p>Loading brands…</p></div>
+            </div>
+          </div>
+
+          <!-- Right: action panel -->
+          <div class="brand-action-panel">
+            <h3>Normalize Selected</h3>
+            <p>Select one or more aliases from the list, then enter the canonical brand name to replace them all.</p>
+
+            <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Selected Aliases</div>
+            <div class="brand-selected-chips" id="brand-chips">
+              <span class="brand-chips-placeholder">No brands selected</span>
+            </div>
+
+            <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Master Brand Name</div>
+            <input
+              class="brand-master-input"
+              id="brand-master-input"
+              type="text"
+              placeholder="e.g. ASICS"
+              oninput="updateNormalizeBtn()"
+            >
+
+            <button class="brand-normalize-btn" id="brand-normalize-btn" onclick="normalizeBrands()" disabled>
+              Normalize Selected
+            </button>
+
+            <div class="brand-result-box" id="brand-result-box"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: User Support Console -->
+      <div id="view-user-support" class="view">
+        <div class="view-header">
+          <h2>👤 User Support Console</h2>
+        </div>
+
+        <!-- Search -->
+        <div class="support-search-bar">
+          <input
+            class="support-search-input"
+            id="support-search-input"
+            type="text"
+            placeholder="Email address or Strava Athlete ID…"
+            onkeydown="if(event.key==='Enter') lookupUser()"
+          >
+          <button class="support-search-btn" id="support-search-btn" onclick="lookupUser()">
+            🔍 Look Up User
+          </button>
+        </div>
+
+        <!-- Results (hidden until search) -->
+        <div id="support-results" class="support-results">
+
+          <!-- Not-found state -->
+          <div id="support-not-found" class="support-not-found" style="display:none;">
+            <div style="font-size:40px;margin-bottom:12px;">🕵️</div>
+            No user found matching that email or Athlete ID.
+          </div>
+
+          <!-- Cards row -->
+          <div id="support-cards" style="display:none;">
+            <div class="support-grid">
+
+              <!-- Card 1: Profile -->
+              <div class="support-card">
+                <div class="support-card-header">
+                  <span class="support-card-header-icon">👤</span>
+                  <span class="support-card-title">User Profile</span>
+                </div>
+                <div class="support-card-body" id="sc-profile">
+                  <div class="loading"><div class="spinner"></div></div>
+                </div>
+              </div>
+
+              <!-- Card 2: Active Rotation -->
+              <div class="support-card">
+                <div class="support-card-header">
+                  <span class="support-card-header-icon">👟</span>
+                  <span class="support-card-title">Active Rotation</span>
+                </div>
+                <div class="support-card-body" id="sc-rotation">
+                  <div class="loading"><div class="spinner"></div></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Card 3: Recent Activity Log -->
+            <div class="support-full-card">
+              <div class="support-card-header">
+                <span class="support-card-header-icon">🏃</span>
+                <span class="support-card-title">Recent Activity Log <span id="sc-act-count" style="font-weight:400;color:#94a3b8;"></span></span>
+              </div>
+              <div id="sc-activities">
+                <div class="loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+
+            <!-- Card 4: Webhook Audit Trail -->
+            <div class="support-full-card">
+              <div class="support-card-header">
+                <span class="support-card-header-icon">📡</span>
+                <span class="support-card-title">Webhook Audit Trail <span id="sc-wh-count" style="font-weight:400;color:#94a3b8;"></span></span>
+              </div>
+              <div id="sc-webhooks">
+                <div class="loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: Deal Engine Monitor -->
+      <div id="view-deal-engine" class="view">
+        <div class="view-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <h2>💰 Deal Engine</h2>
+          <div style="display:flex;gap:10px;">
+            <button class="deal-btn-primary" onclick="openDealModal()">+ Create New Deal</button>
+            <button class="health-refresh-btn" onclick="fetchDealMetrics()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Summary metric cards -->
+        <div class="deal-metric-grid">
+          <div class="deal-metric-card">
+            <div class="deal-metric-icon">📦</div>
+            <div>
+              <div class="deal-metric-val orange" id="dm-active-deals">&mdash;</div>
+              <div class="deal-metric-label">Active Deals (vs MSRP)</div>
+            </div>
+          </div>
+          <div class="deal-metric-card">
+            <div class="deal-metric-icon">🔔</div>
+            <div>
+              <div class="deal-metric-val blue" id="dm-alerts-today">&mdash;</div>
+              <div class="deal-metric-label">Alerts Triggered (last 24h)</div>
+            </div>
+          </div>
+          <div class="deal-metric-card">
+            <div class="deal-metric-icon">🔥</div>
+            <div>
+              <div class="deal-metric-val green" id="dm-deepest">&mdash;</div>
+              <div class="deal-metric-label">Deepest Discount Active</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table 1: Top Active Deals -->
+        <div class="deal-section-title">
+          <span>🏷️ Top Active Deals</span>
+          <span id="dm-deals-count" style="font-weight:400;color:#94a3b8;"></span>
+        </div>
+        <div class="deal-table-wrap">
+          <table class="deal-table">
+            <thead>
+              <tr>
+                <th>Shoe</th>
+                <th>Retailer</th>
+                <th>MSRP</th>
+                <th>Current Price</th>
+                <th>Discount</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dm-deals-tbody">
+              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table 2: Recent User Alerts -->
+        <div class="deal-section-title">
+          <span>🔔 Recent User Alerts Triggered</span>
+          <span id="dm-alerts-count" style="font-weight:400;color:#94a3b8;"></span>
+        </div>
+        <div class="deal-table-wrap">
+          <table class="deal-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Shoe</th>
+                <th>Target Price</th>
+                <th>Currency</th>
+                <th>Alert Set</th>
+                <th>Last Alerted</th>
+              </tr>
+            </thead>
+            <tbody id="dm-alerts-tbody">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Deal CRUD Modal -->
+  <div class="deal-modal-overlay" id="deal-modal-overlay" onclick="closeDealModalOnOverlay(event)">
+    <div class="deal-modal">
+      <h3>➕ Create New Deal</h3>
+      <div class="deal-form-grid">
+        <div class="deal-form-group full">
+          <label>Master Product ID <span style="color:#94a3b8;font-weight:400;text-transform:none;">(UUID from master_shoe_products)</span></label>
+          <input id="df-master-id" type="text" placeholder="e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6">
+        </div>
+        <div class="deal-form-group">
+          <label>Retailer Name</label>
+          <input id="df-retailer" type="text" placeholder="e.g. Running Warehouse">
+        </div>
+        <div class="deal-form-group">
+          <label>Retailer Logo URL</label>
+          <input id="df-logo" type="url" placeholder="https://...">
+        </div>
+        <div class="deal-form-group full">
+          <label>Affiliate URL</label>
+          <input id="df-url" type="url" placeholder="https://...">
+        </div>
+        <div class="deal-form-group">
+          <label>Price (cents)</label>
+          <input id="df-price" type="number" min="0" placeholder="e.g. 9999">
+        </div>
+        <div class="deal-form-group">
+          <label>MSRP (cents)</label>
+          <input id="df-msrp" type="number" min="0" placeholder="e.g. 14999">
+        </div>
+        <div class="deal-form-group">
+          <label>Currency</label>
+          <select id="df-currency">
+            <option value="USD" selected>USD</option>
+            <option value="GBP">GBP</option>
+            <option value="EUR">EUR</option>
+            <option value="CAD">CAD</option>
+            <option value="AUD">AUD</option>
+          </select>
+        </div>
+        <div class="deal-form-group">
+          <label>Market</label>
+          <select id="df-market">
+            <option value="usd_en" selected>usd_en (US)</option>
+            <option value="gbp_en">gbp_en (UK)</option>
+            <option value="eur_en">eur_en (EU)</option>
+            <option value="cad_en">cad_en (CA)</option>
+            <option value="aud_en">aud_en (AU)</option>
+          </select>
+        </div>
+        <div class="deal-form-group">
+          <label>Label <span style="color:#94a3b8;font-weight:400;text-transform:none;">(optional)</span></label>
+          <input id="df-label" type="text" placeholder="e.g. Flash Sale">
+        </div>
+        <div class="deal-form-group">
+          <label>Rank <span style="color:#94a3b8;font-weight:400;text-transform:none;">(display order)</span></label>
+          <input id="df-rank" type="number" min="1" value="1">
+        </div>
+      </div>
+      <div class="deal-form-actions">
+        <button class="deal-btn-secondary" onclick="closeDealModal()">Cancel</button>
+        <button class="deal-btn-primary" onclick="submitDeal()">Save Deal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payload inspector modal -->
+  <div class="payload-modal" id="payload-modal" onclick="closePayloadModal(event)">
+    <div class="payload-modal-box">
+      <h3>📦 Raw Webhook Payload</h3>
+      <pre id="payload-modal-content"></pre>
+      <button class="payload-modal-close" onclick="closePayloadModal()">Close</button>
+    </div>
+  </div>
+
   <div id="toast" class="toast">
     <span id="toast-icon">✓</span>
     <span id="toast-message">Success</span>
   </div>
 
   <script>
-    /* ═══════════════════════════════════════
-       CONFIGURATION
-    ═══════════════════════════════════════ */
-    const SUPABASE_URL   = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMjY0MDAsImV4cCI6MjA0OTYwMjQwMH0.XdJrRrOluCT31PQbqGttJmZ0MBXjhWpYXsTNduwEePw';
+    const SUPABASE_URL      = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzY1NDQsImV4cCI6MjA4MDM1MjU0NH0.0E7C-mQZDRtzOIP-_MsQlpAt8RMo7IM7ZWUmZhRCELg';
     const ADMIN_PASSWORD = 'TreadLeft2024!';
     const ADMIN_TOKEN    = 'admin-secret-token-12345';
 
-    let supabase;
+    let supabaseClient = null;
+
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (!window.supabase) throw new Error('Supabase library not loaded');
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return supabaseClient;
+    }
+
     let pendingData = [];
 
-    /* ═══════════════════════════════════════
-       INIT
-    ═══════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        if (!window.supabase) {
-          showToast('Error: Supabase library failed to load', 'error');
-          return;
-        }
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      } catch (err) {
-        showToast('Error initializing: ' + err.message, 'error');
-      }
-
       if (sessionStorage.getItem('adminLoggedIn') === 'true') showApp();
-
       document.getElementById('password').addEventListener('keypress', e => {
-        if (e.key === 'Enter') login();
+        if (e.key === 'Enter') doLogin();
       });
     });
 
-    /* ═══════════════════════════════════════
-       AUTH
-    ═══════════════════════════════════════ */
-    function login() {
+    /* ── AUTH ── */
+    function doLogin() {
       const password = document.getElementById('password').value;
       if (password === ADMIN_PASSWORD) {
         sessionStorage.setItem('adminLoggedIn', 'true');
@@ -743,7 +1993,7 @@
       }
     }
 
-    function logout() {
+    function doLogout() {
       sessionStorage.removeItem('adminLoggedIn');
       location.reload();
     }
@@ -751,53 +2001,86 @@
     function showApp() {
       document.getElementById('login-gate').style.display = 'none';
       document.getElementById('admin-shell').style.display = 'block';
+      loadTelemetry();
       loadPending();
     }
 
-    /* ═══════════════════════════════════════
-       PLATFORM PULSE — TELEMETRY
-    ═══════════════════════════════════════ */
+    /* ── NAVIGATION ── */
+    let dupLoaded = false;
+    function navigate(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.view === viewId);
+      });
+      if (viewId === 'duplicate-resolver' && !dupLoaded) {
+        dupLoaded = true;
+        loadDuplicates();
+      }
+      if (viewId === 'system-health' && !healthLoaded) {
+        healthLoaded = true;
+        fetchSystemHealth();
+      }
+      if (viewId === 'strava-monitor' && !syncLoaded) {
+        syncLoaded = true;
+        fetchWebhookLogs();
+      }
+      if (viewId === 'brand-normalization' && !brandLoaded) {
+        brandLoaded = true;
+        loadBrands();
+      }
+      if (viewId === 'deal-engine' && !dealEngineLoaded) {
+        dealEngineLoaded = true;
+        fetchDealMetrics();
+      }
+      if (viewId === 'platform-pulse') loadTelemetry();
+    }
+
+    /* ── PLATFORM PULSE — TELEMETRY ── */
     async function loadTelemetry() {
       document.getElementById('pulse-loading').style.display = 'block';
       try {
-        const { data, error } = await supabase.rpc('get_platform_telemetry');
+        const { data, error } = await getSupabase().rpc('get_platform_telemetry');
         if (error) throw error;
-
         const t = data;
         const fmt = n => Number(n).toLocaleString();
         const pct = (a, b) => b > 0 ? Math.round((a / b) * 100) + '%' : '—%';
 
-        document.getElementById('pulse-total-users').textContent     = fmt(t.total_users);
-        document.getElementById('pulse-active-lockers').textContent  = fmt(t.total_active_lockers);
-        document.getElementById('pulse-retired-24h').textContent     = fmt(t.shoes_retired_24h);
-        document.getElementById('pulse-activities-24h').textContent  = fmt(t.total_activities_24h);
+        document.getElementById('pulse-total-users').textContent    = fmt(t.total_users);
+        document.getElementById('pulse-active-lockers').textContent = fmt(t.total_active_lockers);
+        document.getElementById('pulse-retired-24h').textContent    = fmt(t.shoes_retired_24h);
+        document.getElementById('pulse-activities-24h').textContent = fmt(t.total_activities_24h);
 
-        document.getElementById('pulse-healthkit-users').textContent   = fmt(t.healthkit_connected);
-        document.getElementById('pulse-healthkit-pct').textContent     = pct(t.healthkit_connected, t.total_users) + ' of accounts';
-        document.getElementById('pulse-healthkit-acts-24h').textContent = fmt(t.healthkit_activities_24h);
-        document.getElementById('pulse-healthkit-acts-total').textContent = fmt(t.healthkit_activities_total) + ' total HK activities';
+        const u24 = t.users_24h || 0;
+        const l24 = t.lockers_24h || 0;
+        document.getElementById('pulse-users-delta').textContent   = u24 > 0 ? `+${fmt(u24)} in last 24h` : '';
+        document.getElementById('pulse-lockers-delta').textContent = l24 > 0 ? `+${fmt(l24)} in last 24h` : '';
 
-        const bd = t.sync_source_breakdown || {};
-        document.getElementById('breakdown-strava').textContent    = fmt(bd.strava    || 0);
-        document.getElementById('breakdown-healthkit').textContent = fmt(bd.healthkit || 0);
-        document.getElementById('breakdown-manual').textContent    = fmt(bd.manual    || 0);
-        document.getElementById('breakdown-none').textContent      = fmt(bd.none      || 0);
+        document.getElementById('pulse-high-intent').textContent   = fmt(t.high_intent_shoes || 0);
+        document.getElementById('pulse-avg-shoes').textContent     = t.avg_shoes_per_locker != null ? Number(t.avg_shoes_per_locker).toFixed(1) : '—';
+        document.getElementById('pulse-affiliate-24h').textContent = fmt(t.affiliate_clicks_24h || 0);
 
-        document.getElementById('funnel-accounts').textContent    = fmt(t.total_users);
-        document.getElementById('funnel-strava').textContent      = fmt(t.strava_connected);
-        document.getElementById('funnel-healthkit').textContent   = fmt(t.healthkit_connected);
-        document.getElementById('funnel-lockers').textContent     = fmt(t.total_active_lockers);
+        document.getElementById('funnel-accounts').textContent  = fmt(t.total_users);
+        document.getElementById('funnel-strava').textContent    = fmt(t.strava_connected);
+        document.getElementById('funnel-lockers').textContent   = fmt(t.total_active_lockers);
 
-        const totalConnected = (t.strava_connected || 0) + (t.healthkit_connected || 0);
-        const conv1 = t.total_users > 0 ? Math.round((totalConnected / t.total_users) * 100) : 0;
-        const conv2 = totalConnected  > 0 ? Math.round((t.total_active_lockers / totalConnected) * 100) : 0;
+        const conv1 = t.total_users > 0 ? Math.round((t.strava_connected / t.total_users) * 100) : 0;
+        const conv2 = t.strava_connected > 0 ? Math.round((t.total_active_lockers / t.strava_connected) * 100) : 0;
+        document.getElementById('funnel-conv-1').textContent     = conv1 + '%';
+        document.getElementById('funnel-conv-2').textContent     = conv2 + '%';
+        document.getElementById('funnel-strava-pct').textContent = pct(t.strava_connected, t.total_users) + ' of accounts';
+        document.getElementById('funnel-lockers-pct').textContent= pct(t.total_active_lockers, t.strava_connected) + ' of connected';
 
-        document.getElementById('funnel-conv-1').textContent       = conv1 + '%';
-        document.getElementById('funnel-conv-2').textContent       = conv2 + '%';
-        document.getElementById('funnel-strava-pct').textContent   = pct(t.strava_connected,    t.total_users) + ' of accounts';
-        document.getElementById('funnel-healthkit-pct2').textContent = pct(t.healthkit_connected, t.total_users) + ' of accounts';
-        document.getElementById('funnel-lockers-pct').textContent  = pct(t.total_active_lockers, totalConnected) + ' of connected';
+        // ── NEW: Engagement & Activity Quality ──
+        document.getElementById('pulse-dau').textContent         = fmt(t.dau || 0);
+        document.getElementById('pulse-retention-7d').textContent  = (t.retention_7d || 0) + '%';
+        document.getElementById('pulse-orphans').textContent       = fmt(t.orphan_activities || 0);
+        document.getElementById('pulse-km-7d').textContent         = (t.total_km_7d || 0) + 'km';
+        document.getElementById('pulse-avg-distance').textContent  = (t.avg_distance_per_run || 0) + 'km';
 
+        // ── NEW: Product Intelligence ──
+        renderTopShoes(t.top_shoe_models || []);
+        renderBrandDistribution(t.brand_distribution || []);
       } catch (err) {
         showToast('Telemetry error: ' + err.message, 'error');
       } finally {
@@ -805,38 +2088,65 @@
       }
     }
 
-    /* ═══════════════════════════════════════
-       ADMIN LAYOUT — NAVIGATION
-    ═══════════════════════════════════════ */
-    function navigate(viewId) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById('view-' + viewId).classList.add('active');
-
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.view === viewId);
-      });
-
-      if (viewId === 'platform-pulse') loadTelemetry();
+    /* ── PRODUCT INTELLIGENCE RENDERERS ── */
+    function renderTopShoes(models) {
+      const container = document.getElementById('top-shoes-list');
+      if (!models || models.length === 0) {
+        container.innerHTML = '<div style="color:#94a3b8;font-size:13px">No data available</div>';
+        return;
+      }
+      container.innerHTML = models.map((m, i) => `
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:20px;height:20px;border-radius:50%;background:${i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#b45309' : '#e2e8f0'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i < 3 ? '#fff' : '#64748b'}">${i + 1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.brand)} ${escapeHtml(m.model)}</div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#10b981">${Number(m.active_lockers).toLocaleString()}</div>
+        </div>
+      `).join('');
     }
 
-    /* ═══════════════════════════════════════
-       DISCOVERY QUEUE — DATA
-    ═══════════════════════════════════════ */
+    function renderBrandDistribution(brands) {
+      const container = document.getElementById('brand-distribution-list');
+      if (!brands || brands.length === 0) {
+        container.innerHTML = '<div style="color:#94a3b8;font-size:13px">No data available</div>';
+        return;
+      }
+      const max = Math.max(...brands.map(b => b.count));
+      container.innerHTML = brands.map(b => {
+        const pct = Math.round((b.count / max) * 100);
+        return `
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:#1e293b">${escapeHtml(b.brand)}</div>
+          </div>
+          <div style="width:80px;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:#f97316;border-radius:3px"></div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#64748b;width:30px;text-align:right">${Number(b.count).toLocaleString()}</div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    /* ── DISCOVERY QUEUE — DATA ── */
     async function loadPending() {
       try {
-        const { data, error } = await supabase
-          .from('pending_shoe_discoveries')
-          .select('*')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        pendingData = data || [];
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list_pending', token: ADMIN_TOKEN })
+        });
+        const result = await response.json();
+        if (!result.success) throw new Error(result.message || result.error || 'Unknown error');
+        pendingData = result.discoveries || [];
         renderShoes();
         updateStats();
       } catch (err) {
-        showToast('Error loading data: ' + err.message, 'error');
+        console.error('Load error:', err);
+        showToast('Error: ' + err.message, 'error');
+        document.getElementById('shoe-list').innerHTML =
+          '<div class="empty"><p>Error loading data</p><p style="font-size:12px;margin-top:8px;">' + err.message + '</p></div>';
       }
     }
 
@@ -845,31 +2155,21 @@
       const high   = pendingData.filter(s => s.confidence === 'high').length;
       const medium = pendingData.filter(s => s.confidence === 'medium').length;
       const low    = pendingData.filter(s => s.confidence === 'low').length;
-
-      document.getElementById('stat-total').textContent  = total;
-      document.getElementById('stat-high').textContent   = high;
-      document.getElementById('stat-medium').textContent = medium;
-      document.getElementById('stat-low').textContent    = low;
-      document.getElementById('pending-count').textContent        = `${total} pending`;
+      document.getElementById('stat-total').textContent   = total;
+      document.getElementById('stat-high').textContent    = high;
+      document.getElementById('stat-medium').textContent  = medium;
+      document.getElementById('stat-low').textContent     = low;
+      document.getElementById('pending-count').textContent         = `${total} pending`;
       document.getElementById('sidebar-pending-count').textContent = total;
     }
 
-    /* ═══════════════════════════════════════
-       DISCOVERY QUEUE — RENDER
-    ═══════════════════════════════════════ */
+    /* ── DISCOVERY QUEUE — RENDER ── */
     function renderShoes() {
       const container = document.getElementById('shoe-list');
-
       if (pendingData.length === 0) {
-        container.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">🎉</div>
-            <p>No pending shoe discoveries</p>
-            <p style="font-size:12px;margin-top:8px;">All caught up!</p>
-          </div>`;
+        container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
         return;
       }
-
       container.innerHTML = pendingData.map(shoe => `
         <div class="shoe-card view-mode ${shoe.confidence}" id="card-${shoe.id}">
           <div class="shoe-header">
@@ -879,37 +2179,41 @@
             </div>
             <span class="confidence-badge ${shoe.confidence}">${shoe.confidence}</span>
           </div>
-          <div class="shoe-actions">
-            <button class="btn btn-approve" onclick="approve('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>
-            <button class="btn btn-reject"  onclick="reject('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
-            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')" id="btn-edit-${shoe.id}">✏️ Edit</button>
+          <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;">
+            <select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#1e293b;cursor:pointer;flex-shrink:0;">
+              <option value="EVA"   selected>🟡 EVA (Default)</option>
+              <option value="PEBAX"        >⚡ PEBAX (Supershoe)</option>
+              <option value="TPU"          >🔵 TPU (High Durability)</option>
+            </select>
+            <button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>
+            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
+            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
           </div>
         </div>
-
         <div class="shoe-card edit-mode" id="edit-${shoe.id}" style="display:none;">
           <input type="text" id="brand-${shoe.id}" value="${escapeHtml(shoe.brand_name)}" placeholder="Brand name">
           <input type="text" id="model-${shoe.id}" value="${escapeHtml(shoe.model_name)}" placeholder="Model name">
           <div class="edit-actions">
-            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save Changes</button>
+            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save</button>
             <button class="btn btn-edit"    onclick="cancelEdit('${shoe.id}')">Cancel</button>
           </div>
         </div>
       `).join('');
     }
 
-    /* ═══════════════════════════════════════
-       DISCOVERY QUEUE — ACTIONS
-    ═══════════════════════════════════════ */
-    async function approve(id) {
+    /* ── DISCOVERY QUEUE — ACTIONS ── */
+    async function approveShoe(id) {
       setLoading(id, true);
+      const foamEl = document.getElementById(`foam-${id}`);
+      const foam_material = foamEl ? foamEl.value : 'EVA';
       try {
         const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'approve', discovery_id: id, token: ADMIN_TOKEN })
+          body: JSON.stringify({ action: 'approve', discovery_id: id, foam_material, token: ADMIN_TOKEN })
         });
         const result = await res.json();
-        if (result.success) { removeShoe(id); showToast('Shoe approved and added to database', 'success'); }
+        if (result.success) { removeShoe(id); showToast(`Shoe approved (${foam_material}) and added to database`, 'success'); }
         else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
@@ -917,7 +2221,7 @@
       }
     }
 
-    async function reject(id) {
+    async function rejectShoe(id) {
       setLoading(id, true);
       try {
         const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
@@ -938,7 +2242,6 @@
       document.getElementById(`card-${id}`).style.display = 'none';
       document.getElementById(`edit-${id}`).style.display = 'block';
     }
-
     function cancelEdit(id) {
       document.getElementById(`card-${id}`).style.display = 'block';
       document.getElementById(`edit-${id}`).style.display = 'none';
@@ -965,22 +2268,31 @@
       }
     }
 
-    async function approveAllHighConfidence() {
-      if (!confirm('Approve all high-confidence items?')) return;
-      const highConfidence = pendingData.filter(s => s.confidence === 'high');
-      if (!highConfidence.length) { showToast('No high-confidence items to approve', 'error'); return; }
-      try {
-        const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'approve_all_high_confidence', token: ADMIN_TOKEN })
-        });
-        const result = await res.json();
-        if (result.success) { showToast(`Approved ${result.approved} shoes`, 'success'); loadPending(); }
-        else throw new Error(result.message);
-      } catch (err) {
-        showToast('Error: ' + err.message, 'error');
+    async function approveAllHigh() {
+      if (!confirm(`Approve all ${pendingData.length} pending items?`)) return;
+      if (!pendingData.length) { showToast('No items to approve', 'error'); return; }
+
+      const btn = document.querySelector('.batch-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Approving...';
+
+      let approved = 0, failed = 0;
+      for (const shoe of pendingData) {
+        try {
+          const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
+          });
+          const result = await res.json();
+          result.success ? approved++ : failed++;
+        } catch { failed++; }
       }
+
+      showToast(`Approved ${approved} shoes${failed ? `, ${failed} failed` : ''}`, failed ? 'error' : 'success');
+      await loadPending();
+      btn.disabled = false;
+      btn.textContent = '✓ Approve All';
     }
 
     function removeShoe(id) {
@@ -996,14 +2308,164 @@
       });
     }
 
+    /* ── DISCOVERY QUEUE — TAB STATE ── */
+    let dqActiveTab = 'catalog'; // 'catalog' | 'aliases'
+    let aliasData   = [];        // cache for alias rows
+
+    function switchDQTab(tab) {
+      dqActiveTab = tab;
+      document.getElementById('dq-tab-catalog').className = tab === 'catalog' ? 'deal-btn-primary'   : 'deal-btn-secondary';
+      document.getElementById('dq-tab-aliases').className = tab === 'aliases' ? 'deal-btn-primary'   : 'deal-btn-secondary';
+      document.getElementById('dq-tab-catalog').style.cssText = 'font-size:12px;padding:7px 16px;';
+      document.getElementById('dq-tab-aliases').style.cssText = 'font-size:12px;padding:7px 16px;';
+      if (tab === 'catalog') { loadPending(); }
+      else                   { loadDiscoveryQueue(); }
+    }
+
     function refreshData() {
-      loadPending();
+      if (dqActiveTab === 'aliases') loadDiscoveryQueue();
+      else                           loadPending();
       showToast('Data refreshed', 'success');
     }
 
-    /* ═══════════════════════════════════════
-       SHARED UTILITIES
-    ═══════════════════════════════════════ */
+    /* ── ALIAS QUEUE — FETCH ── */
+    async function loadDiscoveryQueue() {
+      document.getElementById('shoe-list').innerHTML =
+        '<div class="loading"><div class="spinner"></div><p>Loading alias queue…</p></div>';
+      try {
+        const { data, error } = await getSupabase()
+          .from('retailer_product_aliases')
+          .select('*, master_shoe_products(brand_name, model_name)')
+          .eq('status', 'pending')
+          .order('confidence_score', { ascending: false });
+
+        if (error) throw error;
+        aliasData = data || [];
+        renderAliasQueue();
+        updateAliasStats();
+      } catch (err) {
+        document.getElementById('shoe-list').innerHTML =
+          `<div class="empty"><p>Error loading alias queue</p><p style="font-size:12px;margin-top:8px;">${escapeHtml(err.message)}</p></div>`;
+        showToast('Alias queue error: ' + err.message, 'error');
+      }
+    }
+
+    function updateAliasStats() {
+      const total  = aliasData.length;
+      const high   = aliasData.filter(r => r.confidence_score >= 0.80).length;
+      const medium = aliasData.filter(r => r.confidence_score >= 0.70 && r.confidence_score < 0.80).length;
+      const low    = aliasData.filter(r => r.confidence_score < 0.70).length;
+      document.getElementById('stat-total').textContent          = total;
+      document.getElementById('stat-high').textContent           = high;
+      document.getElementById('stat-medium').textContent         = medium;
+      document.getElementById('stat-low').textContent            = low;
+      document.getElementById('pending-count').textContent       = `${total} pending`;
+      document.getElementById('sidebar-pending-count').textContent = total;
+    }
+
+    function renderAliasQueue() {
+      const container = document.getElementById('shoe-list');
+      if (aliasData.length === 0) {
+        container.innerHTML =
+          '<div class="empty"><div class="empty-icon">🎉</div><p>No pending affiliate aliases</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
+        return;
+      }
+      container.innerHTML = `
+        <table class="deal-table" style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;">
+          <thead>
+            <tr>
+              <th>Raw Retailer String</th>
+              <th>Suggested Match</th>
+              <th>Confidence</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${aliasData.map(row => {
+              const prod    = row.master_shoe_products;
+              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:#94a3b8">No match</span>';
+              const score   = row.confidence_score != null ? Math.round(row.confidence_score * 100) + '%' : '—';
+              const scoreCol = row.confidence_score >= 0.80
+                ? 'color:#10b981;font-weight:700;'
+                : row.confidence_score >= 0.70
+                  ? 'color:#f59e0b;font-weight:700;'
+                  : 'color:#ef4444;font-weight:700;';
+              return `<tr id="alias-row-${row.id}">
+                <td style="font-family:monospace;font-size:12px;max-width:260px;word-break:break-all;">${escapeHtml(row.raw_string)}</td>
+                <td>${match}</td>
+                <td><span style="${scoreCol}">${score}</span></td>
+                <td style="white-space:nowrap;">
+                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')">✓ Approve</button>
+                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')">✕ Reject</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    /* ── ALIAS QUEUE — RESOLVE ── */
+    async function resolveAlias(aliasId, newStatus) {
+      const row = document.getElementById(`alias-row-${aliasId}`);
+      if (row) { row.style.opacity = '0.4'; row.querySelectorAll('button').forEach(b => b.disabled = true); }
+      const { error } = await getSupabase()
+        .from('retailer_product_aliases')
+        .update({ status: newStatus })
+        .eq('id', aliasId);
+      if (error) {
+        showToast('Update failed: ' + error.message, 'error');
+        if (row) { row.style.opacity = '1'; row.querySelectorAll('button').forEach(b => b.disabled = false); }
+        return;
+      }
+      showToast(newStatus === 'approved' ? 'Alias approved ✓' : 'Alias rejected', 'success');
+      aliasData = aliasData.filter(r => r.id !== aliasId);
+      if (row) row.remove();
+      updateAliasStats();
+      if (aliasData.length === 0) renderAliasQueue();
+    }
+
+    /* ── OVERRIDE approveAllHigh to handle both tabs ── */
+    async function approveAllHigh() {
+      if (dqActiveTab === 'aliases') {
+        const eligible = aliasData.filter(r => r.confidence_score >= 0.60);
+        if (!eligible.length) { showToast('No alias rows to approve', 'error'); return; }
+        if (!confirm(`Approve all ${eligible.length} pending alias rows?`)) return;
+        const btn = document.getElementById('dq-approve-all-btn');
+        btn.disabled = true; btn.textContent = '⏳ Approving…';
+        const ids = eligible.map(r => r.id);
+        const { error } = await getSupabase()
+          .from('retailer_product_aliases')
+          .update({ status: 'approved' })
+          .in('id', ids);
+        if (error) { showToast('Batch approve failed: ' + error.message, 'error'); }
+        else { showToast(`Approved ${ids.length} aliases`, 'success'); }
+        btn.disabled = false; btn.textContent = '✓ Approve All';
+        loadDiscoveryQueue();
+        return;
+      }
+      /* original catalog flow */
+      if (!confirm(`Approve all ${pendingData.length} pending items?`)) return;
+      if (!pendingData.length) { showToast('No items to approve', 'error'); return; }
+      const btn = document.getElementById('dq-approve-all-btn');
+      btn.disabled = true; btn.textContent = '⏳ Approving...';
+      let approved = 0, failed = 0;
+      for (const shoe of pendingData) {
+        try {
+          const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'approve', discovery_id: shoe.id, token: ADMIN_TOKEN })
+          });
+          const result = await res.json();
+          result.success ? approved++ : failed++;
+        } catch { failed++; }
+      }
+      showToast(`Approved ${approved} shoes${failed ? `, ${failed} failed` : ''}`, failed ? 'error' : 'success');
+      await loadPending();
+      btn.disabled = false; btn.textContent = '✓ Approve All';
+    }
+
+    /* ── UTILITIES ── */
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
       toast.className = `toast ${type} show`;
@@ -1016,6 +2478,1167 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DUPLICATE DETECTOR
+    ═══════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════
+       DEAL ENGINE MONITOR
+    ═══════════════════════════════════════════════════ */
+
+    let dealEngineLoaded = false;
+
+    function fmtCents(cents, currency) {
+      if (cents == null) return '—';
+      const sym = { USD:'$', GBP:'£', EUR:'€', AUD:'A$', CAD:'C$' }[currency] || (currency + ' ');
+      return sym + (cents / 100).toFixed(2);
+    }
+
+    function discountPct(price, msrp) {
+      if (!msrp || msrp <= 0) return null;
+      return Math.round(((msrp - price) / msrp) * 100);
+    }
+
+    function discountPillClass(pct) {
+      if (pct >= 30) return 'hot';
+      if (pct >= 15) return 'warm';
+      return '';
+    }
+
+    async function fetchDealMetrics() {
+      dealEngineLoaded = true;
+      /* Loading state */
+      const loadingRow = (cols) => `<tr><td colspan="${cols}" style="text-align:center;color:#94a3b8;padding:28px;"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</td></tr>`;
+      document.getElementById('dm-deals-tbody').innerHTML  = loadingRow(7);
+      document.getElementById('dm-alerts-tbody').innerHTML = loadingRow(6);
+      ['dm-active-deals','dm-alerts-today','dm-deepest'].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;display:inline-block;"></div>';
+      });
+
+      try {
+        const sb = getSupabase();
+        const yesterday = new Date(Date.now() - 864e5).toISOString();
+
+        /* Parallel queries */
+        const [dealsRes, alertsRes] = await Promise.all([
+
+          /* All active discounted deals, sorted by largest % drop */
+          sb.from('shoe_deals')
+            .select('id, price_cents, msrp_cents, currency, retailer_name, updated_at, master_shoe_products(brand_name, model_name, image_url)')
+            .eq('is_active', true)
+            .not('msrp_cents', 'is', null)
+            .gt('msrp_cents', 0)
+            .order('price_cents', { ascending: true })
+            .limit(100),  /* fetch 100, sort by discount % client-side */
+
+          /* Triggered alerts: is_active=false + last_alerted_at set, most recent 20 */
+          sb.from('user_price_alerts')
+            .select('id, target_price_cents, currency, created_at, last_alerted_at, master_shoe_products(brand_name, model_name), users(email, first_name, last_name)')
+            .not('last_alerted_at', 'is', null)
+            .order('last_alerted_at', { ascending: false })
+            .limit(20),
+        ]);
+
+        if (dealsRes.error)  throw dealsRes.error;
+        if (alertsRes.error) throw alertsRes.error;
+
+        /* ─ Process deals ─ */
+        const allDeals = (dealsRes.data || [])
+          .filter(d => d.price_cents < d.msrp_cents)
+          .map(d => ({ ...d, pct: discountPct(d.price_cents, d.msrp_cents) }))
+          .sort((a, b) => b.pct - a.pct);
+
+        const topDeals   = allDeals.slice(0, 20);
+        const deepest    = allDeals[0]?.pct ?? null;
+
+        /* ─ Process alerts ─ */
+        const allAlerts  = alertsRes.data || [];
+        const alertsToday = allAlerts.filter(a => a.last_alerted_at >= yesterday).length;
+
+        /* ─ Update metric cards ─ */
+        document.getElementById('dm-active-deals').textContent  = allDeals.length;
+        document.getElementById('dm-alerts-today').textContent  = alertsToday;
+        document.getElementById('dm-deepest').textContent       = deepest != null ? deepest + '%' : '—';
+
+        /* ─ Render deals table ─ */
+        document.getElementById('dm-deals-count').textContent = `· ${topDeals.length} of ${allDeals.length} shown`;
+        if (topDeals.length === 0) {
+          document.getElementById('dm-deals-tbody').innerHTML =
+            '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
+        } else {
+          document.getElementById('dm-deals-tbody').innerHTML = topDeals.map(d => {
+            const prod  = d.master_shoe_products;
+            const name  = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
+            const thumb = prod?.image_url
+              ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
+              : `<div class="deal-shoe-thumb-placeholder">💟</div>`;
+            const pillCls = discountPillClass(d.pct);
+            return `<tr>
+              <td style="display:flex;align-items:center;gap:10px;">
+                ${thumb}
+                <span style="font-weight:500;">${escapeHtml(name)}</span>
+              </td>
+              <td>${escapeHtml(d.retailer_name)}</td>
+              <td style="color:#94a3b8;text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
+              <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
+              <td><span class="deal-discount-pill ${pillCls}">↓${d.pct}%</span></td>
+              <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
+              <td style="white-space:nowrap;">
+                <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)">✓ Verify</button>
+                <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)">✕ Deactivate</button>
+              </td>
+            </tr>`;
+          }).join('');
+        }
+
+        /* ─ Render alerts table ─ */
+        document.getElementById('dm-alerts-count').textContent = `· ${allAlerts.length} shown`;
+        if (allAlerts.length === 0) {
+          document.getElementById('dm-alerts-tbody').innerHTML =
+            '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No triggered alerts found.</td></tr>';
+        } else {
+          document.getElementById('dm-alerts-tbody').innerHTML = allAlerts.map(a => {
+            const prod   = a.master_shoe_products;
+            const shoeName = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
+            const user   = a.users;
+            const userLabel = user?.email
+              ? escapeHtml(user.email)
+              : user?.first_name
+              ? escapeHtml(`${user.first_name} ${user.last_name||''}`.trim())
+              : `<span style="color:#94a3b8;font-family:monospace;font-size:11px;">${escapeHtml(a.id.slice(0,8))}…</span>`;
+            const isToday = a.last_alerted_at >= yesterday;
+            return `<tr>
+              <td>${userLabel}</td>
+              <td style="font-weight:500;">${escapeHtml(shoeName)}</td>
+              <td style="font-weight:600;color:#10b981;">${fmtCents(a.target_price_cents, a.currency)}</td>
+              <td style="color:#64748b;">${escapeHtml(a.currency || 'USD')}</td>
+              <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(fmtDateTime(a.created_at))}</td>
+              <td style="white-space:nowrap;">
+                <span style="font-size:12px;">${escapeHtml(fmtDateTime(a.last_alerted_at))}</span>
+                ${isToday ? '<span style="margin-left:5px;font-size:10px;background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:10px;font-weight:600;">TODAY</span>' : ''}
+              </td>
+            </tr>`;
+          }).join('');
+        }
+
+      } catch(err) {
+        ['dm-deals-tbody','dm-alerts-tbody'].forEach(id => {
+          document.getElementById(id).innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:28px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        });
+        showToast('Deal Engine error: ' + err.message, 'error');
+      }
+    }
+
+    /* ── DEAL CRUD ── */
+    function openDealModal() {
+      document.getElementById('deal-modal-overlay').classList.add('open');
+    }
+    function closeDealModal() {
+      document.getElementById('deal-modal-overlay').classList.remove('open');
+    }
+    function closeDealModalOnOverlay(e) {
+      if (e.target === document.getElementById('deal-modal-overlay')) closeDealModal();
+    }
+
+    async function submitDeal() {
+      const masterId  = document.getElementById('df-master-id').value.trim();
+      const retailer  = document.getElementById('df-retailer').value.trim();
+      const logoUrl   = document.getElementById('df-logo').value.trim();
+      const url       = document.getElementById('df-url').value.trim();
+      const price     = parseInt(document.getElementById('df-price').value, 10);
+      const msrp      = parseInt(document.getElementById('df-msrp').value, 10);
+      const currency  = document.getElementById('df-currency').value;
+      const market    = document.getElementById('df-market').value;
+      const label     = document.getElementById('df-label').value.trim() || null;
+      const rank      = parseInt(document.getElementById('df-rank').value, 10) || 1;
+
+      if (!masterId || !retailer || !url || isNaN(price)) {
+        showToast('Master Product ID, Retailer, URL and Price are required.', 'error');
+        return;
+      }
+
+      const payload = {
+        master_product_id:  masterId,
+        retailer_name:      retailer,
+        retailer_logo_url:  logoUrl || null,
+        url,
+        price_cents:        price,
+        msrp_cents:         isNaN(msrp) ? null : msrp,
+        currency,
+        market,
+        label,
+        rank,
+        is_active:          true,
+        last_verified_at:   new Date().toISOString(),
+      };
+
+      const { error } = await getSupabase().from('shoe_deals').insert(payload);
+      if (error) { showToast('Insert failed: ' + error.message, 'error'); return; }
+
+      showToast('Deal created successfully!', 'success');
+      closeDealModal();
+      /* Reset form */
+      ['df-master-id','df-retailer','df-logo','df-url','df-price','df-msrp','df-label'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('df-rank').value = '1';
+      document.getElementById('df-currency').value = 'USD';
+      document.getElementById('df-market').value = 'usd_en';
+      /* Reload table */
+      dealEngineLoaded = false;
+      fetchDealMetrics();
+    }
+
+    async function verifyDeal(dealId, btn) {
+      btn.disabled = true;
+      btn.textContent = '…';
+      const { error } = await getSupabase()
+        .from('shoe_deals')
+        .update({ last_verified_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq('id', dealId);
+      if (error) { showToast('Verify failed: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✓ Verify'; return; }
+      showToast('Deal verified — staleness cleared.', 'success');
+      dealEngineLoaded = false;
+      fetchDealMetrics();
+    }
+
+    async function deactivateDeal(dealId, btn) {
+      if (!confirm('Deactivate this deal? It will no longer appear in the app.')) return;
+      btn.disabled = true;
+      btn.textContent = '…';
+      const { error } = await getSupabase()
+        .from('shoe_deals')
+        .update({ is_active: false })
+        .eq('id', dealId);
+      if (error) { showToast('Deactivate failed: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✕ Deactivate'; return; }
+      showToast('Deal deactivated.', 'success');
+      dealEngineLoaded = false;
+      fetchDealMetrics();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       USER SUPPORT CONSOLE
+    ═══════════════════════════════════════════════════ */
+
+    function fmtDist(metres) {
+      if (metres == null) return '—';
+      return (metres / 1000).toFixed(1) + ' km';
+    }
+
+    function fmtMinSec(seconds) {
+      if (!seconds) return '—';
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}m ${String(s).padStart(2,'0')}s`;
+    }
+
+    function wearPill(current, max) {
+      const pct = max ? Math.round((current / max) * 100) : 0;
+      const cls = pct >= 100 ? 'pill-dead' : pct >= 80 ? 'pill-worn' : 'pill-ok';
+      return `<span class="support-kv-val ${cls}">${pct}%</span>`;
+    }
+
+    function weeksLeft(current, max) {
+      if (!max || current >= max) return '—';
+      const weeklyKm = 40; /* rough average */
+      const remaining = (max - current) / 1000;
+      const weeks = Math.round(remaining / weeklyKm);
+      return `~${weeks}w`;
+    }
+
+    async function lookupUser() {
+      const query = document.getElementById('support-search-input').value.trim();
+      if (!query) return;
+
+      const btn = document.getElementById('support-search-btn');
+      btn.disabled = true;
+      btn.textContent = 'Looking up…';
+
+      /* Show results area, reset state */
+      const results = document.getElementById('support-results');
+      results.classList.add('visible');
+      document.getElementById('support-not-found').style.display = 'none';
+      const cards = document.getElementById('support-cards');
+      cards.style.display = 'none';
+
+      /* Reset card bodies to loading spinners */
+      ['sc-profile','sc-rotation'].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      });
+      ['sc-activities','sc-webhooks'].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      });
+
+      try {
+        const sb = getSupabase();
+
+        /* Step 1: resolve user by email OR strava_athlete_id */
+        const isAthleteId = /^\d+$/.test(query);
+        const userQuery = isAthleteId
+          ? sb.from('users').select('id,email,first_name,last_name,avatar_url,strava_athlete_id,preferred_units,created_at,strava_tokens').eq('strava_athlete_id', query).maybeSingle()
+          : sb.from('users').select('id,email,first_name,last_name,avatar_url,strava_athlete_id,preferred_units,created_at,strava_tokens').ilike('email', query).maybeSingle();
+
+        const { data: user, error: userErr } = await userQuery;
+
+        if (userErr) throw userErr;
+        if (!user) {
+          document.getElementById('support-not-found').style.display = 'block';
+          return;
+        }
+
+        cards.style.display = 'block';
+
+        /* Step 2: parallel fetch of all card data */
+        const [gearRes, actRes, whRes] = await Promise.all([
+
+          /* Rotation: active shoes with product join */
+          sb.from('user_gear_items')
+            .select('id,nickname,current_distance,true_wear_distance,max_distance_limit,is_active,master_shoe_products(brand_name,model_name)')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('current_distance', { ascending: false })
+            .limit(10),
+
+          /* Activity log: last 10 */
+          sb.from('user_activities')
+            .select('id,name,type,start_date,distance,true_wear_distance,moving_time,total_elevation_gain')
+            .eq('user_id', user.id)
+            .order('start_date', { ascending: false })
+            .limit(10),
+
+          /* Webhook audit trail: last 10 by athlete ID */
+          user.strava_athlete_id
+            ? sb.from('strava_webhook_logs')
+                .select('id,created_at,object_type,aspect_type,object_id,status,error_message')
+                .eq('owner_id', user.strava_athlete_id)
+                .order('created_at', { ascending: false })
+                .limit(10)
+            : Promise.resolve({ data: [], error: null }),
+        ]);
+
+        /* ─ Card 1: Profile ─ */
+        const lastSync = user.strava_tokens?.expires_at
+          ? fmtDateTime(new Date(user.strava_tokens.expires_at * 1000).toISOString())
+          : '—';
+        const totalDist = actRes.data
+          ? actRes.data.reduce((s, a) => s + (a.distance || 0), 0)
+          : 0;
+        document.getElementById('sc-profile').innerHTML = `
+          <div class="support-kv"><span class="support-kv-label">Name</span><span class="support-kv-val">${escapeHtml((user.first_name||'') + ' ' + (user.last_name||'')) || '—'}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Email</span><span class="support-kv-val">${escapeHtml(user.email || '—')}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Athlete ID</span><span class="support-kv-val mono">${escapeHtml(user.strava_athlete_id || '—')}</span></div>
+          <div class="support-kv"><span class="support-kv-label">User UUID</span><span class="support-kv-val mono" style="font-size:11px;">${escapeHtml(user.id)}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Units</span><span class="support-kv-val">${escapeHtml(user.preferred_units || 'km')}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Token Expiry</span><span class="support-kv-val">${escapeHtml(lastSync)}</span></div>
+          <div class="support-kv"><span class="support-kv-label">Total Distance</span><span class="support-kv-val">${fmtDist(totalDist)} (last 10 runs)</span></div>
+          <div class="support-kv"><span class="support-kv-label">Member Since</span><span class="support-kv-val">${escapeHtml(fmtDateTime(user.created_at))}</span></div>`;
+
+        /* ─ Card 2: Rotation ─ */
+        if (gearRes.error) throw gearRes.error;
+        const shoes = gearRes.data || [];
+        if (shoes.length === 0) {
+          document.getElementById('sc-rotation').innerHTML = '<p style="color:#94a3b8;font-size:13px;">No active shoes.</p>';
+        } else {
+          document.getElementById('sc-rotation').innerHTML = shoes.map(s => {
+            const product = s.master_shoe_products;
+            const name = s.nickname || (product ? `${product.brand_name} ${product.model_name}` : 'Unknown');
+            const wear = s.true_wear_distance ?? s.current_distance ?? 0;
+            return `
+              <div class="support-kv"><span class="support-kv-label" style="max-width:none;flex:1;">${escapeHtml(name)}</span>${wearPill(wear, s.max_distance_limit)}</div>
+              <div class="support-kv" style="padding-left:0;margin-bottom:12px;">
+                <span class="support-kv-label">True wear</span>
+                <span class="support-kv-val">${fmtDist(wear)} / ${fmtDist(s.max_distance_limit)} · ${weeksLeft(wear, s.max_distance_limit)} left</span>
+              </div>`;
+          }).join('');
+        }
+
+        /* ─ Card 3: Activities ─ */
+        if (actRes.error) throw actRes.error;
+        const acts = actRes.data || [];
+        document.getElementById('sc-act-count').textContent = `· ${acts.length} shown`;
+        if (acts.length === 0) {
+          document.getElementById('sc-activities').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No activities found.</p>';
+        } else {
+          document.getElementById('sc-activities').innerHTML = `
+            <table class="support-table">
+              <thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Raw Dist</th><th>True Wear</th><th>Time</th><th>Elev</th></tr></thead>
+              <tbody>${acts.map(a => `
+                <tr>
+                  <td style="white-space:nowrap;">${escapeHtml(fmtDateTime(a.start_date))}</td>
+                  <td>${escapeHtml(a.name || '—')}</td>
+                  <td><span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:600;">${escapeHtml(a.type || '—')}</span></td>
+                  <td>${fmtDist(a.distance)}</td>
+                  <td>${fmtDist(a.true_wear_distance)}</td>
+                  <td style="white-space:nowrap;">${fmtMinSec(a.moving_time)}</td>
+                  <td>${a.total_elevation_gain != null ? Math.round(a.total_elevation_gain) + 'm' : '—'}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>`;
+        }
+
+        /* ─ Card 4: Webhooks ─ */
+        const whs = whRes.data || [];
+        document.getElementById('sc-wh-count').textContent = `· ${whs.length} shown`;
+        if (!user.strava_athlete_id) {
+          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No Strava Athlete ID — cannot query webhook logs.</p>';
+        } else if (whs.length === 0) {
+          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No webhook events found for this athlete.</p>';
+        } else {
+          document.getElementById('sc-webhooks').innerHTML = `
+            <table class="support-table">
+              <thead><tr><th>Timestamp</th><th>Event</th><th>Object ID</th><th>Status</th><th>Error</th></tr></thead>
+              <tbody>${whs.map(w => {
+                const statusCls = w.status === 'ok' ? 'ok' : w.status === 'error' ? 'error' : 'unknown';
+                return `<tr>
+                  <td style="white-space:nowrap;font-size:12px;">${escapeHtml(fmtDateTime(w.created_at))}<br><span style="color:#94a3b8;font-size:11px;">${escapeHtml(timeAgo(w.created_at))}</span></td>
+                  <td><span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:600;">${escapeHtml((w.object_type||'') + '.' + (w.aspect_type||''))}</span></td>
+                  <td style="font-family:monospace;font-size:12px;">${escapeHtml(w.object_id || '—')}</td>
+                  <td><span class="sync-badge ${statusCls}">${w.status === 'ok' ? '✓ OK' : w.status === 'error' ? '✕ Error' : w.status}</span></td>
+                  <td style="font-size:12px;color:#ef4444;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(w.error_message||'')}">${escapeHtml(w.error_message || '—')}</td>
+                </tr>`;
+              }).join('')}
+              </tbody>
+            </table>`;
+        }
+
+      } catch(err) {
+        document.getElementById('support-not-found').style.display = 'block';
+        document.getElementById('support-not-found').innerHTML = `<div style="font-size:32px;margin-bottom:10px;">⚠️</div>${escapeHtml(err.message)}`;
+        cards.style.display = 'none';
+        showToast('Lookup error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔍 Look Up User';
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       BRAND NORMALIZATION
+    ═══════════════════════════════════════════════════ */
+
+    let brandLoaded  = false;
+    let brandAllRows = [];     /* [{ brand_name, count }] */
+    let brandSelected = new Set(); /* selected brand_name strings */
+
+    async function loadBrands() {
+      brandLoaded = true;
+      const scroll = document.getElementById('brand-scroll');
+      scroll.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading brands…</p></div>';
+      brandSelected.clear();
+      renderChips();
+      updateNormalizeBtn();
+
+      try {
+        const sb = getSupabase();
+        /* Fetch every brand_name from master_shoe_products, group by brand */
+        const { data, error } = await sb
+          .from('master_shoe_products')
+          .select('brand_name');
+
+        if (error) throw error;
+
+        /* Count occurrences client-side */
+        const counts = {};
+        (data || []).forEach(r => {
+          const b = r.brand_name?.trim() || '(unknown)';
+          counts[b] = (counts[b] || 0) + 1;
+        });
+
+        brandAllRows = Object.entries(counts)
+          .map(([brand_name, count]) => ({ brand_name, count }))
+          .sort((a, b) => a.brand_name.localeCompare(b.brand_name));
+
+        document.getElementById('brand-list-meta').textContent = `${brandAllRows.length} brands`;
+        renderBrandList(brandAllRows);
+      } catch (err) {
+        scroll.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>${escapeHtml(err.message)}</p></div>`;
+        showToast('Error loading brands: ' + err.message, 'error');
+      }
+    }
+
+    function filterBrands() {
+      const q = document.getElementById('brand-search').value.toLowerCase();
+      const filtered = q ? brandAllRows.filter(r => r.brand_name.toLowerCase().includes(q)) : brandAllRows;
+      renderBrandList(filtered);
+    }
+
+    function renderBrandList(rows) {
+      const scroll = document.getElementById('brand-scroll');
+      if (rows.length === 0) {
+        scroll.innerHTML = '<div class="empty"><p>No brands match.</p></div>';
+        return;
+      }
+      scroll.innerHTML = rows.map(r => {
+        const checked = brandSelected.has(r.brand_name);
+        return `
+          <label class="brand-row${checked ? ' selected' : ''}" data-brand="${escapeHtml(r.brand_name)}">
+            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleBrand('${escapeHtml(r.brand_name.replace(/'/g, "\\'"))}', this.checked)">
+            <span class="brand-row-name">${escapeHtml(r.brand_name)}</span>
+            <span class="brand-row-count">${r.count} shoe${r.count !== 1 ? 's' : ''}</span>
+          </label>`;
+      }).join('');
+    }
+
+    function toggleBrand(name, checked) {
+      if (checked) brandSelected.add(name);
+      else         brandSelected.delete(name);
+
+      /* Update row highlight without full re-render */
+      document.querySelectorAll('.brand-row').forEach(el => {
+        if (el.dataset.brand === name) el.classList.toggle('selected', checked);
+      });
+
+      /* Auto-fill master input when exactly one brand is selected */
+      if (brandSelected.size === 1) {
+        const input = document.getElementById('brand-master-input');
+        if (!input.value) input.value = [...brandSelected][0];
+      }
+
+      renderChips();
+      updateNormalizeBtn();
+    }
+
+    function renderChips() {
+      const container = document.getElementById('brand-chips');
+      if (brandSelected.size === 0) {
+        container.innerHTML = '<span class="brand-chips-placeholder">No brands selected</span>';
+        return;
+      }
+      container.innerHTML = [...brandSelected].map(name => `
+        <span class="brand-chip">
+          ${escapeHtml(name)}
+          <span class="brand-chip-remove" onclick="removeChip('${escapeHtml(name.replace(/'/g, "\\'"))}')">&times;</span>
+        </span>`).join('');
+    }
+
+    function removeChip(name) {
+      brandSelected.delete(name);
+      /* Uncheck the checkbox if visible */
+      document.querySelectorAll('.brand-row').forEach(el => {
+        if (el.dataset.brand === name) {
+          el.classList.remove('selected');
+          const cb = el.querySelector('input[type=checkbox]');
+          if (cb) cb.checked = false;
+        }
+      });
+      renderChips();
+      updateNormalizeBtn();
+    }
+
+    function updateNormalizeBtn() {
+      const master = document.getElementById('brand-master-input').value.trim();
+      const btn = document.getElementById('brand-normalize-btn');
+      btn.disabled = brandSelected.size === 0 || !master;
+    }
+
+    async function normalizeBrands() {
+      const master = document.getElementById('brand-master-input').value.trim();
+      const aliases = [...brandSelected];
+      if (!aliases.length || !master) return;
+
+      const btn = document.getElementById('brand-normalize-btn');
+      const resultBox = document.getElementById('brand-result-box');
+      btn.disabled = true;
+      btn.textContent = 'Normalizing…';
+      resultBox.className = 'brand-result-box';
+
+      try {
+        const sb = getSupabase();
+        const { data, error } = await sb
+          .rpc('normalize_brand_name', { aliases, master_name: master });
+
+        if (error) throw error;
+
+        const updated = data ?? 0;
+        resultBox.className = 'brand-result-box ok';
+        resultBox.textContent = `✓ ${updated} row${updated !== 1 ? 's' : ''} updated — "${aliases.join('", "')}" → "${master}"`;
+
+        showToast(`Normalized ${updated} rows to "${master}"`, 'success');
+
+        /* Reset selection & reload list */
+        brandSelected.clear();
+        document.getElementById('brand-master-input').value = '';
+        document.getElementById('brand-search').value = '';
+        renderChips();
+        updateNormalizeBtn();
+        loadBrands();
+
+      } catch (err) {
+        resultBox.className = 'brand-result-box error';
+        resultBox.textContent = '⚠️ ' + err.message;
+        showToast('Normalization failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Normalize Selected';
+        updateNormalizeBtn();
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       STRAVA SYNC MONITOR
+    ═══════════════════════════════════════════════════ */
+
+    let syncLoaded = false;
+    let syncFilter = 'all';
+    let syncAllLogs = [];
+
+    const WEBHOOK_FN_URL = `${SUPABASE_URL}/functions/v1/strava-webhook`;
+
+    function setSyncFilter(filter) {
+      syncFilter = filter;
+      document.querySelectorAll('.sync-filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === filter);
+      });
+      renderWebhookLogs(syncAllLogs);
+    }
+
+    async function fetchWebhookLogs() {
+      syncLoaded = true;
+      const tbody = document.getElementById('sync-table-body');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+
+      try {
+        const sb = getSupabase();
+        const { data, error } = await sb
+          .from('strava_webhook_logs')
+          .select('id, created_at, object_type, aspect_type, object_id, owner_id, status, error_message, payload')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+        syncAllLogs = data || [];
+        renderWebhookLogs(syncAllLogs);
+
+        /* Update error badge */
+        const errCount = syncAllLogs.filter(r => r.status === 'error').length;
+        const badge = document.getElementById('sync-error-badge');
+        const sidebarBadge = document.getElementById('sidebar-error-count');
+        if (errCount > 0) {
+          badge.textContent = `${errCount} error${errCount > 1 ? 's' : ''}`;
+          badge.style.display = '';
+          sidebarBadge.textContent = errCount;
+          sidebarBadge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+          sidebarBadge.style.display = 'none';
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        showToast('Error loading webhook logs: ' + err.message, 'error');
+      }
+    }
+
+    function renderWebhookLogs(logs) {
+      const tbody = document.getElementById('sync-table-body');
+      const filtered = syncFilter === 'all' ? logs : logs.filter(r => r.status === syncFilter);
+
+      if (filtered.length === 0) {
+        const msg = syncFilter === 'all'
+          ? 'No webhook events yet. Events will appear here after the next Strava activity.'
+          : `No ${syncFilter} events in the last 50.`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:40px;">${escapeHtml(msg)}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(row => {
+        const ts = fmtDateTime(row.created_at);
+        const ago = timeAgo(row.created_at);
+        const eventClass = row.aspect_type === 'delete' ? 'delete' : row.aspect_type === 'update' ? 'update' : '';
+        const eventLabel = row.object_type && row.aspect_type
+          ? `${row.object_type}.${row.aspect_type}`
+          : row.object_type || '—';
+        const statusClass = row.status === 'ok' ? 'ok' : row.status === 'error' ? 'error' : 'skipped';
+        const statusIcon  = row.status === 'ok' ? '✓' : row.status === 'error' ? '✕' : '⏭';
+        const statusLabel = row.status === 'ok' ? '200 OK' : row.status === 'error' ? 'Error' : 'Skipped';
+
+        const retryBtn = row.status === 'error'
+          ? `<button class="sync-retry-btn" id="retry-${row.id}" onclick="retryStravaSync('${row.id}', ${escapeHtml(JSON.stringify(JSON.stringify(row.payload)))})">↩ Retry</button>`
+          : '';
+        const payloadBtn = `<button class="sync-payload-btn" onclick="showPayload('${row.id}')">{ }</button>`;
+
+        const errTip = row.error_message
+          ? `<div style="font-size:11px;color:#ef4444;margin-top:3px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(row.error_message)}">${escapeHtml(row.error_message)}</div>`
+          : '';
+
+        return `
+          <tr data-id="${row.id}">
+            <td>
+              <div style="font-size:12px;color:#1e293b;">${escapeHtml(ts)}</div>
+              <div style="font-size:11px;color:#94a3b8;">${escapeHtml(ago)}</div>
+            </td>
+            <td><span class="sync-event-pill ${eventClass}">${escapeHtml(eventLabel)}</span></td>
+            <td style="font-family:monospace;font-size:12px;color:#64748b;">${escapeHtml(row.owner_id || '—')}</td>
+            <td style="font-family:monospace;font-size:12px;color:#64748b;">${escapeHtml(row.object_id || '—')}</td>
+            <td>
+              <span class="sync-badge ${statusClass}">${statusIcon} ${statusLabel}</span>
+              ${errTip}
+            </td>
+            <td style="display:flex;gap:6px;align-items:center;">
+              ${retryBtn}
+              ${payloadBtn}
+            </td>
+          </tr>`;
+      }).join('');
+
+      /* Cache payloads for the modal */
+      window._syncPayloads = {};
+      logs.forEach(r => { window._syncPayloads[r.id] = r.payload; });
+    }
+
+    async function retryStravaSync(logId, payloadJson) {
+      const btn = document.getElementById(`retry-${logId}`);
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Retrying…'; }
+
+      let payload;
+      try { payload = JSON.parse(payloadJson); } catch { payload = {}; }
+
+      try {
+        const res = await fetch(WEBHOOK_FN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast('Retry submitted — refreshing logs…', 'success');
+        setTimeout(fetchWebhookLogs, 2000);
+      } catch (err) {
+        showToast('Retry failed: ' + err.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = '↩ Retry'; }
+      }
+    }
+
+    function showPayload(logId) {
+      const payload = window._syncPayloads?.[logId];
+      document.getElementById('payload-modal-content').textContent =
+        JSON.stringify(payload, null, 2);
+      document.getElementById('payload-modal').classList.add('open');
+    }
+
+    function closePayloadModal(e) {
+      if (!e || e.target === document.getElementById('payload-modal')) {
+        document.getElementById('payload-modal').classList.remove('open');
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SYSTEM HEALTH
+    ═══════════════════════════════════════════════════ */
+
+    let healthLoaded = false;
+
+    function timeAgo(isoString) {
+      if (!isoString) return 'Never';
+      const diff = Date.now() - new Date(isoString).getTime();
+      const mins  = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days  = Math.floor(diff / 86400000);
+      if (mins < 2)   return 'Just now';
+      if (mins < 60)  return `${mins} minutes ago`;
+      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+
+    function fmtDateTime(isoString) {
+      if (!isoString) return '—';
+      return new Date(isoString).toLocaleString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function setVal(id, value, removeClass) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = value;
+      el.classList.remove('loading-val');
+      if (removeClass) el.classList.remove(removeClass);
+    }
+
+    async function fetchSystemHealth() {
+      healthLoaded = true;
+
+      /* Spinner on button */
+      const btn = document.getElementById('health-refresh-btn');
+      if (btn) btn.classList.add('spinning');
+
+      /* Reset to loading state */
+      ['h-queue-val','h-orphan-val','h-cron-val','h-total-val'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = '…'; el.classList.add('loading-val'); }
+      });
+      const cronTbody = document.getElementById('h-cron-table');
+      if (cronTbody) cronTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;">Loading…</td></tr>';
+
+      try {
+        const sb = getSupabase();
+
+        /* Run 4 queries concurrently */
+        const [queueRes, orphanRes, lastDealRes, totalRes, cronRes] = await Promise.all([
+
+          /* 1. Pending discovery queue count */
+          sb.from('pending_shoe_discoveries')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending'),
+
+          /* 2. Orphaned runs — user_activities where gear_id IS NULL */
+          sb.from('user_activities')
+            .select('id', { count: 'exact', head: true })
+            .is('gear_id', null),
+
+          /* 3. Last deal updated_at as scraper proxy */
+          sb.from('shoe_deals')
+            .select('updated_at')
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+
+          /* 4. Total master shoe products */
+          sb.from('master_shoe_products')
+            .select('id', { count: 'exact', head: true }),
+
+          /* 5. Recent cron jobs from pg_cron view (may not be accessible via anon) */
+          sb.from('cron.job_run_details')
+            .select('jobid, jobname, start_time, end_time, status, return_message')
+            .order('start_time', { ascending: false })
+            .limit(10)
+            .then(r => r)
+            .catch(() => ({ data: null, error: { message: 'cron schema not accessible via anon' } }))
+        ]);
+
+        /* Queue size */
+        const queueCount = queueRes.count ?? '?';
+        setVal('h-queue-val', queueCount);
+        document.getElementById('h-queue-sub').textContent =
+          queueCount === 1 ? 'shoe awaiting review' : 'shoes awaiting review';
+
+        /* Orphaned runs */
+        const orphanCount = orphanRes.count ?? '?';
+        setVal('h-orphan-val', orphanCount);
+        const orphanCard = document.getElementById('h-orphan-card');
+        if (orphanCard) orphanCard.classList.toggle('warn', orphanCount > 0);
+
+        /* Last scraper run */
+        const lastDeal = lastDealRes.data?.updated_at;
+        setVal('h-cron-val', timeAgo(lastDeal));
+        document.getElementById('h-cron-sub').textContent =
+          lastDeal ? `Last deal updated ${fmtDateTime(lastDeal)}` : 'No deals found';
+
+        /* Total shoes */
+        setVal('h-total-val', totalRes.count ?? '?');
+
+        /* Cron table */
+        if (cronRes.error || !cronRes.data || cronRes.data.length === 0) {
+          /* pg_cron.job_run_details needs service role — show graceful fallback */
+          cronTbody.innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align:center;color:#94a3b8;padding:24px;font-size:12px;">
+                <div style="margin-bottom:6px">🔒 Cron details require service-role access</div>
+                <a href="https://supabase.com/dashboard/project/vpeszlbrrqwsmnhqdtpf/database/query-runner"
+                   target="_blank"
+                   style="color:#f97316;text-decoration:underline;font-size:12px;">
+                  View in Supabase SQL Editor →
+                </a>
+              </td>
+            </tr>`;
+        } else {
+          cronTbody.innerHTML = cronRes.data.map(row => {
+            const duration = row.start_time && row.end_time
+              ? ((new Date(row.end_time) - new Date(row.start_time)) / 1000).toFixed(1) + 's'
+              : '—';
+            const statusClass = row.status === 'succeeded' ? 'ok'
+              : row.status === 'failed' ? 'error' : 'warn';
+            return `
+              <tr>
+                <td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${escapeHtml(row.jobname || String(row.jobid))}</code></td>
+                <td>${fmtDateTime(row.start_time)}<br><span style="color:#94a3b8;font-size:11px">${timeAgo(row.start_time)}</span></td>
+                <td><span class="status-pill ${statusClass}">${escapeHtml(row.status || 'unknown')}</span></td>
+                <td>${duration}</td>
+              </tr>`;
+          }).join('');
+        }
+
+      } catch (err) {
+        console.error('Health fetch error:', err);
+        showToast('Health fetch error: ' + err.message, 'error');
+        ['h-queue-val','h-orphan-val','h-cron-val','h-total-val'].forEach(id => setVal(id, '!'));
+      } finally {
+        if (btn) btn.classList.remove('spinning');
+      }
+    }
+
+    /* State: groupKey → { shoes[], masterId } */
+    const dupState = {};
+
+    /* ── Similarity helpers ── */
+
+    /** Normalise a model name for comparison */
+    function normaliseName(name) {
+      return name
+        .toLowerCase()
+        .replace(/\bv\d+\b/g, '')          // strip version suffixes (v2, v3…)
+        .replace(/[^a-z0-9\s]/g, '')       // strip punctuation
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    /** Levenshtein distance – O(m*n) */
+    function levenshtein(a, b) {
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, (_, i) =>
+        Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+      );
+      for (let i = 1; i <= m; i++)
+        for (let j = 1; j <= n; j++)
+          dp[i][j] = a[i-1] === b[j-1]
+            ? dp[i-1][j-1]
+            : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+      return dp[m][n];
+    }
+
+    /** Similarity ratio 0–1 (1 = identical) */
+    function similarity(a, b) {
+      const na = normaliseName(a), nb = normaliseName(b);
+      if (na === nb) return 1;
+      const maxLen = Math.max(na.length, nb.length);
+      if (maxLen === 0) return 1;
+      return 1 - levenshtein(na, nb) / maxLen;
+    }
+
+    const SIM_THRESHOLD = 0.80; // ≥80% similar → suspected duplicate
+
+    /** Group shoes into suspect clusters */
+    function groupDuplicates(shoes) {
+      const groups = [];
+      const assigned = new Set();
+
+      for (let i = 0; i < shoes.length; i++) {
+        if (assigned.has(i)) continue;
+        const group = [shoes[i]];
+        assigned.add(i);
+
+        for (let j = i + 1; j < shoes.length; j++) {
+          if (assigned.has(j)) continue;
+          if (
+            shoes[i].brand_name.toLowerCase() === shoes[j].brand_name.toLowerCase() &&
+            similarity(shoes[i].model_name, shoes[j].model_name) >= SIM_THRESHOLD
+          ) {
+            group.push(shoes[j]);
+            assigned.add(j);
+          }
+        }
+
+        if (group.length >= 2) groups.push(group);
+      }
+      return groups;
+    }
+
+    /* ── Data fetching ── */
+
+    async function loadDuplicates() {
+      dupLoaded = true;
+      const container = document.getElementById('dup-list');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Scanning for duplicates…</p></div>';
+      document.getElementById('dup-group-count').textContent = '—';
+
+      try {
+        const sb = getSupabase();
+
+        const { data: shoes, error } = await sb
+          .from('master_shoe_products')
+          .select('id, brand_name, model_name, image_url, created_at')
+          .order('brand_name')
+          .order('model_name');
+
+        if (error) throw error;
+
+        /* Also fetch cheapest deal per product for price display */
+        const { data: deals } = await sb
+          .from('shoe_deals')
+          .select('master_product_id, price_cents, currency')
+          .eq('is_active', true)
+          .order('price_cents');
+
+        const cheapestDeal = {};
+        (deals || []).forEach(d => {
+          if (!cheapestDeal[d.master_product_id]) cheapestDeal[d.master_product_id] = d;
+        });
+
+        const groups = groupDuplicates(shoes);
+        renderDuplicates(groups, cheapestDeal);
+      } catch (err) {
+        console.error('Dup load error:', err);
+        container.innerHTML = `<div class="dup-empty"><div class="dup-empty-icon">⚠️</div><p>Error: ${escapeHtml(err.message)}</p></div>`;
+        showToast('Error loading duplicates: ' + err.message, 'error');
+      }
+    }
+
+    /* ── Rendering ── */
+
+    function renderDuplicates(groups, cheapestDeal) {
+      const container = document.getElementById('dup-list');
+      const badge = document.getElementById('dup-group-count');
+
+      if (groups.length === 0) {
+        badge.textContent = '0';
+        badge.style.background = '#10b981';
+        container.innerHTML = `
+          <div class="dup-empty">
+            <div class="dup-empty-icon">✅</div>
+            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">No duplicates found</p>
+            <p>All ${escapeHtml(String(document.title))} shoe records appear to be unique.</p>
+          </div>`;
+        return;
+      }
+
+      badge.textContent = groups.length;
+      badge.style.background = '#ef4444';
+
+      container.innerHTML = groups.map((group, gi) => {
+        const key = `group-${gi}`;
+        /* Default master = first shoe (oldest created_at) */
+        const defaultMaster = group.reduce((a, b) =>
+          new Date(a.created_at) < new Date(b.created_at) ? a : b
+        );
+        dupState[key] = { shoes: group, masterId: defaultMaster.id };
+
+        const cardsHtml = group.map(shoe => {
+          const isMaster = shoe.id === defaultMaster.id;
+          const deal = cheapestDeal[shoe.id];
+          const priceStr = deal
+            ? `${deal.currency} ${(deal.price_cents / 100).toFixed(2)}`
+            : 'No deals';
+          const img = shoe.image_url
+            ? `<img class="dup-card-img" src="${escapeHtml(shoe.image_url)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : '';
+          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}>👟</div>`;
+
+          return `
+            <div class="dup-card ${isMaster ? 'is-master' : ''}"
+                 id="card-${key}-${shoe.id}"
+                 onclick="selectMaster('${key}','${shoe.id}')">
+              ${isMaster ? '<div class="master-label">Master</div>' : ''}
+              <div class="dup-card-radio"></div>
+              ${img}${placeholder}
+              <div class="dup-card-body">
+                <div class="dup-card-name">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
+                <div class="dup-card-brand">${escapeHtml(shoe.brand_name)}</div>
+                <div class="dup-card-price">${escapeHtml(priceStr)}</div>
+                <div class="dup-card-id">${shoe.id}</div>
+              </div>
+            </div>`;
+        }).join('');
+
+        const dupCount = group.length - 1;
+        return `
+          <div class="dup-group" id="${key}">
+            <div class="dup-group-header">
+              <h3>${escapeHtml(group[0].brand_name)} — ${escapeHtml(group[0].model_name)}</h3>
+              <span>${group.length} variants · ${dupCount} to remove</span>
+            </div>
+            <div class="dup-cards">${cardsHtml}</div>
+            <div class="dup-group-footer">
+              <p>Click a card to set it as the master record. All child data (wear logs, deals, alerts) will be migrated.</p>
+              <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                🔀 Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    /* ── Interaction ── */
+
+    function selectMaster(groupKey, shoeId) {
+      const state = dupState[groupKey];
+      if (!state) return;
+      state.masterId = shoeId;
+
+      state.shoes.forEach(shoe => {
+        const card = document.getElementById(`card-${groupKey}-${shoe.id}`);
+        if (!card) return;
+        const isMaster = shoe.id === shoeId;
+        card.classList.toggle('is-master', isMaster);
+
+        /* Update master label */
+        const existing = card.querySelector('.master-label');
+        if (isMaster && !existing) {
+          const label = document.createElement('div');
+          label.className = 'master-label';
+          label.textContent = 'Master';
+          card.prepend(label);
+        } else if (!isMaster && existing) {
+          existing.remove();
+        }
+      });
+    }
+
+    async function mergeDuplicates(groupKey) {
+      const state = dupState[groupKey];
+      if (!state) return;
+
+      const duplicates = state.shoes.filter(s => s.id !== state.masterId);
+      if (!duplicates.length) { showToast('No duplicates to merge', 'error'); return; }
+
+      const masterName = state.shoes.find(s => s.id === state.masterId);
+      const masterLabel = masterName
+        ? `${masterName.brand_name} ${masterName.model_name}`
+        : state.masterId;
+
+      if (!confirm(`Keep "${masterLabel}" as master and delete ${duplicates.length} duplicate(s)? This cannot be undone.`)) return;
+
+      const btn = document.getElementById(`merge-btn-${groupKey}`);
+      btn.disabled = true;
+      btn.textContent = '⏳ Merging…';
+
+      let successCount = 0;
+      const errors = [];
+
+      for (const dup of duplicates) {
+        try {
+          const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
+            master_id:    state.masterId,
+            duplicate_id: dup.id
+          });
+          if (error) throw error;
+          if (!data) throw new Error('RPC returned false');
+          successCount++;
+        } catch (err) {
+          console.error('Merge error for', dup.id, err);
+          errors.push(`${dup.brand_name} ${dup.model_name}: ${err.message}`);
+        }
+      }
+
+      if (errors.length === 0) {
+        /* Optimistic removal */
+        const groupEl = document.getElementById(groupKey);
+        if (groupEl) {
+          groupEl.style.transition = 'opacity 0.3s, max-height 0.4s';
+          groupEl.style.opacity = '0';
+          setTimeout(() => groupEl.remove(), 350);
+        }
+        delete dupState[groupKey];
+
+        /* Update badge */
+        const remaining = Object.keys(dupState).length;
+        const badge = document.getElementById('dup-group-count');
+        badge.textContent = remaining;
+        if (remaining === 0) {
+          badge.style.background = '#10b981';
+          document.getElementById('dup-list').innerHTML = `
+            <div class="dup-empty">
+              <div class="dup-empty-icon">✅</div>
+              <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
+              <p>Great work — the catalog is clean.</p>
+            </div>`;
+        }
+        showToast(`Merged ${successCount} duplicate${successCount > 1 ? 's' : ''} into master`, 'success');
+      } else {
+        btn.disabled = false;
+        btn.textContent = `🔀 Retry merge`;
+        showToast(`${errors.length} merge(s) failed: ${errors[0]}`, 'error');
+      }
     }
   </script>
 </body>
