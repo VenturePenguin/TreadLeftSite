@@ -225,6 +225,50 @@
     .pulse-delta { font-size: 11px; font-weight: 600; color: #10b981; margin-top: 5px; }
 
     /* Funnel */
+    /* ── Triage Zone ─────────────────────────────────────────── */
+    .triage-zone {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .triage-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #64748b; margin-bottom: 14px;
+    }
+    .triage-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .triage-card {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 18px; border-radius: 10px;
+      cursor: pointer; transition: transform .12s, box-shadow .12s;
+      border-left: 4px solid transparent;
+    }
+    .triage-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+    .triage-card--warning { background: #fffbeb; border-left-color: #f59e0b; }
+    .triage-card--alert   { background: #fff7ed; border-left-color: #ef4444; }
+    .triage-card-icon  { font-size: 26px; flex-shrink: 0; }
+    .triage-card-body  { flex: 1; }
+    .triage-card-value { font-size: 28px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 2px; }
+    .triage-card-label { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 2px; }
+    .triage-card-sub   { font-size: 11px; color: #94a3b8; }
+    .triage-card-cta   { font-size: 12px; font-weight: 700; color: #64748b; flex-shrink: 0; white-space: nowrap; }
+    .triage-card--warning .triage-card-cta { color: #d97706; }
+    .triage-card--alert   .triage-card-cta { color: #ef4444; }
+
+    /* ── Pulse section subheadings ───────────────────────────── */
+    .pulse-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #94a3b8;
+      margin-bottom: 12px; margin-top: 4px;
+    }
+
+    /* ── Funnel ──────────────────────────────────────────────── */
     .funnel {
       background: #fff;
       border: 1px solid #e2e8f0;
@@ -237,19 +281,26 @@
       font-size: 12px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 20px;
     }
-    .funnel-steps { display: flex; align-items: stretch; }
+    .funnel-steps { display: flex; align-items: stretch; gap: 0; }
     .funnel-step {
       flex: 1; text-align: center; padding: 16px 12px;
       background: #f8fafc; border-radius: 10px;
+    }
+    .funnel-step--elevated {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,.07);
     }
     .funnel-step-num  { font-size: 26px; font-weight: 800; color: #10b981; margin-bottom: 4px; }
     .funnel-step-name { font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 500; }
     .funnel-step-pct  { font-size: 11px; color: #94a3b8; }
     .funnel-conv {
       display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 0 8px;
+      justify-content: center; padding: 0 10px;
     }
-    .funnel-conv-pct   { font-size: 13px; font-weight: 700; color: #f59e0b; }
+    .funnel-arrow-icon { font-size: 22px; color: #cbd5e1; margin-bottom: 2px; }
+    .funnel-conv-pct   { font-size: 14px; font-weight: 800; color: #f59e0b; }
+    .funnel-conv-pct--dropout { color: #ef4444; }
     .funnel-conv-label { font-size: 10px; color: #94a3b8; margin-top: 2px; }
 
     /* Stats */
@@ -1352,7 +1403,34 @@
           <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
         </div>
 
-        <div class="pulse-grid">
+        <!-- ── TRIAGE ZONE ──────────────────────────────────────────────── -->
+        <div class="triage-zone">
+          <div class="triage-title">⚡ Action Required</div>
+          <div class="triage-cards">
+            <div class="triage-card triage-card--warning" onclick="navigate('discovery-queue')">
+              <div class="triage-card-icon">🔍</div>
+              <div class="triage-card-body">
+                <div class="triage-card-value" id="triage-pending-count">—</div>
+                <div class="triage-card-label">Pending Shoe Discoveries</div>
+                <div class="triage-card-sub">Review &amp; approve catalog additions</div>
+              </div>
+              <div class="triage-card-cta">Review →</div>
+            </div>
+            <div class="triage-card triage-card--alert" onclick="navigate('platform-pulse'); setTimeout(()=>document.getElementById('pulse-orphans').closest('.pulse-card').scrollIntoView({behavior:'smooth'}),300)">
+              <div class="triage-card-icon">👟</div>
+              <div class="triage-card-body">
+                <div class="triage-card-value" id="triage-orphan-count">—</div>
+                <div class="triage-card-label">Orphan Activities</div>
+                <div class="triage-card-sub">Runs not assigned to a shoe</div>
+              </div>
+              <div class="triage-card-cta">View →</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── AUDIENCE & GROWTH ──────────────────────────────────────────── -->
+        <div class="pulse-section-label">Audience &amp; Growth</div>
+        <div class="pulse-grid" style="margin-bottom:24px">
           <div class="pulse-card" style="--accent:#10b981">
             <div class="pulse-value" id="pulse-total-users">—</div>
             <div class="pulse-label">Total Users</div>
@@ -1365,6 +1443,16 @@
             <div class="pulse-sub">Users with ≥1 active shoe</div>
             <div class="pulse-delta" id="pulse-lockers-delta"></div>
           </div>
+          <div class="pulse-card" style="--accent:#10b981">
+            <div class="pulse-value" id="pulse-dau">—</div>
+            <div class="pulse-label">Daily Active Users</div>
+            <div class="pulse-sub">Users who synced today</div>
+          </div>
+        </div>
+
+        <!-- ── SYSTEM THROUGHPUT ──────────────────────────────────────────── -->
+        <div class="pulse-section-label">System Throughput</div>
+        <div class="pulse-grid" style="margin-bottom:24px">
           <div class="pulse-card" style="--accent:#f97316">
             <div class="pulse-value" id="pulse-retired-24h">—</div>
             <div class="pulse-label">Data Engine Feed</div>
@@ -1409,13 +1497,8 @@
         </div>
 
         <!-- Engagement & Activity Quality -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Engagement &amp; Activity Quality</div>
+        <div class="pulse-section-label">Engagement &amp; Activity Quality</div>
         <div class="pulse-grid" style="margin-bottom:24px">
-          <div class="pulse-card" style="--accent:#10b981">
-            <div class="pulse-value" id="pulse-dau">—</div>
-            <div class="pulse-label">Daily Active Users</div>
-            <div class="pulse-sub">Users who synced today</div>
-          </div>
           <div class="pulse-card" style="--accent:#14b8a6">
             <div class="pulse-value" id="pulse-retention-7d">—%</div>
             <div class="pulse-label">7-Day Retention</div>
@@ -1441,34 +1524,39 @@
         <div class="funnel">
           <div class="funnel-title">Activation Funnel</div>
           <div class="funnel-steps">
-            <div class="funnel-step">
+            <!-- Step 1 -->
+            <div class="funnel-step funnel-step--elevated">
               <div class="funnel-step-num" id="funnel-accounts">—</div>
               <div class="funnel-step-name">Accounts Created</div>
               <div class="funnel-step-pct">100%</div>
             </div>
+            <!-- Dropout 1 -->
             <div class="funnel-conv">
-              <div style="color:#cbd5e1;font-size:20px">›</div>
-              <div class="funnel-conv-pct" id="funnel-conv-1">—%</div>
+              <div class="funnel-arrow-icon">›</div>
+              <div class="funnel-conv-pct funnel-conv-pct--dropout" id="funnel-conv-1">—%</div>
               <div class="funnel-conv-label">connection rate</div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div class="funnel-step" style="border-top:2px solid #f97316">
+            <!-- Step 2: dual auth paths -->
+            <div style="display:flex;flex-direction:column;gap:8px;flex:1">
+              <div class="funnel-step funnel-step--elevated" style="border-top:3px solid #f97316">
                 <div class="funnel-step-num" id="funnel-strava" style="color:#f97316">—</div>
                 <div class="funnel-step-name">Strava</div>
                 <div class="funnel-step-pct" id="funnel-strava-pct">—</div>
               </div>
-              <div class="funnel-step" style="border-top:2px solid #22c55e">
+              <div class="funnel-step funnel-step--elevated" style="border-top:3px solid #22c55e">
                 <div class="funnel-step-num" id="funnel-healthkit" style="color:#22c55e">—</div>
                 <div class="funnel-step-name">Apple Health</div>
                 <div class="funnel-step-pct" id="funnel-healthkit-pct2">—</div>
               </div>
             </div>
+            <!-- Dropout 2 -->
             <div class="funnel-conv">
-              <div style="color:#cbd5e1;font-size:20px">›</div>
-              <div class="funnel-conv-pct" id="funnel-conv-2">—%</div>
+              <div class="funnel-arrow-icon">›</div>
+              <div class="funnel-conv-pct funnel-conv-pct--dropout" id="funnel-conv-2">—%</div>
               <div class="funnel-conv-label">shoe add rate</div>
             </div>
-            <div class="funnel-step">
+            <!-- Step 3 -->
+            <div class="funnel-step funnel-step--elevated">
               <div class="funnel-step-num" id="funnel-lockers">—</div>
               <div class="funnel-step-name">First Shoe Added</div>
               <div class="funnel-step-pct" id="funnel-lockers-pct">—</div>
@@ -2084,8 +2172,11 @@
         const fmt = n => Number(n).toLocaleString();
         const pct = (a, b) => b > 0 ? Math.round((a / b) * 100) + '%' : '—%';
 
+        document.getElementById('triage-orphan-count').textContent  = fmt(t.orphan_activities || 0);
+
         document.getElementById('pulse-total-users').textContent    = fmt(t.total_users);
         document.getElementById('pulse-active-lockers').textContent = fmt(t.total_active_lockers);
+        document.getElementById('pulse-dau').textContent            = fmt(t.dau || 0);
         document.getElementById('pulse-retired-24h').textContent    = fmt(t.shoes_retired_24h);
         document.getElementById('pulse-activities-24h').textContent = fmt(t.total_activities_24h);
 
@@ -2124,7 +2215,6 @@
         document.getElementById('funnel-lockers-pct').textContent   = pct(t.total_active_lockers, totalConnected) + ' of connected';
 
         // ── NEW: Engagement & Activity Quality ──
-        document.getElementById('pulse-dau').textContent         = fmt(t.dau || 0);
         document.getElementById('pulse-retention-7d').textContent  = (t.retention_7d || 0) + '%';
         document.getElementById('pulse-orphans').textContent       = fmt(t.orphan_activities || 0);
         document.getElementById('pulse-km-7d').textContent         = (t.total_km_7d || 0) + 'km';
@@ -2207,6 +2297,8 @@
       const high   = pendingData.filter(s => s.confidence === 'high').length;
       const medium = pendingData.filter(s => s.confidence === 'medium').length;
       const low    = pendingData.filter(s => s.confidence === 'low').length;
+      const triagePending = document.getElementById('triage-pending-count');
+      if (triagePending) triagePending.textContent = total > 0 ? total : '0';
       document.getElementById('stat-total').textContent   = total;
       document.getElementById('stat-high').textContent    = high;
       document.getElementById('stat-medium').textContent  = medium;
