@@ -299,6 +299,8 @@
     .triage-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
     .triage-card--warning { background: #fffbeb; border-left-color: #f59e0b; }
     .triage-card--alert   { background: #fff7ed; border-left-color: #ef4444; }
+    html.dark .triage-card--warning { background: rgba(245,158,11,0.1); }
+    html.dark .triage-card--alert   { background: rgba(239,68,68,0.1); }
     .triage-card-icon  { font-size: 26px; flex-shrink: 0; }
     .triage-card-body  { flex: 1; }
     .triage-card-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1; margin-bottom: 2px; }
@@ -753,12 +755,12 @@
     .sync-toolbar-left { display: flex; align-items: center; gap: 10px; }
     .sync-filter-btn {
       padding: 6px 14px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
       border-radius: 20px;
-      background: #fff;
+      background: var(--bg-surface);
       font-size: 12px;
       font-weight: 500;
-      color: #64748b;
+      color: var(--text-secondary);
       cursor: pointer;
       font-family: inherit;
       transition: all 0.15s;
@@ -1084,15 +1086,15 @@
     .deal-section-title {
       font-size: 13px;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--text-primary);
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
     .deal-table-wrap {
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       overflow: hidden;
       margin-bottom: 20px;
@@ -1105,20 +1107,20 @@
     .deal-table th {
       text-align: left;
       padding: 9px 14px;
-      font-size: 11px; font-weight: 600; color: #64748b;
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: .05em;
-      border-bottom: 1px solid #f1f5f9;
-      background: #f8fafc;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
       white-space: nowrap;
     }
     .deal-table td {
       padding: 10px 14px;
-      border-bottom: 1px solid #f8fafc;
-      color: #1e293b;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
       vertical-align: middle;
     }
     .deal-table tbody tr:last-child td { border-bottom: none; }
-    .deal-table tbody tr:hover td { background: #fafafa; }
+    .deal-table tbody tr:hover td { background: var(--bg-subtle); }
     .deal-shoe-thumb {
       width: 40px; height: 40px;
       border-radius: 8px;
@@ -1158,7 +1160,7 @@
     }
     .deal-modal-overlay.open { display: flex; }
     .deal-modal {
-      background: #fff;
+      background: var(--bg-surface);
       border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0,0,0,.18);
       padding: 28px 28px 24px;
@@ -1167,7 +1169,7 @@
       max-height: 90vh;
       overflow-y: auto;
     }
-    .deal-modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; color: #1e293b; }
+    .deal-modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary); }
     .deal-form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1179,16 +1181,16 @@
     .deal-form-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
     .deal-form-group input, .deal-form-group select {
       padding: 9px 11px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 13px;
       font-family: inherit;
-      color: #1e293b;
-      background: #f8fafc;
+      color: var(--text-primary);
+      background: var(--bg-subtle);
       outline: none;
       transition: border-color .15s;
     }
-    .deal-form-group input:focus, .deal-form-group select:focus { border-color: #f97316; background: #fff; }
+    .deal-form-group input:focus, .deal-form-group select:focus { border-color: #f97316; background: var(--bg-surface); }
     .deal-form-actions { display: flex; gap: 10px; justify-content: flex-end; }
     .deal-btn-primary {
       padding: 10px 22px;
@@ -1204,9 +1206,9 @@
     .deal-btn-primary:hover { background: #ea580c; }
     .deal-btn-secondary {
       padding: 10px 18px;
-      background: #fff;
-      color: #64748b;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 13px;
       font-weight: 500;
@@ -1235,16 +1237,16 @@
     .support-search-input {
       flex: 1;
       padding: 11px 16px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
       border-radius: 10px;
       font-size: 14px;
       font-family: inherit;
-      color: #1e293b;
+      color: var(--text-primary);
       outline: none;
       transition: border-color 0.15s;
-      background: #fff;
+      background: var(--bg-surface);
     }
-    .support-search-input:focus { border-color: #f97316; }
+    .support-search-input:focus { border-color: #f97316; background: var(--bg-surface); }
     .support-search-btn {
       padding: 11px 22px;
       background: #f97316;
@@ -1269,31 +1271,31 @@
       margin-bottom: 20px;
     }
     .support-card {
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       overflow: hidden;
     }
     .support-card-header {
       display: flex; align-items: center; gap: 10px;
       padding: 14px 16px;
-      border-bottom: 1px solid #f1f5f9;
-      background: #f8fafc;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
     }
     .support-card-header-icon { font-size: 18px; }
     .support-card-title { font-size: 13px; font-weight: 700; color: #1e293b; }
     .support-card-body { padding: 16px; }
     .support-kv { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .support-kv:last-child { margin-bottom: 0; }
-    .support-kv-label { color: #94a3b8; font-weight: 500; min-width: 110px; flex-shrink: 0; }
-    .support-kv-val   { color: #1e293b; word-break: break-all; }
+    .support-kv-label { color: var(--text-muted); font-weight: 500; min-width: 110px; flex-shrink: 0; }
+    .support-kv-val   { color: var(--text-primary); word-break: break-all; }
     .support-kv-val.mono { font-family: monospace; font-size: 12px; }
     .support-kv-val.pill-ok    { color: #065f46; background: #d1fae5; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
     .support-kv-val.pill-worn  { color: #92400e; background: #fef3c7; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
     .support-kv-val.pill-dead  { color: #991b1b; background: #fee2e2; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
     .support-full-card {
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       overflow: hidden;
       margin-bottom: 16px;
@@ -1303,15 +1305,15 @@
     }
     .support-table th {
       text-align: left; padding: 9px 14px;
-      font-size: 11px; font-weight: 600; color: #64748b;
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: .05em;
-      border-bottom: 1px solid #f1f5f9;
-      background: #f8fafc;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
     }
     .support-table td {
       padding: 10px 14px;
-      border-bottom: 1px solid #f8fafc;
-      color: #1e293b;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
       vertical-align: middle;
     }
     .support-table tbody tr:last-child td { border-bottom: none; }
@@ -1342,8 +1344,8 @@
     .toast {
       position: fixed;
       bottom: 20px; right: 20px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       box-shadow: 0 4px 6px rgba(0,0,0,.1);
       padding: 14px 20px;
       border-radius: 12px;
@@ -1639,14 +1641,14 @@
         <!-- Product Intelligence -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Product Intelligence</div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px">
-          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-            <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏆 Top Shoe Models</div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏆 Top Shoe Models</div>
             <div id="top-shoes-list" style="display:flex;flex-direction:column;gap:8px">
               <div style="color:#94a3b8;font-size:13px">Loading…</div>
             </div>
           </div>
-          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-            <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏷️ Brand Distribution</div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏷️ Brand Distribution</div>
             <div id="brand-distribution-list" style="display:flex;flex-direction:column;gap:8px">
               <div style="color:#94a3b8;font-size:13px">Loading…</div>
             </div>
@@ -1773,7 +1775,7 @@
 
         <!-- Cron jobs table -->
         <div class="health-section-title">Recent Cron Activity</div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
           <table class="health-table">
             <thead>
               <tr>
@@ -2399,7 +2401,7 @@
             <span class="confidence-badge ${shoe.confidence}">${shoe.confidence}</span>
           </div>
           <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;">
-            <select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#1e293b;cursor:pointer;flex-shrink:0;">
+            <select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;flex-shrink:0;">
               <option value="EVA"   selected>🟡 EVA (Default)</option>
               <option value="PEBAX"        >⚡ PEBAX (Supershoe)</option>
               <option value="TPU"          >🔵 TPU (High Durability)</option>
@@ -2590,7 +2592,7 @@
         return;
       }
       container.innerHTML = `
-        <table class="deal-table" style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;">
+        <table class="deal-table" style="background:var(--bg-surface);border-radius:14px;overflow:hidden;border:1px solid var(--border);">
           <thead>
             <tr>
               <th>Raw Retailer String</th>
