@@ -430,6 +430,40 @@
     .confidence-badge.medium { background: #f59e0b; }
     .confidence-badge.low    { background: #ef4444; }
 
+    .suggested-match-block {
+      margin: 6px 20px 0;
+      padding: 8px 12px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    html.dark .suggested-match-block {
+      background: rgba(251,191,36,0.08);
+      border-color: rgba(251,191,36,0.25);
+    }
+    .suggested-match-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #92400e;
+    }
+    html.dark .suggested-match-label { color: #fcd34d; }
+    .suggested-match-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #78350f;
+    }
+    html.dark .suggested-match-name { color: #fde68a; }
+    .suggested-match-score {
+      font-size: 11px;
+      color: #a16207;
+      margin-left: auto;
+    }
+    html.dark .suggested-match-score { color: #b45309; }
+
     .shoe-actions { display: flex; gap: 10px; padding: 0 20px 18px; }
     .btn {
       flex: 1;
@@ -2391,7 +2425,23 @@
         container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
         return;
       }
-      container.innerHTML = pendingData.map(shoe => `
+      container.innerHTML = pendingData.map(shoe => {
+        const hasSuggestion = shoe.confidence === 'medium' && shoe.suggested_master_product_id && shoe.suggested_shoe;
+        const suggestedName  = hasSuggestion ? `${escapeHtml(shoe.suggested_shoe.brand_name)} ${escapeHtml(shoe.suggested_shoe.model_name)}` : '';
+        const fuseScore      = (hasSuggestion && shoe.fuse_score != null) ? Number(shoe.fuse_score).toFixed(2) : null;
+
+        const suggestedBlock = hasSuggestion ? `
+          <div class="suggested-match-block">
+            <span class="suggested-match-label">✨ Suggested Match:</span>
+            <span class="suggested-match-name">${suggestedName}</span>
+            ${fuseScore ? `<span class="suggested-match-score">Score: ${fuseScore}</span>` : ''}
+          </div>` : '';
+
+        const approveBtn = hasSuggestion
+          ? `<button class="btn btn-approve" onclick="quickApproveShoe('${shoe.id}','${shoe.suggested_master_product_id}')" id="btn-approve-${shoe.id}">⚡ Quick Approve</button>`
+          : `<button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>`;
+
+        return `
         <div class="shoe-card view-mode ${shoe.confidence}" id="card-${shoe.id}">
           <div class="shoe-header">
             <div class="shoe-info">
@@ -2400,13 +2450,14 @@
             </div>
             <span class="confidence-badge ${shoe.confidence}">${shoe.confidence}</span>
           </div>
-          <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;">
-            <select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;flex-shrink:0;">
+          ${suggestedBlock}
+          <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;margin-top:${hasSuggestion ? '10px' : '0'};">
+            ${hasSuggestion ? '' : `<select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;flex-shrink:0;">
               <option value="EVA"   selected>🟡 EVA (Default)</option>
               <option value="PEBAX"        >⚡ PEBAX (Supershoe)</option>
               <option value="TPU"          >🔵 TPU (High Durability)</option>
-            </select>
-            <button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>
+            </select>`}
+            ${approveBtn}
             <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
             <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
           </div>
@@ -2418,8 +2469,8 @@
             <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save</button>
             <button class="btn btn-edit"    onclick="cancelEdit('${shoe.id}')">Cancel</button>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
     /* ── DISCOVERY QUEUE — ACTIONS ── */
@@ -2435,6 +2486,23 @@
         });
         const result = await res.json();
         if (result.success) { removeShoe(id); showToast(`Shoe approved (${foam_material}) and added to database`, 'success'); }
+        else throw new Error(result.message);
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+        setLoading(id, false);
+      }
+    }
+
+    async function quickApproveShoe(id, suggestedMasterProductId) {
+      setLoading(id, true);
+      try {
+        const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'quick_approve', discovery_id: id, suggested_master_product_id: suggestedMasterProductId, token: ADMIN_TOKEN })
+        });
+        const result = await res.json();
+        if (result.success) { removeShoe(id); showToast('⚡ Quick approved — linked to existing product', 'success'); }
         else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
