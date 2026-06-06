@@ -655,6 +655,23 @@
     }
     .merge-btn:hover { background: #0f172a; }
     .merge-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .nuke-btn {
+      padding: 9px 18px;
+      background: #7f1d1d;
+      color: #fca5a5;
+      border: 1px solid #991b1b;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, opacity 0.2s;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+    .nuke-btn:hover:not(:disabled) { background: #991b1b; color: #fecaca; }
+    .nuke-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    html.dark .nuke-btn { background: #450a0a; border-color: #7f1d1d; }
     .dup-toolbar {
       display: flex;
       align-items: center;
@@ -1751,7 +1768,10 @@
           <p class="dup-toolbar-info">
             Shoes are grouped by identical brand + highly similar name. Select the <strong>master</strong> to keep, then merge the rest.
           </p>
-          <button class="dup-refresh-btn" onclick="loadDuplicates()">🔄 Refresh</button>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="nuke-btn" id="nuke-btn" onclick="executeNuclearMerge()" disabled title="Auto-merges clusters where all non-master variants have 0 users and 0 deals">☢️ Nuclear Merge (0 safe)</button>
+            <button class="dup-refresh-btn" onclick="loadDuplicates()">🔄 Refresh</button>
+          </div>
         </div>
 
         <div id="dup-list">
@@ -3662,6 +3682,9 @@
 
     /* State: groupKey → { shoes[], masterId } */
     const dupState = {};
+    /* Cached telemetry for Nuclear Merge */
+    let _nukeUserCount = {};
+    let _nukeDealCount = {};
 
     /* ── Similarity helpers ── */
 
@@ -3770,6 +3793,8 @@
           userCount[r.master_product_id] = (userCount[r.master_product_id] || 0) + 1;
         });
 
+        _nukeUserCount = userCount;
+        _nukeDealCount = dealCount;
         const groups = groupDuplicates(shoes);
         renderDuplicates(groups, cheapestDeal, dealCount, userCount);
       } catch (err) {
@@ -3789,6 +3814,75 @@
         (shoe.image_url ? 10 : 0)         +
         (shoe.created_at ? 1 / (new Date(shoe.created_at).getTime() / 1e12) : 0)
       );
+    }
+
+    /* ── Nuclear Merge helpers ── */
+
+    /**
+     * Returns array of groupKeys where every non-master variant
+     * has STRICTLY 0 users AND 0 deals — safe to auto-merge.
+     */
+    function getNukeableClusters(userCount, dealCount) {
+      return Object.entries(dupState).filter(([, state]) => {
+        if (state.shoes.length < 2) return false;
+        const nonMasters = state.shoes.filter(s => s.id !== state.masterId);
+        return nonMasters.every(s =>
+          (userCount[s.id] || 0) === 0 && (dealCount[s.id] || 0) === 0
+        );
+      }).map(([key]) => key);
+    }
+
+    function updateNukeBtnState() {
+      const btn = document.getElementById('nuke-btn');
+      if (!btn) return;
+      const eligible = getNukeableClusters(_nukeUserCount, _nukeDealCount);
+      btn.disabled = eligible.length === 0;
+      btn.textContent = `☢️ Nuclear Merge (${eligible.length} safe)`;
+    }
+
+    async function executeNuclearMerge() {
+      const eligible = getNukeableClusters(_nukeUserCount, _nukeDealCount);
+      if (eligible.length === 0) return;
+
+      if (!confirm(`Auto-merge ${eligible.length} cluster${eligible.length > 1 ? 's' : ''}?\n\nAll non-master variants in these clusters have 0 users and 0 deals.\nThis cannot be undone.`)) return;
+
+      const btn = document.getElementById('nuke-btn');
+      btn.disabled = true;
+
+      let done = 0;
+      const errors = [];
+
+      for (const key of eligible) {
+        const state = dupState[key];
+        if (!state) continue;
+        const duplicates = state.shoes.filter(s => s.id !== state.masterId);
+
+        for (const dup of duplicates) {
+          try {
+            const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
+              master_id:    state.masterId,
+              duplicate_id: dup.id
+            });
+            if (error) throw error;
+            if (!data) throw new Error('RPC returned false');
+          } catch (err) {
+            console.error('Nuclear merge error', dup.id, err);
+            errors.push(`${dup.brand_name} ${dup.model_name}: ${err.message}`);
+          }
+        }
+
+        done++;
+        btn.textContent = `☢️ Merging… ${done} / ${eligible.length}`;
+      }
+
+      if (errors.length > 0) {
+        showToast(`${errors.length} cluster(s) failed — check console`, 'error');
+      } else {
+        showToast(`☢️ Nuclear Merge complete — ${done} cluster${done > 1 ? 's' : ''} resolved`, 'success');
+      }
+
+      /* Full reload to get clean state */
+      await loadDuplicates();
     }
 
     function renderDuplicates(groups, cheapestDeal, dealCount, userCount) {
@@ -3866,6 +3960,9 @@
             </div>
           </div>`;
       }).join('');
+
+      /* Update Nuclear Merge button count now that dupState is fully populated */
+      updateNukeBtnState();
     }
 
     /* ── Interaction ── */
@@ -3892,6 +3989,9 @@
           existing.remove();
         }
       });
+
+      /* Re-evaluate Nuclear Merge eligibility after master change */
+      updateNukeBtnState();
     }
 
     async function mergeDuplicates(groupKey) {
@@ -3939,6 +4039,7 @@
           setTimeout(() => groupEl.remove(), 350);
         }
         delete dupState[groupKey];
+        updateNukeBtnState();
 
         /* Update badge */
         const remaining = Object.keys(dupState).length;
