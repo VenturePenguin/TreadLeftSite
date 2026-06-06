@@ -589,7 +589,10 @@
     .dup-card-name { font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.3; }
     .dup-card-brand { font-size: 11px; color: #64748b; margin-bottom: 6px; }
     .dup-card-price { font-size: 12px; color: #10b981; font-weight: 600; }
-    .dup-card-id { font-size: 10px; color: #cbd5e1; font-family: monospace; margin-top: 4px; word-break: break-all; }
+    .dup-card-telemetry { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+    .dup-card-stat { font-size: 11px; font-weight: 600; }
+    .dup-card-stat.active { color: #10b981; }
+    .dup-card-stat.zero   { color: #94a3b8; }
     .dup-card-radio {
       position: absolute;
       top: 10px;
@@ -3742,7 +3745,7 @@
 
         if (error) throw error;
 
-        /* Also fetch cheapest deal per product for price display */
+        /* Fetch cheapest deal per product + active deal counts */
         const { data: deals } = await sb
           .from('shoe_deals')
           .select('master_product_id, price_cents, currency')
@@ -3750,12 +3753,25 @@
           .order('price_cents');
 
         const cheapestDeal = {};
+        const dealCount = {};
         (deals || []).forEach(d => {
           if (!cheapestDeal[d.master_product_id]) cheapestDeal[d.master_product_id] = d;
+          dealCount[d.master_product_id] = (dealCount[d.master_product_id] || 0) + 1;
+        });
+
+        /* Fetch active user counts per product */
+        const { data: gearRows } = await sb
+          .from('user_gear_items')
+          .select('master_product_id')
+          .eq('is_active', true);
+
+        const userCount = {};
+        (gearRows || []).forEach(r => {
+          userCount[r.master_product_id] = (userCount[r.master_product_id] || 0) + 1;
         });
 
         const groups = groupDuplicates(shoes);
-        renderDuplicates(groups, cheapestDeal);
+        renderDuplicates(groups, cheapestDeal, dealCount, userCount);
       } catch (err) {
         console.error('Dup load error:', err);
         container.innerHTML = `<div class="dup-empty"><div class="dup-empty-icon">⚠️</div><p>Error: ${escapeHtml(err.message)}</p></div>`;
@@ -3765,7 +3781,17 @@
 
     /* ── Rendering ── */
 
-    function renderDuplicates(groups, cheapestDeal) {
+    /* ── Scoring: higher = better master candidate ── */
+    function scoreVariant(shoe, userCount, dealCount) {
+      return (
+        (userCount[shoe.id] || 0) * 1000 +
+        (dealCount[shoe.id]  || 0) * 100  +
+        (shoe.image_url ? 10 : 0)         +
+        (shoe.created_at ? 1 / (new Date(shoe.created_at).getTime() / 1e12) : 0)
+      );
+    }
+
+    function renderDuplicates(groups, cheapestDeal, dealCount, userCount) {
       const container = document.getElementById('dup-list');
       const badge = document.getElementById('dup-group-count');
 
@@ -3786,14 +3812,13 @@
 
       container.innerHTML = groups.map((group, gi) => {
         const key = `group-${gi}`;
-        /* Default master = first shoe (oldest created_at) */
-        const defaultMaster = group.reduce((a, b) =>
-          new Date(a.created_at) < new Date(b.created_at) ? a : b
-        );
-        dupState[key] = { shoes: group, masterId: defaultMaster.id };
 
-        const cardsHtml = group.map(shoe => {
-          const isMaster = shoe.id === defaultMaster.id;
+        /* Sort by score descending — index 0 is always best candidate */
+        const sorted = [...group].sort((a, b) => scoreVariant(b, userCount, dealCount) - scoreVariant(a, userCount, dealCount));
+        dupState[key] = { shoes: sorted, masterId: sorted[0].id };
+
+        const cardsHtml = sorted.map((shoe, idx) => {
+          const isMaster = idx === 0;
           const deal = cheapestDeal[shoe.id];
           const priceStr = deal
             ? `${deal.currency} ${(deal.price_cents / 100).toFixed(2)}`
@@ -3803,18 +3828,24 @@
             : '';
           const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}>👟</div>`;
 
+          const users = userCount[shoe.id] || 0;
+          const deals = dealCount[shoe.id]  || 0;
+
           return `
             <div class="dup-card ${isMaster ? 'is-master' : ''}"
                  id="card-${key}-${shoe.id}"
                  onclick="selectMaster('${key}','${shoe.id}')">
-              ${isMaster ? '<div class="master-label">Master</div>' : ''}
+              ${isMaster ? '<div class="master-label">⭐ Master</div>' : ''}
               <div class="dup-card-radio"></div>
               ${img}${placeholder}
               <div class="dup-card-body">
                 <div class="dup-card-name">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
                 <div class="dup-card-brand">${escapeHtml(shoe.brand_name)}</div>
                 <div class="dup-card-price">${escapeHtml(priceStr)}</div>
-                <div class="dup-card-id">${shoe.id}</div>
+                <div class="dup-card-telemetry">
+                  <div class="dup-card-stat ${users > 0 ? 'active' : 'zero'}">👥 Users: ${users}</div>
+                  <div class="dup-card-stat ${deals > 0 ? 'active' : 'zero'}">🏷️ Deals: ${deals}</div>
+                </div>
               </div>
             </div>`;
         }).join('');
@@ -3823,7 +3854,7 @@
         return `
           <div class="dup-group" id="${key}">
             <div class="dup-group-header">
-              <h3>${escapeHtml(group[0].brand_name)} — ${escapeHtml(group[0].model_name)}</h3>
+              <h3>${escapeHtml(sorted[0].brand_name)} — ${escapeHtml(sorted[0].model_name)}</h3>
               <span>${group.length} variants · ${dupCount} to remove</span>
             </div>
             <div class="dup-cards">${cardsHtml}</div>
