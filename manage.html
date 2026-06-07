@@ -3876,13 +3876,14 @@
       btn.disabled = true;
 
       let done = 0;
-      const errors = [];
+      const clusterErrors = [];
 
       for (const key of eligible) {
         const state = dupState[key];
         if (!state) continue;
         const duplicates = state.shoes.filter(s => s.id !== state.masterId);
 
+        let clusterOk = true;
         for (const dup of duplicates) {
           try {
             const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
@@ -3890,19 +3891,23 @@
               duplicate_id: dup.id
             });
             if (error) throw error;
-            if (!data) throw new Error('RPC returned false');
+            if (data === false) throw new Error('RPC returned false — no rows affected');
           } catch (err) {
-            console.error('Nuclear merge error', dup.id, err);
-            errors.push(`${dup.brand_name} ${dup.model_name}: ${err.message}`);
+            console.error('Nuclear merge error', { clusterKey: key, dupId: dup.id, error: err });
+            clusterErrors.push(`${dup.brand_name} ${dup.model_name}: ${err.message}`);
+            clusterOk = false;
           }
         }
 
-        done++;
-        btn.textContent = `☢️ Merging… ${done} / ${eligible.length}`;
+        if (clusterOk) done++;
+        btn.textContent = `☢️ Merging… ${done + clusterErrors.length} / ${eligible.length}`;
       }
 
-      if (errors.length > 0) {
-        showToast(`${errors.length} cluster(s) failed — check console`, 'error');
+      if (clusterErrors.length > 0) {
+        const firstErr = clusterErrors[0];
+        const extra = clusterErrors.length > 1 ? ` (+${clusterErrors.length - 1} more)` : '';
+        showToast(`${clusterErrors.length} failed: ${firstErr}${extra}`, 'error', 8000);
+        console.error('Nuclear merge failures:\n' + clusterErrors.join('\n'));
       } else {
         showToast(`☢️ Nuclear Merge complete — ${done} cluster${done > 1 ? 's' : ''} resolved`, 'success');
       }
