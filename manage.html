@@ -1420,6 +1420,140 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── System Ledger ── */
+    .ledger-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .ledger-table th {
+      background: var(--bg-card);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .ledger-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .ledger-table tr:last-child td { border-bottom: none; }
+    .ledger-table tr:hover td { background: var(--bg-card); }
+    .ledger-action-pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .ledger-action-pill.merge    { background:#fef3c7;color:#92400e; }
+    .ledger-action-pill.approve  { background:#d1fae5;color:#065f46; }
+    .ledger-action-pill.reject   { background:#fee2e2;color:#991b1b; }
+    .ledger-action-pill.ai       { background:#f3e8ff;color:#6d28d9; }
+    .ledger-action-pill.edit     { background:#eff6ff;color:#1d4ed8; }
+    .ledger-action-pill.brand    { background:#fff7ed;color:#9a3412; }
+    .ledger-view-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .ledger-view-btn:hover { background: var(--bg-surface); border-color: #7c3aed; color: #7c3aed; }
+
+    /* ── Diff Modal ── */
+    .diff-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .diff-modal-overlay.open { display: flex; }
+    .diff-modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      width: 90%;
+      max-width: 860px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .diff-modal h3 { margin: 0; font-size: 16px; color: var(--text-primary); }
+    .diff-modal-meta { font-size: 12px; color: #64748b; display:flex; gap:16px; flex-wrap:wrap; }
+    .diff-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      overflow: auto;
+      flex: 1;
+    }
+    @media (max-width: 640px) { .diff-panels { grid-template-columns: 1fr; } }
+    .diff-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .diff-panel-header {
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+    .diff-panel-header.before { color:#ef4444;background:rgba(239,68,68,.06); }
+    .diff-panel-header.after  { color:#10b981;background:rgba(16,185,129,.06); }
+    .diff-panel pre {
+      margin: 0;
+      padding: 14px;
+      font-size: 11px;
+      line-height: 1.6;
+      overflow: auto;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-all;
+      flex: 1;
+    }
+    .diff-close-btn {
+      align-self: flex-end;
+      padding: 8px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    .diff-close-btn:hover { border-color: #7c3aed; color: #7c3aed; }
+
     /* ── AI Buttons ── */
     .ai-btn {
       background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%) !important;
@@ -1554,6 +1688,11 @@
       <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
         <span class="nav-icon">🏷️</span>
         Brand Normalization
+      </button>
+
+      <button class="nav-item" data-view="system-ledger" onclick="navigate('system-ledger')">
+        <span class="nav-icon">📜</span>
+        System Ledger
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">System</div>
@@ -1857,6 +1996,52 @@
             <div class="spinner"></div>
             <p>Scanning for duplicates…</p>
           </div>
+        </div>
+      </div>
+
+      <!-- VIEW: System Ledger -->
+      <div id="view-system-ledger" class="view">
+        <div class="view-header">
+          <h2>📜 System Ledger <span class="badge" id="ledger-count-badge" style="background:#7c3aed;">—</span></h2>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <p style="font-size:13px;color:#64748b;margin:0;">Immutable append-only log of every admin mutation. Rows cannot be edited or deleted.</p>
+          <div style="display:flex;gap:8px;">
+            <select id="ledger-filter-action" onchange="renderLedger()" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;">
+              <option value="">All Actions</option>
+              <option value="MERGE_CLUSTER">MERGE_CLUSTER</option>
+              <option value="NUCLEAR_MERGE">NUCLEAR_MERGE</option>
+              <option value="APPROVE_DISCOVERY">APPROVE_DISCOVERY</option>
+              <option value="REJECT_DISCOVERY">REJECT_DISCOVERY</option>
+              <option value="EDIT_DISCOVERY">EDIT_DISCOVERY</option>
+              <option value="AI_NORMALIZE">AI_NORMALIZE</option>
+              <option value="AI_CLUSTER">AI_CLUSTER</option>
+              <option value="NORMALIZE_BRAND">NORMALIZE_BRAND</option>
+            </select>
+            <button class="health-refresh-btn" onclick="loadLedger()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="ledger-table-wrap">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Entity ID</th>
+                <th>Admin</th>
+                <th>Payload</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-tbody">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2266,6 +2451,30 @@
     </div>
   </div>
 
+  <!-- Diff / Payload Modal -->
+  <div class="diff-modal-overlay" id="diff-modal-overlay" onclick="closeDiffModalOnOverlay(event)">
+    <div class="diff-modal">
+      <h3>📋 Audit Log Payload</h3>
+      <div class="diff-modal-meta">
+        <span id="diff-meta-action"></span>
+        <span id="diff-meta-entity"></span>
+        <span id="diff-meta-time"></span>
+        <span id="diff-meta-admin"></span>
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel">
+          <div class="diff-panel-header before">⬅ Previous State</div>
+          <pre id="diff-previous"></pre>
+        </div>
+        <div class="diff-panel">
+          <div class="diff-panel-header after">➡ New State</div>
+          <pre id="diff-new"></pre>
+        </div>
+      </div>
+      <button class="diff-close-btn" onclick="closeDiffModal()">Close</button>
+    </div>
+  </div>
+
   <div id="toast" class="toast">
     <span id="toast-icon">✓</span>
     <span id="toast-message">Success</span>
@@ -2362,6 +2571,10 @@
       if (viewId === 'strava-monitor' && !syncLoaded) {
         syncLoaded = true;
         fetchWebhookLogs();
+      }
+      if (viewId === 'system-ledger' && !ledgerLoaded) {
+        ledgerLoaded = true;
+        loadLedger();
       }
       if (viewId === 'brand-normalization' && !brandLoaded) {
         brandLoaded = true;
@@ -2579,6 +2792,7 @@
       setLoading(id, true);
       const foamEl = document.getElementById(`foam-${id}`);
       const foam_material = foamEl ? foamEl.value : 'EVA';
+      const shoe = pendingData.find(s => s.id === id);
       try {
         const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
@@ -2586,7 +2800,10 @@
           body: JSON.stringify({ action: 'approve', discovery_id: id, foam_material, token: ADMIN_TOKEN })
         });
         const result = await res.json();
-        if (result.success) { removeShoe(id); showToast(`Shoe approved (${foam_material}) and added to database`, 'success'); }
+        if (result.success) {
+          await writeAuditLog({ action_type: 'APPROVE_DISCOVERY', entity_type: 'pending_shoe_discoveries', entity_id: id, previous_state: shoe ? { status: 'pending', brand_name: shoe.brand_name, model_name: shoe.model_name, raw_name: shoe.raw_name } : null, new_state: { status: 'approved', foam_material } });
+          removeShoe(id); showToast(`Shoe approved (${foam_material}) and added to database`, 'success');
+        }
         else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
@@ -2613,6 +2830,7 @@
 
     async function rejectShoe(id) {
       setLoading(id, true);
+      const shoe = pendingData.find(s => s.id === id);
       try {
         const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
@@ -2620,7 +2838,10 @@
           body: JSON.stringify({ action: 'reject', discovery_id: id, token: ADMIN_TOKEN })
         });
         const result = await res.json();
-        if (result.success) { removeShoe(id); showToast('Shoe rejected', 'success'); }
+        if (result.success) {
+          await writeAuditLog({ action_type: 'REJECT_DISCOVERY', entity_type: 'pending_shoe_discoveries', entity_id: id, previous_state: shoe ? { status: 'pending', brand_name: shoe.brand_name, model_name: shoe.model_name } : null, new_state: { status: 'rejected' } });
+          removeShoe(id); showToast('Shoe rejected', 'success');
+        }
         else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
@@ -2640,6 +2861,9 @@
     async function saveEdit(id) {
       const brand = document.getElementById(`brand-${id}`).value.trim();
       const model = document.getElementById(`model-${id}`).value.trim();
+      const shoe = pendingData.find(s => s.id === id);
+      const prevBrand = shoe?.brand_name;
+      const prevModel = shoe?.model_name;
       try {
         const res    = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
           method: 'POST',
@@ -2648,7 +2872,7 @@
         });
         const result = await res.json();
         if (result.success) {
-          const shoe = pendingData.find(s => s.id === id);
+          await writeAuditLog({ action_type: 'EDIT_DISCOVERY', entity_type: 'pending_shoe_discoveries', entity_id: id, previous_state: { brand_name: prevBrand, model_name: prevModel }, new_state: { brand_name: brand, model_name: model } });
           if (shoe) { shoe.brand_name = brand; shoe.model_name = model; }
           renderShoes();
           showToast('Changes saved', 'success');
@@ -2814,6 +3038,25 @@
       if (aliasData.length === 0) renderAliasQueue();
     }
 
+    /* ═══════════════════════════════════════════════════
+       AUDIT LOGGING
+    ═══════════════════════════════════════════════════ */
+
+    async function writeAuditLog({ action_type, entity_type, entity_id, previous_state = null, new_state = null, admin_identifier = 'admin_panel' }) {
+      try {
+        await getSupabase().from('admin_audit_logs').insert({
+          admin_identifier,
+          action_type,
+          entity_type,
+          entity_id: String(entity_id),
+          previous_state,
+          new_state,
+        });
+      } catch (err) {
+        console.warn('Audit log write failed:', err.message);
+      }
+    }
+
     /* ── OVERRIDE approveAllHigh to handle both tabs ── */
     async function approveAllHigh() {
       if (dqActiveTab === 'aliases') {
@@ -2944,6 +3187,7 @@
         }
 
         const normalized = results.filter(r => r.confidence >= 0.7).length;
+        await writeAuditLog({ action_type: 'AI_NORMALIZE', entity_type: dqActiveTab === 'catalog' ? 'pending_shoe_discoveries' : 'retailer_product_aliases', entity_id: 'batch', admin_identifier: 'ai_janitor', previous_state: { item_count: payload.length }, new_state: { normalized_count: normalized, results: results.slice(0, 20) } });
         showToast(`✨ AI normalized ${normalized} of ${results.length} items`, 'success');
 
       } catch (err) {
@@ -3139,6 +3383,7 @@
         navigate('duplicate-resolver');
         renderAIClusters(groups, cheapestDeal, dealCount, userCount);
 
+        await writeAuditLog({ action_type: 'AI_CLUSTER', entity_type: 'master_shoe_products', entity_id: 'batch', admin_identifier: 'ai_janitor', previous_state: { shoes_analyzed: shoes.length }, new_state: { clusters_found: groups.length, cluster_ids: clusters } });
         showToast(`🧠 AI found ${groups.length} semantic cluster${groups.length > 1 ? 's' : ''}`, 'success');
 
       } catch (err) {
@@ -3455,6 +3700,97 @@
       showToast('Deal deactivated.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SYSTEM LEDGER
+    ═══════════════════════════════════════════════════ */
+
+    let ledgerLoaded = false;
+    let ledgerAllRows = [];
+
+    async function loadLedger() {
+      ledgerLoaded = true;
+      const tbody = document.getElementById('ledger-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+
+      try {
+        const { data, error } = await getSupabase()
+          .from('admin_audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(200);
+
+        if (error) throw error;
+        ledgerAllRows = data || [];
+
+        const badge = document.getElementById('ledger-count-badge');
+        badge.textContent = ledgerAllRows.length;
+
+        renderLedger();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        showToast('Ledger load error: ' + err.message, 'error');
+      }
+    }
+
+    function renderLedger() {
+      const tbody = document.getElementById('ledger-tbody');
+      const filter = document.getElementById('ledger-filter-action')?.value || '';
+      const rows = filter ? ledgerAllRows.filter(r => r.action_type === filter) : ledgerAllRows;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No audit entries found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(row => {
+        const pillClass = /MERGE|NUCLEAR/.test(row.action_type) ? 'merge'
+          : /APPROVE/.test(row.action_type) ? 'approve'
+          : /REJECT/.test(row.action_type) ? 'reject'
+          : /AI/.test(row.action_type) ? 'ai'
+          : /EDIT/.test(row.action_type) ? 'edit'
+          : 'brand';
+        const shortId = row.entity_id?.length > 12 ? row.entity_id.slice(0, 8) + '…' : row.entity_id;
+        return `<tr>
+          <td style="white-space:nowrap;font-size:11px;">
+            ${escapeHtml(fmtDateTime(row.created_at))}<br>
+            <span style="color:#94a3b8">${escapeHtml(timeAgo(row.created_at))}</span>
+          </td>
+          <td><span class="ledger-action-pill ${pillClass}">${escapeHtml(row.action_type)}</span></td>
+          <td style="font-size:11px;color:#64748b;">${escapeHtml(row.entity_type)}</td>
+          <td style="font-family:monospace;font-size:11px;" title="${escapeHtml(row.entity_id)}">${escapeHtml(shortId)}</td>
+          <td style="font-size:11px;color:#64748b;">${escapeHtml(row.admin_identifier)}</td>
+          <td>
+            <button class="ledger-view-btn" onclick="openDiffModal(${escapeHtml(JSON.stringify(JSON.stringify(row)))})">View Payload</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function openDiffModal(rowJson) {
+      let row;
+      try { row = JSON.parse(rowJson); } catch { return; }
+
+      document.getElementById('diff-meta-action').textContent  = '🔖 ' + (row.action_type || '—');
+      document.getElementById('diff-meta-entity').textContent  = '📦 ' + (row.entity_type || '—') + ' · ' + (row.entity_id || '—');
+      document.getElementById('diff-meta-time').textContent    = '🕐 ' + fmtDateTime(row.created_at);
+      document.getElementById('diff-meta-admin').textContent   = '👤 ' + (row.admin_identifier || '—');
+
+      document.getElementById('diff-previous').textContent =
+        row.previous_state != null ? JSON.stringify(row.previous_state, null, 2) : '(none)';
+      document.getElementById('diff-new').textContent =
+        row.new_state != null ? JSON.stringify(row.new_state, null, 2) : '(none)';
+
+      document.getElementById('diff-modal-overlay').classList.add('open');
+    }
+
+    function closeDiffModal() {
+      document.getElementById('diff-modal-overlay').classList.remove('open');
+    }
+
+    function closeDiffModalOnOverlay(e) {
+      if (e.target === document.getElementById('diff-modal-overlay')) closeDiffModal();
     }
 
     /* ═══════════════════════════════════════════════════
@@ -4310,6 +4646,7 @@
         showToast(`${clusterErrors.length} failed: ${firstErr}${extra}`, 'error', 8000);
         console.error('Nuclear merge failures:\n' + clusterErrors.join('\n'));
       } else {
+        await writeAuditLog({ action_type: 'NUCLEAR_MERGE', entity_type: 'master_shoe_products', entity_id: 'batch', previous_state: { clusters_targeted: eligible.length }, new_state: { clusters_merged: done } });
         showToast(`☢️ Nuclear Merge complete — ${done} cluster${done > 1 ? 's' : ''} resolved`, 'success');
       }
 
@@ -4467,6 +4804,7 @@
       }
 
       if (errors.length === 0) {
+        await writeAuditLog({ action_type: 'MERGE_CLUSTER', entity_type: 'master_shoe_products', entity_id: state.masterId, previous_state: { cluster: state.shoes.map(s => ({ id: s.id, brand_name: s.brand_name, model_name: s.model_name })) }, new_state: { master_id: state.masterId, merged_ids: duplicates.map(d => d.id), merged_count: successCount } });
         /* Optimistic removal */
         const groupEl = document.getElementById(groupKey);
         if (groupEl) {
