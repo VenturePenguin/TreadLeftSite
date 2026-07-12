@@ -1626,7 +1626,101 @@
     .toast.success { border-left: 4px solid #10b981; }
     .toast.error   { border-left: 4px solid #ef4444; }
     .toast.show    { display: flex; }
-  </style>
+
+    /* ── Revenue Analytics ── */
+    .rev-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 760px) { .rev-kpi-grid { grid-template-columns: 1fr; } }
+    .rev-kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .rev-kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .rev-kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .rev-kpi-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .rev-kpi-card.highlight { border-color: #7c3aed; }
+    .rev-kpi-card.highlight .rev-kpi-value { color: #7c3aed; }
+    .rev-perf-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .rev-perf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .rev-perf-table th {
+      background: var(--bg-card);
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .rev-perf-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .rev-perf-table tr:last-child td { border-bottom: none; }
+    .rev-perf-table tr:hover td { background: var(--bg-card); }
+    .rev-clicks-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rev-clicks-bar {
+      height: 6px;
+      background: linear-gradient(90deg, #7c3aed, #a78bfa);
+      border-radius: 3px;
+      min-width: 2px;
+      transition: width .3s;
+    }
+    .rev-verify-btn {
+      font-size: 11px;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .rev-verify-btn:hover { border-color: #10b981; color: #10b981; }
+    </style>
 </head>
 <body>
 
@@ -1663,6 +1757,11 @@
       <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
         <span class="nav-icon">📡</span>
         Platform Pulse
+      </button>
+
+      <button class="nav-item" data-view="revenue-analytics" onclick="navigate('revenue-analytics')">
+        <span class="nav-icon">💸</span>
+        Revenue Analytics
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Catalog</div>
@@ -1996,6 +2095,57 @@
             <div class="spinner"></div>
             <p>Scanning for duplicates…</p>
           </div>
+        </div>
+      </div>
+
+      <!-- VIEW: Revenue Analytics -->
+      <div id="view-revenue-analytics" class="view">
+        <div class="view-header">
+          <h2>💸 Revenue Analytics</h2>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadRevenueAnalytics()">🔄 Refresh</button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="rev-kpi-grid">
+          <div class="rev-kpi-card">
+            <div class="rev-kpi-label">🔗 Total Outbound Clicks (Last 30 Days)</div>
+            <div class="rev-kpi-value" id="rev-kpi-clicks">—</div>
+            <div class="rev-kpi-sub" id="rev-kpi-clicks-sub">Loading…</div>
+          </div>
+          <div class="rev-kpi-card">
+            <div class="rev-kpi-label">🔥 Most Active Deal</div>
+            <div class="rev-kpi-value" id="rev-kpi-top-deal" style="font-size:16px;line-height:1.3;padding-top:4px;">—</div>
+            <div class="rev-kpi-sub" id="rev-kpi-top-deal-sub">Loading…</div>
+          </div>
+          <div class="rev-kpi-card highlight">
+            <div class="rev-kpi-label">💰 Estimated Conversion Value</div>
+            <div class="rev-kpi-value" id="rev-kpi-epc">—</div>
+            <div class="rev-kpi-sub">Estimate: clicks × $0.50 EPC — not guaranteed revenue</div>
+          </div>
+        </div>
+
+        <!-- Performance Table -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h3 style="margin:0;font-size:15px;font-weight:700;">Deal Performance</h3>
+          <span style="font-size:12px;color:#64748b;">Active deals only · ordered by total clicks</span>
+        </div>
+        <div class="rev-perf-table-wrap">
+          <table class="rev-perf-table">
+            <thead>
+              <tr>
+                <th>Shoe Deal</th>
+                <th>Retailer</th>
+                <th>Price</th>
+                <th>Total Clicks</th>
+                <th>Unique Users</th>
+                <th>Last Clicked</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="rev-perf-tbody">
+              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2571,6 +2721,9 @@
       if (viewId === 'strava-monitor' && !syncLoaded) {
         syncLoaded = true;
         fetchWebhookLogs();
+      }
+      if (viewId === 'revenue-analytics' && !revenueAnalyticsLoaded) {
+        loadRevenueAnalytics();
       }
       if (viewId === 'system-ledger' && !ledgerLoaded) {
         ledgerLoaded = true;
@@ -3700,6 +3853,90 @@
       showToast('Deal deactivated.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       REVENUE ANALYTICS
+    ═══════════════════════════════════════════════════ */
+
+    let revenueAnalyticsLoaded = false;
+    const EPC = 0.50;
+
+    async function loadRevenueAnalytics() {
+      revenueAnalyticsLoaded = true;
+      const tbody = document.getElementById('rev-perf-tbody');
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      document.getElementById('rev-kpi-clicks').textContent     = '—';
+      document.getElementById('rev-kpi-top-deal').textContent   = '—';
+      document.getElementById('rev-kpi-epc').textContent        = '—';
+
+      try {
+        const sb = getSupabase();
+
+        const [perfRes, kpiRes] = await Promise.all([
+          sb.rpc('get_affiliate_performance'),
+          sb.rpc('get_affiliate_kpis', { days: 30 }),
+        ]);
+
+        if (perfRes.error) throw perfRes.error;
+        if (kpiRes.error)  throw kpiRes.error;
+
+        const rows = perfRes.data  || [];
+        const kpis = kpiRes.data?.[0] || {};
+
+        // ─ KPI Cards ─
+        const clicksPeriod = Number(kpis.total_clicks_period || 0);
+        const topShoe      = kpis.top_shoe_name    || '—';
+        const topClicks    = Number(kpis.top_deal_clicks || 0);
+        const epcValue     = (clicksPeriod * EPC).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+        document.getElementById('rev-kpi-clicks').textContent     = clicksPeriod.toLocaleString();
+        document.getElementById('rev-kpi-clicks-sub').textContent = `${Number(kpis.total_clicks_all || 0).toLocaleString()} total all-time`;
+        document.getElementById('rev-kpi-top-deal').textContent   = topShoe;
+        document.getElementById('rev-kpi-top-deal-sub').textContent = topClicks > 0 ? `${topClicks.toLocaleString()} clicks in last 30 days` : 'No clicks recorded yet';
+        document.getElementById('rev-kpi-epc').textContent        = epcValue;
+
+        // ─ Performance Table ─
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">📦 No active deals found.</td></tr>`;
+          return;
+        }
+
+        const maxClicks = Math.max(...rows.map(r => Number(r.total_clicks) || 0), 1);
+        const currSym = c => ({ USD:'$', GBP:'£', EUR:'€', AUD:'A$', CAD:'C$' }[c] || (c + ' '));
+
+        tbody.innerHTML = rows.map(row => {
+          const clicks    = Number(row.total_clicks)  || 0;
+          const uniq      = Number(row.unique_users)  || 0;
+          const barWidth  = Math.max(Math.round((clicks / maxClicks) * 80), 2);
+          const price     = row.price_cents ? `${currSym(row.currency)}${(row.price_cents / 100).toFixed(2)}` : '—';
+          const lastClick = row.last_clicked_at ? timeAgo(row.last_clicked_at) : 'Never';
+          const safeUrl   = escapeHtml(row.deal_url || '#');
+          return `<tr>
+            <td style="font-weight:600;max-width:200px;">${escapeHtml(row.shoe_name)}</td>
+            <td style="font-size:12px;color:#64748b;">${escapeHtml(row.retailer || '—')}</td>
+            <td style="font-size:12px;">${escapeHtml(price)}</td>
+            <td>
+              <div class="rev-clicks-bar-wrap">
+                <div class="rev-clicks-bar" style="width:${barWidth}px"></div>
+                <span style="font-weight:700;font-size:13px;">${clicks.toLocaleString()}</span>
+              </div>
+            </td>
+            <td style="font-size:13px;">${uniq.toLocaleString()}</td>
+            <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(lastClick)}</td>
+            <td>
+              <a class="rev-verify-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer"
+                 title="Open deal URL in new tab to verify link is live">
+                ↗️ Verify Link
+              </a>
+            </td>
+          </tr>`;
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        showToast('Revenue analytics error: ' + err.message, 'error');
+      }
     }
 
     /* ═══════════════════════════════════════════════════
