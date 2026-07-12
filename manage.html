@@ -1420,6 +1420,56 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── AI Buttons ── */
+    .ai-btn {
+      background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%) !important;
+      color: #fff !important;
+      border-color: #7c3aed !important;
+      font-weight: 600 !important;
+    }
+    .ai-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%) !important;
+      border-color: #6d28d9 !important;
+      color: #fff !important;
+    }
+    .ai-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* AI normalised badge on shoe cards */
+    .ai-normalized-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #7c3aed;
+      background: #f3e8ff;
+      border: 1px solid #d8b4fe;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 6px;
+      letter-spacing: 0.02em;
+    }
+    html.dark .ai-normalized-badge {
+      background: rgba(124,58,237,0.15);
+      border-color: rgba(124,58,237,0.4);
+      color: #c4b5fd;
+    }
+
+    /* AI cluster source badge */
+    .ai-cluster-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      padding: 2px 9px;
+      border-radius: 10px;
+      margin-left: 8px;
+      letter-spacing: 0.02em;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -1774,6 +1824,7 @@
         <div class="batch-actions">
           <button class="batch-btn" id="dq-approve-all-btn" onclick="approveAllHigh()">✓ Approve All</button>
           <button class="batch-btn" onclick="refreshData()">🔄 Refresh</button>
+          <button class="batch-btn ai-btn" id="dq-ai-normalize-btn" onclick="aiNormalizeQueue()" title="Use AI to parse messy brand/model strings">🤖 AI Normalize Queue</button>
         </div>
 
         <div id="shoe-list" class="shoe-list">
@@ -1794,7 +1845,8 @@
           <p class="dup-toolbar-info">
             Shoes are grouped by identical brand + highly similar name. Select the <strong>master</strong> to keep, then merge the rest.
           </p>
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="dup-refresh-btn ai-btn" id="dup-ai-btn" onclick="aiSemanticClustering()" title="Use AI to find semantic duplicates SQL would miss">🧠 AI Semantic Clustering</button>
             <button class="nuke-btn" id="nuke-btn" onclick="executeNuclearMerge()" disabled title="Auto-merges clusters where all non-master variants have 0 users and 0 deals">☢️ Nuclear Merge (0 safe)</button>
             <button class="dup-refresh-btn" onclick="loadDuplicates()">🔄 Refresh</button>
           </div>
@@ -2821,6 +2873,355 @@
     /* ═══════════════════════════════════════════════════
        DUPLICATE DETECTOR
     ═══════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════
+       AI OPS
+    ═══════════════════════════════════════════════════ */
+
+    const AI_OPS_URL = `${SUPABASE_URL}/functions/v1/admin-ai-ops`;
+
+    // ── Phase 2: AI Normalize Discovery Queue ─────────────────────────────
+    async function aiNormalizeQueue() {
+      const btn = document.getElementById('dq-ai-normalize-btn');
+      const source = dqActiveTab === 'catalog' ? pendingData : aliasData;
+
+      if (!source.length) {
+        showToast('No items in queue to normalize', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '🤖 Analyzing…';
+
+      // Build payload: use raw_name for catalog tab, raw_string for alias tab
+      const payload = source.map(item => ({
+        id:       item.id,
+        raw_name: dqActiveTab === 'catalog' ? (item.raw_name || `${item.brand_name} ${item.model_name}`) : item.raw_string,
+      }));
+
+      try {
+        const res = await fetch(AI_OPS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'normalize_discovery', payload, token: ADMIN_TOKEN }),
+        });
+
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'AI request failed');
+
+        const results = json.results || [];
+        if (!results.length) {
+          showToast('AI returned no results', 'error');
+          return;
+        }
+
+        // Build a lookup map by id
+        const byId = {};
+        results.forEach(r => { byId[r.id] = r; });
+
+        // Update pendingData in-memory with AI-parsed brand/model
+        if (dqActiveTab === 'catalog') {
+          pendingData.forEach(shoe => {
+            const ai = byId[shoe.id];
+            if (!ai) return;
+            shoe._ai_brand      = ai.brand;
+            shoe._ai_model      = ai.model;
+            shoe._ai_confidence = ai.confidence;
+            shoe._ai_normalized = true;
+          });
+          renderShoesWithAI();
+        } else {
+          // For alias tab, annotate each row
+          aliasData.forEach(row => {
+            const ai = byId[row.id];
+            if (!ai) return;
+            row._ai_brand      = ai.brand;
+            row._ai_model      = ai.model;
+            row._ai_confidence = ai.confidence;
+            row._ai_normalized = true;
+          });
+          renderAliasQueueWithAI();
+        }
+
+        const normalized = results.filter(r => r.confidence >= 0.7).length;
+        showToast(`✨ AI normalized ${normalized} of ${results.length} items`, 'success');
+
+      } catch (err) {
+        showToast('AI normalize error: ' + err.message, 'error');
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🤖 AI Normalize Queue';
+      }
+    }
+
+    // Re-render catalog shoes with AI annotations injected
+    function renderShoesWithAI() {
+      const container = document.getElementById('shoe-list');
+      if (pendingData.length === 0) {
+        container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p></div>';
+        return;
+      }
+      container.innerHTML = pendingData.map(shoe => {
+        const hasAI = shoe._ai_normalized;
+        const displayBrand = hasAI ? shoe._ai_brand : shoe.brand_name;
+        const displayModel = hasAI ? shoe._ai_model : shoe.model_name;
+        const aiBadge = hasAI
+          ? `<span class="ai-normalized-badge">✨ AI · ${Math.round((shoe._ai_confidence || 0) * 100)}%</span>`
+          : '';
+
+        const hasSuggestion = shoe.confidence === 'medium' && shoe.suggested_master_product_id && shoe.suggested_shoe;
+        const suggestedName  = hasSuggestion ? `${escapeHtml(shoe.suggested_shoe.brand_name)} ${escapeHtml(shoe.suggested_shoe.model_name)}` : '';
+        const fuseScore      = (hasSuggestion && shoe.fuse_score != null) ? Number(shoe.fuse_score).toFixed(2) : null;
+        const suggestedBlock = hasSuggestion ? `
+          <div class="suggested-match-block">
+            <span class="suggested-match-label">✨ Suggested Match:</span>
+            <span class="suggested-match-name">${suggestedName}</span>
+            ${fuseScore ? `<span class="suggested-match-score">Score: ${fuseScore}</span>` : ''}
+          </div>` : '';
+
+        const approveBtn = hasSuggestion
+          ? `<button class="btn btn-approve" onclick="quickApproveShoe('${shoe.id}','${shoe.suggested_master_product_id}')" id="btn-approve-${shoe.id}">⚡ Quick Approve</button>`
+          : `<button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>`;
+
+        return `
+        <div class="shoe-card view-mode ${shoe.confidence}" id="card-${shoe.id}">
+          <div class="shoe-header">
+            <div class="shoe-info">
+              <h3>${escapeHtml(displayBrand)} ${escapeHtml(displayModel)}${aiBadge}</h3>
+              <div class="raw">Raw: ${escapeHtml(shoe.raw_name || shoe.brand_name + ' ' + shoe.model_name)}</div>
+            </div>
+            <span class="confidence-badge ${shoe.confidence}">${shoe.confidence}</span>
+          </div>
+          ${suggestedBlock}
+          <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;margin-top:${hasSuggestion ? '10px' : '0'};">
+            ${hasSuggestion ? '' : `<select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;flex-shrink:0;">
+              <option value="EVA" selected>🟡 EVA (Default)</option>
+              <option value="PEBAX">⚡ PEBAX (Supershoe)</option>
+              <option value="TPU">🔵 TPU (High Durability)</option>
+            </select>`}
+            ${approveBtn}
+            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
+            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
+          </div>
+        </div>
+        <div class="shoe-card edit-mode" id="edit-${shoe.id}" style="display:none;">
+          <input type="text" id="brand-${shoe.id}" value="${escapeHtml(displayBrand)}" placeholder="Brand name">
+          <input type="text" id="model-${shoe.id}" value="${escapeHtml(displayModel)}" placeholder="Model name">
+          <div class="edit-actions">
+            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save</button>
+            <button class="btn btn-edit"    onclick="cancelEdit('${shoe.id}')">Cancel</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Re-render alias queue with AI annotations
+    function renderAliasQueueWithAI() {
+      const container = document.getElementById('shoe-list');
+      if (!aliasData.length) { renderAliasQueue(); return; }
+      container.innerHTML = `
+        <table class="deal-table" style="background:var(--bg-surface);border-radius:14px;overflow:hidden;border:1px solid var(--border);">
+          <thead>
+            <tr>
+              <th>Raw Retailer String</th>
+              <th>Suggested Match</th>
+              <th>AI Parsed</th>
+              <th>Confidence</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${aliasData.map(row => {
+              const prod    = row.master_shoe_products;
+              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:#94a3b8">No match</span>';
+              const score   = row.confidence_score != null ? Math.round(row.confidence_score * 100) + '%' : '—';
+              const scoreCol = row.confidence_score >= 0.80
+                ? 'color:#10b981;font-weight:700;'
+                : row.confidence_score >= 0.70
+                  ? 'color:#f59e0b;font-weight:700;'
+                  : 'color:#ef4444;font-weight:700;';
+              const aiCell = row._ai_normalized
+                ? `<span style="font-weight:600;color:#7c3aed;">✨ ${escapeHtml(row._ai_brand)} ${escapeHtml(row._ai_model)}</span><br><span style="font-size:10px;color:#94a3b8">${Math.round((row._ai_confidence||0)*100)}% conf</span>`
+                : '<span style="color:#94a3b8">—</span>';
+              return `<tr id="alias-row-${row.id}">
+                <td style="font-family:monospace;font-size:12px;max-width:200px;word-break:break-all;">${escapeHtml(row.raw_string)}</td>
+                <td>${match}</td>
+                <td>${aiCell}</td>
+                <td><span style="${scoreCol}">${score}</span></td>
+                <td style="white-space:nowrap;">
+                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')">✓ Approve</button>
+                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')">✕ Reject</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ── Phase 3: AI Semantic Clustering ───────────────────────────────────
+    async function aiSemanticClustering() {
+      const btn = document.getElementById('dup-ai-btn');
+      btn.disabled = true;
+      btn.textContent = '🧠 Analyzing…';
+
+      try {
+        const sb = getSupabase();
+
+        // Fetch up to 200 shoes for AI analysis
+        const { data: shoes, error } = await sb
+          .from('master_shoe_products')
+          .select('id, brand_name, model_name, image_url, created_at')
+          .order('brand_name')
+          .order('model_name')
+          .limit(200);
+
+        if (error) throw error;
+        if (!shoes || shoes.length === 0) {
+          showToast('No shoes in catalog to analyze', 'error');
+          return;
+        }
+
+        const res = await fetch(AI_OPS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'find_duplicates',
+            payload: shoes.map(s => ({ id: s.id, brand_name: s.brand_name, model_name: s.model_name })),
+            token: ADMIN_TOKEN,
+          }),
+        });
+
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'AI request failed');
+
+        const clusters = json.clusters || [];
+        if (!clusters.length) {
+          showToast('🧠 AI found no semantic duplicates in this batch', 'success');
+          return;
+        }
+
+        // Build shoe lookup map
+        const shoeMap = {};
+        shoes.forEach(s => { shoeMap[s.id] = s; });
+
+        // Convert AI cluster id arrays into shoe objects
+        const groups = clusters
+          .map(idArr => idArr.map(id => shoeMap[id]).filter(Boolean))
+          .filter(g => g.length >= 2);
+
+        if (!groups.length) {
+          showToast('🧠 AI clusters did not match known shoe IDs', 'error');
+          return;
+        }
+
+        // Fetch deal and user counts (same as loadDuplicates)
+        const [dealsRes, gearRes] = await Promise.all([
+          sb.from('shoe_deals').select('master_product_id, price_cents, currency').eq('is_active', true).order('price_cents'),
+          sb.from('user_gear_items').select('master_product_id').eq('is_active', true),
+        ]);
+
+        const cheapestDeal = {};
+        const dealCount = {};
+        (dealsRes.data || []).forEach(d => {
+          if (!cheapestDeal[d.master_product_id]) cheapestDeal[d.master_product_id] = d;
+          dealCount[d.master_product_id] = (dealCount[d.master_product_id] || 0) + 1;
+        });
+        const userCount = {};
+        (gearRes.data || []).forEach(r => {
+          userCount[r.master_product_id] = (userCount[r.master_product_id] || 0) + 1;
+        });
+
+        _nukeUserCount = { ..._nukeUserCount, ...userCount };
+        _nukeDealCount = { ..._nukeDealCount, ...dealCount };
+
+        // Navigate to dup view and inject AI clusters
+        navigate('duplicate-resolver');
+        renderAIClusters(groups, cheapestDeal, dealCount, userCount);
+
+        showToast(`🧠 AI found ${groups.length} semantic cluster${groups.length > 1 ? 's' : ''}`, 'success');
+
+      } catch (err) {
+        showToast('AI clustering error: ' + err.message, 'error');
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🧠 AI Semantic Clustering';
+      }
+    }
+
+    function renderAIClusters(groups, cheapestDeal, dealCount, userCount) {
+      const container = document.getElementById('dup-list');
+      const badge = document.getElementById('dup-group-count');
+
+      badge.textContent = groups.length;
+      badge.style.background = '#7c3aed';
+
+      // Prepend a header distinguishing AI clusters from SQL clusters
+      const headerHtml = `
+        <div style="background:linear-gradient(135deg,#ede9fe,#f3e8ff);border:1px solid #d8b4fe;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🧠</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#6d28d9;">AI Semantic Clusters — ${groups.length} found</div>
+            <div style="font-size:12px;color:#7c3aed;margin-top:2px;">These clusters were identified by AI and may include variations that SQL similarity scoring would miss. Review carefully before merging.</div>
+          </div>
+        </div>`;
+
+      const clustersHtml = groups.map((group, gi) => {
+        const key = `ai-group-${gi}`;
+        const sorted = [...group].sort((a, b) => scoreVariant(b, userCount, dealCount) - scoreVariant(a, userCount, dealCount));
+        dupState[key] = { shoes: sorted, masterId: sorted[0].id };
+
+        const cardsHtml = sorted.map((shoe, idx) => {
+          const isMaster = idx === 0;
+          const deal = cheapestDeal[shoe.id];
+          const priceStr = deal ? `${deal.currency} ${(deal.price_cents / 100).toFixed(2)}` : 'No deals';
+          const img = shoe.image_url
+            ? `<img class="dup-card-img" src="${escapeHtml(shoe.image_url)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : '';
+          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}>👟</div>`;
+          const users = userCount[shoe.id] || 0;
+          const deals = dealCount[shoe.id]  || 0;
+          return `
+            <div class="dup-card ${isMaster ? 'is-master' : ''}"
+                 id="card-${key}-${shoe.id}"
+                 onclick="selectMaster('${key}','${shoe.id}')">
+              ${img}${placeholder}
+              <div class="dup-card-body">
+                <div class="dup-card-name">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
+                <div class="dup-card-price">${escapeHtml(priceStr)}</div>
+                <div class="dup-card-telemetry">
+                  <span class="dup-card-stat ${users > 0 ? 'active' : 'zero'}">👥 ${users}</span>
+                  <span class="dup-card-stat ${deals > 0 ? 'active' : 'zero'}">🏷️ ${deals}</span>
+                </div>
+              </div>
+              <div class="dup-card-right">
+                <div class="dup-card-radio"></div>
+                ${isMaster ? '<div class="master-label">⭐ Master</div>' : ''}
+              </div>
+            </div>`;
+        }).join('');
+
+        const dupCount = group.length - 1;
+        return `
+          <div class="dup-group" id="${key}">
+            <div class="dup-group-header">
+              <h3>${escapeHtml(sorted[0].brand_name)} — ${escapeHtml(sorted[0].model_name)} <span class="ai-cluster-badge">🧠 AI</span></h3>
+              <span>${group.length} variants · ${dupCount} to remove</span>
+            </div>
+            <div class="dup-cards">${cardsHtml}</div>
+            <div class="dup-group-footer">
+              <p>AI-identified semantic duplicate. Click a card to set it as the master record.</p>
+              <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                🔀 Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+
+      container.innerHTML = headerHtml + clustersHtml;
+      updateNukeBtnState();
+    }
 
     /* ═══════════════════════════════════════════════════
        DEAL ENGINE MONITOR
