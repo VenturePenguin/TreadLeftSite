@@ -1814,6 +1814,110 @@
       border: 1px solid var(--border);
       color: #64748b;
     }
+
+    /* ── User Cohorts CRM ── */
+    .cohort-control-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+    }
+    .cohort-select {
+      flex: 1;
+      min-width: 180px;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+    .cohort-count-pill {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .cohort-export-btn {
+      margin-left: auto;
+      padding: 8px 18px;
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cohort-export-btn:hover { background: #059669; }
+    .cohort-export-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    .cohort-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .cohort-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .cohort-table th {
+      background: var(--bg-card);
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .cohort-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .cohort-table tr:last-child td { border-bottom: none; }
+    .cohort-table tr:hover td { background: var(--bg-card); }
+    .cohort-shoe-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      padding: 0 7px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .cohort-shoe-pill.zero  { background: rgba(239,68,68,.12); color:#ef4444; }
+    .cohort-shoe-pill.low   { background: rgba(245,158,11,.12); color:#f59e0b; }
+    .cohort-shoe-pill.good  { background: rgba(16,185,129,.12); color:#10b981; }
+    .cohort-shoe-pill.power { background: rgba(124,58,237,.12); color:#7c3aed; }
+    .strava-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      flex-shrink: 0;
+    }
+    .strava-dot.on  { background: #fc4c02; }
+    .strava-dot.off { background: #475569; }
     </style>
 </head>
 <body>
@@ -1911,6 +2015,11 @@
       <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
         <span class="nav-icon">👤</span>
         User Support
+      </button>
+
+      <button class="nav-item" data-view="user-cohorts" onclick="navigate('user-cohorts')">
+        <span class="nav-icon">🎯</span>
+        User Cohorts
       </button>
     </nav>
 
@@ -2194,6 +2303,51 @@
             <div class="spinner"></div>
             <p>Scanning for duplicates…</p>
           </div>
+        </div>
+      </div>
+
+      <!-- VIEW: User Cohorts CRM -->
+      <div id="view-user-cohorts" class="view">
+        <div class="view-header">
+          <h2>🎯 User Cohorts</h2>
+        </div>
+
+        <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
+          Segment the user base for targeted re-engagement campaigns. Export any cohort as CSV.
+        </p>
+
+        <!-- Control Bar -->
+        <div class="cohort-control-bar">
+          <select id="cohort-filter-select" class="cohort-select" onchange="loadUserCohorts(this.value)">
+            <option value="ALL">👥 All Users</option>
+            <option value="NO_SHOES">👟 Empty Lockers (0 active shoes)</option>
+            <option value="STALE_SYNC">💤 Stale Syncs (14+ days)</option>
+            <option value="POWER_USERS">⚡ Power Users (3+ shoes)</option>
+          </select>
+          <span class="cohort-count-pill" id="cohort-count-label">— users</span>
+          <button class="cohort-export-btn" id="cohort-export-btn" onclick="exportCohortCSV()" disabled>
+            ⬇ Export CSV
+          </button>
+        </div>
+
+        <!-- Data Table -->
+        <div class="cohort-table-wrap">
+          <table class="cohort-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Active Shoes</th>
+                <th>Strava</th>
+                <th>Last Sync</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody id="cohort-tbody">
+              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">Select a segment above to load users…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2873,6 +3027,9 @@
       if (viewId === 'strava-monitor' && !syncLoaded) {
         syncLoaded = true;
         fetchWebhookLogs();
+      }
+      if (viewId === 'user-cohorts' && !cohortLoaded) {
+        loadUserCohorts('ALL');
       }
       if (viewId === 'lifespan-insights' && !lifespanLoaded) {
         loadLifespanInsights();
@@ -4008,6 +4165,99 @@
       showToast('Deal deactivated.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       USER COHORTS CRM
+    ═══════════════════════════════════════════════════ */
+
+    let cohortData = [];
+    let cohortLoaded = false;
+    let currentCohortFilter = 'ALL';
+
+    async function loadUserCohorts(filter) {
+      filter = filter || document.getElementById('cohort-filter-select').value;
+      currentCohortFilter = filter;
+      cohortLoaded = true;
+
+      const tbody  = document.getElementById('cohort-tbody');
+      const label  = document.getElementById('cohort-count-label');
+      const expBtn = document.getElementById('cohort-export-btn');
+
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      label.textContent  = '— users';
+      expBtn.disabled    = true;
+      cohortData         = [];
+
+      try {
+        const { data, error } = await getSupabase().rpc('get_user_cohorts', { segment_filter: filter });
+        if (error) throw error;
+
+        cohortData = data || [];
+        label.textContent = `${cohortData.length.toLocaleString()} user${cohortData.length !== 1 ? 's' : ''}`;
+        expBtn.disabled   = cohortData.length === 0;
+
+        if (!cohortData.length) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">🎯 No users match this segment.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = cohortData.map((row, i) => {
+          const shoes    = Number(row.active_shoe_count) || 0;
+          const shoeClass = shoes === 0 ? 'zero' : shoes < 3 ? 'low' : shoes < 6 ? 'good' : 'power';
+          const syncText = row.last_sync_date ? timeAgo(row.last_sync_date) : 'Never';
+          const joinedText = row.account_created_at
+            ? new Date(row.account_created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+            : '—';
+          const stravaOn = row.strava_connected;
+          return `<tr>
+            <td style="color:#64748b;font-size:11px;">${i + 1}</td>
+            <td style="font-family:monospace;font-size:12px;">${escapeHtml(row.email || '—')}</td>
+            <td style="font-size:12px;">${escapeHtml(row.first_name || '—')}</td>
+            <td><span class="cohort-shoe-pill ${shoeClass}">${shoes}</span></td>
+            <td style="white-space:nowrap;">
+              <span class="strava-dot ${stravaOn ? 'on' : 'off'}"></span>
+              <span style="font-size:11px;color:${stravaOn ? '#fc4c02' : '#64748b'}">${stravaOn ? 'Connected' : 'None'}</span>
+            </td>
+            <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(syncText)}</td>
+            <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(joinedText)}</td>
+          </tr>`;
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        showToast('Cohort load error: ' + err.message, 'error');
+      }
+    }
+
+    function exportCohortCSV() {
+      if (!cohortData.length) return;
+
+      const headers = ['user_id','email','first_name','active_shoe_count','strava_connected','last_sync_date','account_created_at'];
+      const escape  = v => {
+        if (v == null) return '';
+        const s = String(v);
+        return s.includes(',') || s.includes('"') || s.includes('\n')
+          ? `"${s.replace(/"/g, '""')}"`
+          : s;
+      };
+
+      const lines = [
+        headers.join(','),
+        ...cohortData.map(r => headers.map(h => escape(r[h])).join(','))
+      ];
+
+      const blob    = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url     = URL.createObjectURL(blob);
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const a       = document.createElement('a');
+      a.href        = url;
+      a.download    = `treadleft_cohort_${currentCohortFilter.toLowerCase()}_${dateStr}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+
+      showToast(`Exported ${cohortData.length} rows as CSV`, 'success');
     }
 
     /* ═══════════════════════════════════════════════════
