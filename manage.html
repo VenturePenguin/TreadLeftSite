@@ -5445,9 +5445,30 @@
         if (!state) continue;
         const duplicates = state.shoes.filter(s => s.id !== state.masterId);
 
+        // Pre-flight: skip entire cluster if master was already deleted by a prior merge
+        const { data: masterCheck } = await getSupabase()
+          .from('master_shoe_products')
+          .select('id')
+          .eq('id', state.masterId)
+          .maybeSingle();
+        if (!masterCheck) {
+          console.warn('Nuclear merge: master already gone, skipping cluster', key);
+          done++; // treat as resolved — it no longer exists
+          btn.textContent = `☢️ Merging… ${done} / ${eligible.length}`;
+          continue;
+        }
+
         let clusterOk = true;
         for (const dup of duplicates) {
           try {
+            // If duplicate is already gone, skip silently
+            const { data: dupCheck } = await getSupabase()
+              .from('master_shoe_products')
+              .select('id')
+              .eq('id', dup.id)
+              .maybeSingle();
+            if (!dupCheck) continue;
+
             const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
               master_id:    state.masterId,
               duplicate_id: dup.id
@@ -5613,8 +5634,29 @@
       let successCount = 0;
       const errors = [];
 
+      // Pre-flight: verify master still exists (may have been merged away in an earlier op)
+      const { data: masterCheck } = await getSupabase()
+        .from('master_shoe_products')
+        .select('id')
+        .eq('id', state.masterId)
+        .maybeSingle();
+      if (!masterCheck) {
+        showToast(`Master record no longer exists — reload duplicates to refresh`, 'error');
+        btn.disabled = false;
+        btn.textContent = '🔀 Retry merge';
+        return;
+      }
+
       for (const dup of duplicates) {
         try {
+          // If duplicate was already deleted in a prior session, treat as success
+          const { data: dupCheck } = await getSupabase()
+            .from('master_shoe_products')
+            .select('id')
+            .eq('id', dup.id)
+            .maybeSingle();
+          if (!dupCheck) { successCount++; continue; }
+
           const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
             master_id:    state.masterId,
             duplicate_id: dup.id
