@@ -1720,6 +1720,100 @@
       display: inline-block;
     }
     .rev-verify-btn:hover { border-color: #10b981; color: #10b981; }
+
+    /* ── Lifespan Insights (Graveyard) ── */
+    .grave-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 760px) { .grave-kpi-grid { grid-template-columns: 1fr; } }
+    .grave-kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .grave-kpi-card.green  { border-color: #10b981; }
+    .grave-kpi-card.green .grave-kpi-value  { color: #10b981; }
+    .grave-kpi-card.red    { border-color: #ef4444; }
+    .grave-kpi-card.red   .grave-kpi-value  { color: #ef4444; }
+    .grave-kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .grave-kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .grave-kpi-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .grave-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .grave-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .grave-table th {
+      background: var(--bg-card);
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .grave-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .grave-table tr:last-child td { border-bottom: none; }
+    .grave-table tr:hover td { background: var(--bg-card); }
+    .grave-bar-track {
+      height: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      width: 120px;
+      flex-shrink: 0;
+    }
+    .grave-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .4s ease;
+    }
+    .grave-sample-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #64748b;
+    }
     </style>
 </head>
 <body>
@@ -1775,6 +1869,11 @@
       <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
         <span class="nav-icon">💰</span>
         Deal Engine
+      </button>
+
+      <button class="nav-item" data-view="lifespan-insights" onclick="navigate('lifespan-insights')">
+        <span class="nav-icon">🪦</span>
+        Lifespan Insights
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Data Governance</div>
@@ -2095,6 +2194,59 @@
             <div class="spinner"></div>
             <p>Scanning for duplicates…</p>
           </div>
+        </div>
+      </div>
+
+      <!-- VIEW: Lifespan Insights -->
+      <div id="view-lifespan-insights" class="view">
+        <div class="view-header">
+          <h2>🪦 Lifespan Insights <span class="badge" id="grave-model-count" style="background:#64748b;">—</span></h2>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadLifespanInsights()">🔄 Refresh</button>
+        </div>
+
+        <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
+          Real-world lifespan aggregated from retired shoes in the wild. Only models with ≥3 retired samples are shown.
+        </p>
+
+        <!-- KPI Cards -->
+        <div class="grave-kpi-grid">
+          <div class="grave-kpi-card">
+            <div class="grave-kpi-label">🪦 Total Shoes Retired</div>
+            <div class="grave-kpi-value" id="grave-kpi-total">—</div>
+            <div class="grave-kpi-sub" id="grave-kpi-total-sub">across all models</div>
+          </div>
+          <div class="grave-kpi-card green">
+            <div class="grave-kpi-label">🏆 Longest Lasting Model</div>
+            <div class="grave-kpi-value" id="grave-kpi-longest" style="font-size:16px;line-height:1.4;padding-top:2px;">—</div>
+            <div class="grave-kpi-sub" id="grave-kpi-longest-sub">avg lifespan</div>
+          </div>
+          <div class="grave-kpi-card red">
+            <div class="grave-kpi-label">🔥 Fastest Burn Rate</div>
+            <div class="grave-kpi-value" id="grave-kpi-fastest" style="font-size:16px;line-height:1.4;padding-top:2px;">—</div>
+            <div class="grave-kpi-sub" id="grave-kpi-fastest-sub">avg lifespan (sample &gt;5)</div>
+          </div>
+        </div>
+
+        <!-- Graveyard Table -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h3 style="margin:0;font-size:15px;font-weight:700;">Model Lifespan Breakdown</h3>
+          <span style="font-size:12px;color:#64748b;">Benchmark: 800 km standard lifespan</span>
+        </div>
+        <div class="grave-table-wrap">
+          <table class="grave-table">
+            <thead>
+              <tr>
+                <th>Brand &amp; Model</th>
+                <th>Sample Size</th>
+                <th>Avg Lifespan</th>
+                <th>Max Distance</th>
+                <th>Median</th>
+              </tr>
+            </thead>
+            <tbody id="grave-tbody">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;">Click Refresh to load…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2721,6 +2873,9 @@
       if (viewId === 'strava-monitor' && !syncLoaded) {
         syncLoaded = true;
         fetchWebhookLogs();
+      }
+      if (viewId === 'lifespan-insights' && !lifespanLoaded) {
+        loadLifespanInsights();
       }
       if (viewId === 'revenue-analytics' && !revenueAnalyticsLoaded) {
         loadRevenueAnalytics();
@@ -3853,6 +4008,100 @@
       showToast('Deal deactivated.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LIFESPAN INSIGHTS (GRAVEYARD)
+    ═══════════════════════════════════════════════════ */
+
+    const LIFESPAN_BENCHMARK_KM = 800;
+    let lifespanLoaded = false;
+
+    async function loadLifespanInsights() {
+      lifespanLoaded = true;
+      const tbody = document.getElementById('grave-tbody');
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      ['grave-kpi-total','grave-kpi-longest','grave-kpi-fastest'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+      });
+
+      try {
+        const sb = getSupabase();
+        const [insightRes, kpiRes] = await Promise.all([
+          sb.rpc('get_lifespan_insights'),
+          sb.rpc('get_lifespan_kpis'),
+        ]);
+
+        if (insightRes.error) throw insightRes.error;
+        if (kpiRes.error)     throw kpiRes.error;
+
+        const rows = insightRes.data  || [];
+        const kpis = kpiRes.data?.[0] || {};
+
+        // ─ KPI Cards ─
+        const totalRetired = Number(kpis.total_retired || 0);
+        document.getElementById('grave-kpi-total').textContent     = totalRetired.toLocaleString();
+        document.getElementById('grave-kpi-total-sub').textContent = `${rows.length} model${rows.length !== 1 ? 's' : ''} with ≥3 samples`;
+
+        const longestName = kpis.longest_model_name || '—';
+        const longestKm   = kpis.longest_avg_km != null ? Number(kpis.longest_avg_km).toLocaleString() + ' km avg' : '—';
+        document.getElementById('grave-kpi-longest').textContent     = longestName;
+        document.getElementById('grave-kpi-longest-sub').textContent = longestKm;
+
+        const fastestName = kpis.fastest_model_name || 'No data (need >5 samples)';
+        const fastestKm   = kpis.fastest_avg_km != null ? Number(kpis.fastest_avg_km).toLocaleString() + ' km avg' : '—';
+        document.getElementById('grave-kpi-fastest').textContent     = fastestName;
+        document.getElementById('grave-kpi-fastest-sub').textContent = kpis.fastest_avg_km != null ? fastestKm : 'Need sample >5 for any model';
+
+        // Badge
+        document.getElementById('grave-model-count').textContent = rows.length;
+        document.getElementById('grave-model-count').style.background = rows.length > 0 ? '#10b981' : '#64748b';
+
+        // ─ Table ─
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;">🪦 No retired shoes with ≥3 samples yet.<br><span style="font-size:11px;">Retire some shoes in the app or add mock data to see insights.</span></td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = rows.map((row, i) => {
+          const avg    = Number(row.avg_lifespan_km)    || 0;
+          const max    = Number(row.max_lifespan_km)    || 0;
+          const median = Number(row.median_lifespan_km) || 0;
+          const pct    = Math.min(Math.round((avg / LIFESPAN_BENCHMARK_KM) * 100), 100);
+          const barColor = pct >= 100 ? '#10b981' : pct >= 75 ? '#f59e0b' : pct >= 50 ? '#f97316' : '#ef4444';
+          const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+          return `<tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                ${row.image_url
+                  ? `<img src="${escapeHtml(row.image_url)}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" loading="lazy" onerror="this.style.display='none'">`
+                  : `<div style="width:36px;height:36px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">👟</div>`
+                }
+                <div>
+                  <div style="font-weight:600;">${rank} ${escapeHtml(row.brand_name)} ${escapeHtml(row.model_name)}</div>
+                  <div style="font-size:11px;color:#94a3b8;">${escapeHtml(row.master_product_id?.slice(0,8) || '')}…</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="grave-sample-badge">${row.sample_size}</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="grave-bar-track">
+                  <div class="grave-bar-fill" style="width:${pct}%;background:${barColor};"></div>
+                </div>
+                <span style="font-weight:700;font-size:13px;">${avg.toLocaleString()} km</span>
+                <span style="font-size:10px;color:#94a3b8;">${pct}%</span>
+              </div>
+            </td>
+            <td style="font-weight:600;color:#10b981;">${max.toLocaleString()} km</td>
+            <td style="font-size:12px;color:#64748b;">${median.toLocaleString()} km</td>
+          </tr>`;
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:36px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        showToast('Lifespan insights error: ' + err.message, 'error');
+      }
     }
 
     /* ═══════════════════════════════════════════════════
