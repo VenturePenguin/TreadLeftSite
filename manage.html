@@ -3598,70 +3598,159 @@
         return;
       }
 
+      // Confirm before processing large queues
+      if (source.length > 20) {
+        if (!confirm(`AI will normalize all ${source.length} items and auto-approve those with ≥80% confidence. This may take a minute. Continue?`)) return;
+      }
+
       btn.disabled = true;
-      btn.textContent = '🤖 Analyzing…';
 
-      // Build payload: use raw_name for catalog tab, raw_string for alias tab
-      const payload = source.map(item => ({
-        id:       item.id,
-        raw_name: dqActiveTab === 'catalog' ? (item.raw_name || `${item.brand_name} ${item.model_name}`) : item.raw_string,
-      }));
+      // Process in AI batches of 30 (OpenAI token limit safety)
+      const AI_BATCH = 30;
+      const allResults = [];
+      const totalBatches = Math.ceil(source.length / AI_BATCH);
 
-      try {
-        const res = await fetch(AI_OPS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'normalize_discovery', payload, token: ADMIN_TOKEN }),
-        });
+      for (let batchIdx = 0; batchIdx < totalBatches; batchIdx++) {
+        const slice = source.slice(batchIdx * AI_BATCH, (batchIdx + 1) * AI_BATCH);
+        btn.textContent = `🤖 Analyzing… (${Math.min((batchIdx + 1) * AI_BATCH, source.length)}/${source.length})`;
 
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error || 'AI request failed');
+        const payload = slice.map(item => ({
+          id:       item.id,
+          raw_name: dqActiveTab === 'catalog' ? (item.raw_name || `${item.brand_name} ${item.model_name}`) : item.raw_string,
+        }));
 
-        const results = json.results || [];
-        if (!results.length) {
-          showToast('AI returned no results', 'error');
-          return;
+        try {
+          const res = await fetch(AI_OPS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'normalize_discovery', payload, token: ADMIN_TOKEN }),
+          });
+          const json = await res.json();
+          if (!json.success) throw new Error(json.error || 'AI request failed');
+          allResults.push(...(json.results || []));
+        } catch (err) {
+          showToast(`AI batch ${batchIdx + 1} error: ${err.message}`, 'error');
         }
 
-        // Build a lookup map by id
-        const byId = {};
-        results.forEach(r => { byId[r.id] = r; });
+        // Brief pause between batches to respect rate limits
+        if (batchIdx + 1 < totalBatches) await new Promise(r => setTimeout(r, 400));
+      }
 
-        // Update pendingData in-memory with AI-parsed brand/model
-        if (dqActiveTab === 'catalog') {
-          pendingData.forEach(shoe => {
-            const ai = byId[shoe.id];
-            if (!ai) return;
-            shoe._ai_brand      = ai.brand;
-            shoe._ai_model      = ai.model;
-            shoe._ai_confidence = ai.confidence;
-            shoe._ai_normalized = true;
-          });
-          renderShoesWithAI();
-        } else {
-          // For alias tab, annotate each row
-          aliasData.forEach(row => {
-            const ai = byId[row.id];
-            if (!ai) return;
-            row._ai_brand      = ai.brand;
-            row._ai_model      = ai.model;
-            row._ai_confidence = ai.confidence;
-            row._ai_normalized = true;
-          });
-          renderAliasQueueWithAI();
-        }
-
-        const normalized = results.filter(r => r.confidence >= 0.7).length;
-        await writeAuditLog({ action_type: 'AI_NORMALIZE', entity_type: dqActiveTab === 'catalog' ? 'pending_shoe_discoveries' : 'retailer_product_aliases', entity_id: 'batch', admin_identifier: 'ai_janitor', previous_state: { item_count: payload.length }, new_state: { normalized_count: normalized, results: results.slice(0, 20) } });
-        showToast(`✨ AI normalized ${normalized} of ${results.length} items`, 'success');
-
-      } catch (err) {
-        showToast('AI normalize error: ' + err.message, 'error');
-        console.error(err);
-      } finally {
+      if (!allResults.length) {
+        showToast('AI returned no results', 'error');
         btn.disabled = false;
         btn.textContent = '🤖 AI Normalize Queue';
+        return;
       }
+
+      const byId = {};
+      allResults.forEach(r => { byId[r.id] = r; });
+
+      // ── Catalog tab: persist edits + auto-approve high-confidence ──────────
+      if (dqActiveTab === 'catalog') {
+        const highConf  = allResults.filter(r => r.confidence >= 0.80);
+        const lowConf   = allResults.filter(r => r.confidence <  0.80);
+
+        btn.textContent = `⚙️ Saving ${highConf.length} corrections…`;
+
+        let approved = 0, edited = 0, failed = 0;
+
+        // 1. Persist AI-corrected brand/model for ALL results via edit action
+        for (const r of allResults) {
+          if (!r.brand || !r.model) continue;
+          try {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'edit', discovery_id: r.id, brand_name: r.brand, model_name: r.model, token: ADMIN_TOKEN }),
+            });
+            const result = await res.json();
+            if (result.success) edited++;
+          } catch { failed++; }
+        }
+
+        // 2. Auto-approve high-confidence results
+        btn.textContent = `✅ Approving ${highConf.length} high-confidence…`;
+        for (const r of highConf) {
+          try {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'approve', discovery_id: r.id, token: ADMIN_TOKEN }),
+            });
+            const result = await res.json();
+            if (result.success) approved++;
+            else failed++;
+          } catch { failed++; }
+        }
+
+        // 3. Annotate remaining low-confidence items in-memory for manual review
+        lowConf.forEach(r => {
+          const shoe = pendingData.find(s => s.id === r.id);
+          if (!shoe) return;
+          shoe._ai_brand      = r.brand;
+          shoe._ai_model      = r.model;
+          shoe._ai_confidence = r.confidence;
+          shoe._ai_normalized = true;
+          shoe.brand_name     = r.brand;
+          shoe.model_name     = r.model;
+        });
+
+        await writeAuditLog({
+          action_type: 'AI_NORMALIZE_AND_APPROVE',
+          entity_type: 'pending_shoe_discoveries',
+          entity_id: 'batch',
+          admin_identifier: 'ai_janitor',
+          previous_state: { total: source.length },
+          new_state: { edited, approved, failed, low_conf_remaining: lowConf.length },
+        });
+
+        // Reload queue from DB to show true remaining state
+        await loadPending();
+        if (lowConf.length > 0) renderShoesWithAI();
+
+        showToast(
+          `✨ Auto-approved ${approved} · ${lowConf.length} need manual review${failed ? ` · ${failed} failed` : ''}`,
+          failed > approved ? 'error' : 'success'
+        );
+
+      // ── Alias tab: batch-approve high-confidence aliases ────────────────────
+      } else {
+        const highConf = allResults.filter(r => r.confidence >= 0.80);
+        const ids      = highConf.map(r => r.id).filter(Boolean);
+
+        if (ids.length) {
+          btn.textContent = `✅ Approving ${ids.length} aliases…`;
+          const { error } = await getSupabase()
+            .from('retailer_product_aliases')
+            .update({ status: 'approved' })
+            .in('id', ids);
+          if (error) showToast('Alias batch approve failed: ' + error.message, 'error');
+        }
+
+        // Annotate remaining for visual review
+        allResults.forEach(r => {
+          const row = aliasData.find(a => a.id === r.id);
+          if (!row) return;
+          row._ai_brand = r.brand; row._ai_model = r.model;
+          row._ai_confidence = r.confidence; row._ai_normalized = true;
+        });
+
+        await writeAuditLog({
+          action_type: 'AI_NORMALIZE_AND_APPROVE',
+          entity_type: 'retailer_product_aliases',
+          entity_id: 'batch',
+          admin_identifier: 'ai_janitor',
+          previous_state: { total: source.length },
+          new_state: { approved: ids.length, low_conf_remaining: allResults.length - ids.length },
+        });
+
+        await loadDiscoveryQueue();
+        showToast(`✨ Approved ${ids.length} aliases · ${allResults.length - ids.length} need manual review`, 'success');
+      }
+
+      btn.disabled = false;
+      btn.textContent = '🤖 AI Normalize Queue';
     }
 
     // Re-render catalog shoes with AI annotations injected
