@@ -20,3 +20,8 @@
   from = "/privacy"
   to = "/legal-privacy.html"
   status = 301
+
+[[redirects]]
+  from = "/release-notes"
+  to = "/release-notes.html"
+  status = 200
