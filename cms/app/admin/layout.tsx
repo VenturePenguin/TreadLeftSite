@@ -20,10 +20,11 @@ export default function AdminLayout({
       if (error) {
         console.error('Auth check failed:', error);
       }
-      const isLogin = pathname === '/admin/login';
-      if (!session && !isLogin) {
+      const publicAdminRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
+      const isPublic = publicAdminRoutes.includes(pathname);
+      if (!session && !isPublic) {
         router.replace('/admin/login');
-      } else if (session && isLogin) {
+      } else if (session && isPublic) {
         router.replace('/admin/posts');
       }
       setLoading(false);
@@ -32,10 +33,11 @@ export default function AdminLayout({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      const isLogin = pathname === '/admin/login';
-      if (event === 'SIGNED_OUT' && !isLogin) {
+      const publicAdminRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
+      const isPublic = publicAdminRoutes.includes(pathname);
+      if (event === 'SIGNED_OUT' && !isPublic) {
         router.replace('/admin/login');
-      } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && isLogin) {
+      } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && isPublic) {
         router.replace('/admin/posts');
       }
     });
