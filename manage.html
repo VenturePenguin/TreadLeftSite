@@ -2103,6 +2103,11 @@
             <div class="pulse-label">HK Syncs Today</div>
             <div class="pulse-sub" id="pulse-healthkit-acts-total">— total</div>
           </div>
+          <div class="pulse-card" style="--accent:#ec4899">
+            <div class="pulse-value" id="pulse-ai-calls-24h">—</div>
+            <div class="pulse-label">AI Calls Today</div>
+            <div class="pulse-sub" id="pulse-ai-calls-sub">— calls / — tokens / — errors</div>
+          </div>
         </div>
 
         <!-- Sync Source Breakdown -->
@@ -3083,6 +3088,10 @@
         document.getElementById('pulse-healthkit-pct').textContent      = pct(t.healthkit_connected || 0, t.total_users) + ' of accounts';
         document.getElementById('pulse-healthkit-acts-24h').textContent  = fmt(t.healthkit_activities_24h || 0);
         document.getElementById('pulse-healthkit-acts-total').textContent = fmt(t.healthkit_activities_total || 0) + ' total HK activities';
+
+        document.getElementById('pulse-ai-calls-24h').textContent = fmt(t.ai_calls_24h || 0);
+        document.getElementById('pulse-ai-calls-sub').textContent =
+          fmt(t.ai_calls_24h || 0) + ' calls / ' + fmt(t.ai_tokens_24h || 0) + ' tokens / ' + fmt(t.ai_errors_24h || 0) + ' errors';
 
         const bd = t.sync_source_breakdown || {};
         document.getElementById('breakdown-strava').textContent    = fmt(bd.strava    || 0);
