@@ -106,7 +106,12 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
         router.refresh();
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage =
+        (err as any)?.message ??
+        (err as any)?.error_description ??
+        (err as any)?.hint ??
+        (typeof err === 'string' ? err : JSON.stringify(err));
+      console.error('Save failed:', err);
       setMessage(`Save failed: ${errorMessage}`);
     } finally {
       setIsSaving(false);

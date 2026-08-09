@@ -1,30 +1,53 @@
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import PostForm from '@/components/PostForm';
+import { Loader2 } from 'lucide-react';
 
-interface EditPostPageProps {
-  params: { id: string };
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  status: 'draft' | 'published';
+  published_at: string | null;
 }
 
-export async function generateMetadata({ params }: EditPostPageProps): Promise<Metadata> {
-  const { data: post } = await supabase
-    .from('blog_posts')
-    .select('title')
-    .eq('id', params.id)
-    .single();
+export default function EditPostPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  return {
-    title: post ? `Edit: ${post.title}` : 'Edit Post',
-  };
-}
+  const [post, setPost] = useState<Post | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function EditPostPage({ params }: EditPostPageProps) {
-  const { data: post, error } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('id', params.id)
-    .single();
+  useEffect(() => {
+    if (!id) return;
+    supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', id)
+      .single()
+      .then(({ data, error }) => {
+        setLoading(false);
+        if (error || !data) {
+          setError(error?.message ?? 'Post not found');
+        } else {
+          setPost(data);
+        }
+      });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </main>
+    );
+  }
 
   if (error || !post) {
     notFound();

@@ -1,24 +1,52 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Edit, Eye, Plus } from 'lucide-react';
+import { Edit, Eye, Plus, Loader2 } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Blog Posts',
-};
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  status: 'draft' | 'published';
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
-export const revalidate = 60;
+export default function PostsAdminPage() {
+  const [posts, setPosts] = useState<Post[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function PostsAdminPage() {
-  const { data: posts, error } = await supabase
-    .from('blog_posts')
-    .select('id, title, slug, status, published_at, created_at, updated_at')
-    .order('created_at', { ascending: false });
+  useEffect(() => {
+    supabase
+      .from('blog_posts')
+      .select('id, title, slug, status, published_at, created_at, updated_at')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        setLoading(false);
+        if (error) {
+          setError(error.message);
+        } else {
+          setPosts(data ?? []);
+        }
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="mx-auto flex max-w-5xl items-center justify-center px-4 py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </main>
+    );
+  }
 
   if (error) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-10">
-        <p className="text-red-600">Failed to load posts: {error.message}</p>
+        <p className="text-red-600">Failed to load posts: {error}</p>
       </main>
     );
   }
