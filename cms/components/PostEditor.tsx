@@ -7,7 +7,15 @@ import { Loader2 } from 'lucide-react';
 import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(
-  () => import('react-quill'),
+  async () => {
+    const { default: RQ } = await import('react-quill');
+    // next/dynamic does not forward refs by default, which silently breaks
+    // imperative access to the Quill instance (e.g. the image upload handler).
+    // Wrap in a small forwardRef component to pass the ref through.
+    return function ForwardedReactQuill({ forwardedRef, ...props }: any) {
+      return <RQ ref={forwardedRef} {...props} />;
+    };
+  },
   {
     ssr: false,
     loading: () => (
@@ -69,7 +77,10 @@ export default function PostEditor({
         const publicUrl = publicUrlData.publicUrl;
 
         const editor = quillRef.current?.getEditor();
-        if (!editor) return;
+        if (!editor) {
+          window.alert('Editor not ready. Please try again in a moment.');
+          return;
+        }
 
         const range = editor.getSelection(true);
         const index = range ? range.index : editor.getLength();
@@ -128,7 +139,7 @@ export default function PostEditor({
         </div>
       )}
       <ReactQuill
-        ref={quillRef}
+        forwardedRef={quillRef}
         theme="snow"
         value={value}
         onChange={onChange}
