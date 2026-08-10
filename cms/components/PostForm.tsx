@@ -102,8 +102,6 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
       setMessage(publish ? 'Post published!' : 'Post saved as draft.');
       if (!postId) {
         router.push('/admin/posts');
-      } else {
-        router.refresh();
       }
     } catch (err) {
       const errorMessage =
