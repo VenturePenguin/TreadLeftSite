@@ -43,28 +43,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-50">
+    <div className="flex min-h-screen flex-col bg-brand-light text-brand-navy">
       <BlogHeader />
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
         <Link
           href="/"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 hover:text-white"
+          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-brand-slate hover:text-brand-orange"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Journal
         </Link>
 
-        <article className="rounded-2xl border border-white/10 bg-slate-900 p-8 shadow-lg md:p-12">
+        <article className="rounded-2xl border border-brand-border bg-white p-8 shadow-sm md:p-12">
           <header className="mb-8">
-            <h1 className="mb-4 text-3xl font-extrabold tracking-tight leading-tight text-white md:text-4xl">
+            <h1 className="mb-4 text-3xl font-extrabold tracking-tight leading-tight text-brand-navy md:text-4xl">
               {post.title}
             </h1>
             {post.excerpt && (
-              <p className="text-lg text-slate-400">{post.excerpt}</p>
+              <p className="text-lg text-brand-slate">{post.excerpt}</p>
             )}
             {post.published_at && (
-              <div className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400">
+              <div className="mt-4 inline-flex items-center gap-2 text-sm text-brand-slate">
                 <Calendar className="h-4 w-4" />
                 {new Date(post.published_at).toLocaleDateString(undefined, {
                   year: 'numeric',
@@ -76,7 +76,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </header>
 
           <div
-            className="prose prose-invert max-w-none prose-headings:text-white prose-a:text-brand-orange"
+            className="prose prose-slate max-w-none prose-a:text-brand-orange"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </article>

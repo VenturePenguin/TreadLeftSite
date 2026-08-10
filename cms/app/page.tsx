@@ -21,7 +21,7 @@ export default async function BlogIndexPage() {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-5xl bg-slate-950 px-4 py-12 text-red-400">
+      <main className="mx-auto max-w-5xl bg-brand-light px-4 py-12 text-red-600">
         <p>Failed to load posts: {error.message}</p>
       </main>
     );
@@ -30,13 +30,13 @@ export default async function BlogIndexPage() {
   const [featured, ...rest] = posts ?? [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-50">
+    <div className="flex min-h-screen flex-col bg-brand-light text-brand-navy">
       <BlogHeader />
 
       <section className="py-16 text-center">
         <div className="mx-auto max-w-3xl px-4">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">TreadLeft Journal</h1>
-          <p className="mt-3 text-lg text-slate-400">
+          <h1 className="text-4xl font-extrabold tracking-tight text-brand-navy md:text-5xl">TreadLeft Journal</h1>
+          <p className="mt-3 text-lg text-brand-slate">
             Running tips, shoe guides, and training insights.
           </p>
         </div>
@@ -44,25 +44,25 @@ export default async function BlogIndexPage() {
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12">
         {!posts || posts.length === 0 ? (
-          <p className="text-center text-slate-400">No published posts yet.</p>
+          <p className="text-center text-brand-slate">No published posts yet.</p>
         ) : (
           <>
-            <article className="mb-12 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-lg transition hover:border-white/20">
+            <article className="mb-12 overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition hover:shadow-md">
               <div className="p-8 md:p-10">
-                <span className="mb-3 inline-block rounded-full bg-brand-orange/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-orange">
+                <span className="mb-3 inline-block rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-orange">
                   Latest
                 </span>
-                <h2 className="mb-3 text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+                <h2 className="mb-3 text-2xl font-extrabold tracking-tight text-brand-navy md:text-3xl">
                   <Link href={`/posts/${featured.slug}`} className="hover:text-brand-orange">
                     {featured.title}
                   </Link>
                 </h2>
                 {featured.excerpt && (
-                  <p className="mb-5 max-w-2xl text-slate-400">{featured.excerpt}</p>
+                  <p className="mb-5 max-w-2xl text-brand-slate">{featured.excerpt}</p>
                 )}
                 <div className="flex items-center justify-between">
                   {featured.published_at && (
-                    <span className="inline-flex items-center gap-1.5 text-sm text-slate-400">
+                    <span className="inline-flex items-center gap-1.5 text-sm text-brand-slate">
                       <Calendar className="h-4 w-4" />
                       {new Date(featured.published_at).toLocaleDateString()}
                     </span>
@@ -83,19 +83,19 @@ export default async function BlogIndexPage() {
                 {rest.map((post) => (
                   <article
                     key={post.id}
-                    className="flex flex-col rounded-xl border border-white/10 bg-slate-900 p-6 shadow-lg transition hover:border-white/20"
+                    className="flex flex-col rounded-xl border border-brand-border bg-white p-6 shadow-sm transition hover:shadow-md"
                   >
-                    <h3 className="mb-2 text-lg font-bold text-white">
+                    <h3 className="mb-2 text-lg font-bold text-brand-navy">
                       <Link href={`/posts/${post.slug}`} className="hover:text-brand-orange">
                         {post.title}
                       </Link>
                     </h3>
                     {post.excerpt && (
-                      <p className="mb-4 line-clamp-3 flex-1 text-sm text-slate-400">{post.excerpt}</p>
+                      <p className="mb-4 line-clamp-3 flex-1 text-sm text-brand-slate">{post.excerpt}</p>
                     )}
                     <div className="mt-auto flex items-center justify-between">
                       {post.published_at && (
-                        <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-brand-slate">
                           <Calendar className="h-3.5 w-3.5" />
                           {new Date(post.published_at).toLocaleDateString()}
                         </span>
