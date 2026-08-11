@@ -107,7 +107,12 @@ export default function PostEditor({
         editor.insertEmbed(index, 'image', publicUrl);
         editor.setSelection(index + 1, 0);
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
+        const message =
+          err instanceof Error
+            ? err.message
+            : typeof err === 'string'
+              ? err
+              : (err as any)?.message ?? JSON.stringify(err);
         console.error('[PostEditor] Exception during image upload:', err);
         window.alert(`Image upload failed: ${message}`);
       } finally {
