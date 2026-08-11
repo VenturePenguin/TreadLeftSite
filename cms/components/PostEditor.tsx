@@ -52,16 +52,36 @@ export default function PostEditor({
 
       setIsUploading(true);
       try {
-        const fileExt = file.name.split('.').pop() ?? 'png';
+        let uploadFile: File | Blob = file;
+        let fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'png';
+        let contentType = file.type;
+
+        // HEIC/HEIF (default iPhone photo format) isn't renderable in an <img>
+        // tag by most browsers (Chrome, Firefox, etc.) - only Safari/iOS support
+        // it natively. Convert to JPEG client-side so it displays everywhere.
+        const isHeic =
+          fileExt === 'heic' ||
+          fileExt === 'heif' ||
+          file.type === 'image/heic' ||
+          file.type === 'image/heif';
+
+        if (isHeic) {
+          const heic2any = (await import('heic2any')).default;
+          const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+          uploadFile = Array.isArray(converted) ? converted[0] : converted;
+          fileExt = 'jpg';
+          contentType = 'image/jpeg';
+        }
+
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from(BUCKET_NAME)
-          .upload(filePath, file, {
+          .upload(filePath, uploadFile, {
             cacheControl: '3600',
             upsert: false,
-            contentType: file.type,
+            contentType,
           });
 
         if (uploadError) {
