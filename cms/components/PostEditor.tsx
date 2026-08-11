@@ -32,6 +32,85 @@ interface PostEditorProps {
 
 const BUCKET_NAME = 'blog-assets';
 
+// Convert a browser-decodable image (including HEIC on Safari/iOS) to a
+// cross-browser JPEG. We also downscale to a max 1600px edge to avoid
+// huge file sizes in blog posts.
+function convertHeicToJpeg(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+
+    const timer = window.setTimeout(() => {
+      URL.revokeObjectURL(url);
+      reject('Image decoding timed out. HEIC/HEIF is not supported in this browser.');
+    }, 15000);
+
+    img.onload = () => {
+      window.clearTimeout(timer);
+
+      const maxDim = 1600;
+      const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+      const width = Math.round(img.naturalWidth * scale);
+      const height = Math.round(img.naturalHeight * scale);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject('Canvas not available in this browser.');
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) {
+            reject('Could not convert image to JPEG.');
+          } else {
+            resolve(blob);
+          }
+        },
+        'image/jpeg',
+        0.92
+      );
+    };
+
+    img.onerror = () => {
+      window.clearTimeout(timer);
+      URL.revokeObjectURL(url);
+      reject('Image could not be decoded in this browser. HEIC/HEIF files need to be converted to JPG/PNG first.');
+    };
+
+    img.src = url;
+  });
+}
+
+// Detect HEIC/HEIF by extension/type or by the ISO BMFF ftyp brand.
+// Catches misnamed files where the extension has been changed to .jpg.
+async function fileIsHeic(file: File): Promise<boolean> {
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+  if (ext === 'heic' || ext === 'heif') return true;
+  if (file.type === 'image/heic' || file.type === 'image/heif') return true;
+
+  try {
+    const buf = await file.slice(0, 32).arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    const ftyp = String.fromCharCode(...bytes.slice(4, 8));
+    if (ftyp !== 'ftyp') return false;
+
+    const brand = String.fromCharCode(...bytes.slice(8, 12));
+    const compatible = String.fromCharCode(...bytes.slice(12, 32));
+    const brands = ['heic', 'heix', 'heis', 'heim', 'mif1', 'heif'];
+    return brands.includes(brand) || brands.some((b) => compatible.includes(b));
+  } catch {
+    return false;
+  }
+}
+
 export default function PostEditor({
   value,
   onChange,
@@ -58,27 +137,19 @@ export default function PostEditor({
 
         // HEIC/HEIF (default iPhone photo format) isn't renderable in an <img>
         // tag by most browsers (Chrome, Firefox, etc.) - only Safari/iOS support
-        // it natively. Convert to JPEG client-side so it displays everywhere.
-        const isHeic =
-          fileExt === 'heic' ||
-          fileExt === 'heif' ||
-          file.type === 'image/heic' ||
-          file.type === 'image/heif';
+        // it natively. Use the browser's own decoder to convert it to a JPEG.
+        // If the browser can't decode it, the user has to convert it manually.
+        const isHeic = await fileIsHeic(file);
 
         if (isHeic) {
           try {
-            const heic2any = (await import('heic2any')).default;
-            const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
-            uploadFile = Array.isArray(converted) ? converted[0] : converted;
+            uploadFile = await convertHeicToJpeg(file);
             fileExt = 'jpg';
             contentType = 'image/jpeg';
           } catch (conversionErr) {
-            // Some HEIC variants (e.g. certain burst/live-photo profiles) aren't
-            // supported by the client-side decoder. Don't upload a file that
-            // will just show as broken - guide the user to convert it instead.
             console.error('[PostEditor] HEIC conversion failed:', conversionErr);
             window.alert(
-              "This photo's HEIC format couldn't be converted automatically. " +
+              "This photo's HEIC/HEIF format couldn't be converted in this browser. " +
                 'Please convert it to JPG or PNG first (e.g. open it in Photos and use "Export" or "Share" as JPEG), then try uploading again.'
             );
             return;
