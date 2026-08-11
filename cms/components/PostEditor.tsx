@@ -66,11 +66,23 @@ export default function PostEditor({
           file.type === 'image/heif';
 
         if (isHeic) {
-          const heic2any = (await import('heic2any')).default;
-          const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
-          uploadFile = Array.isArray(converted) ? converted[0] : converted;
-          fileExt = 'jpg';
-          contentType = 'image/jpeg';
+          try {
+            const heic2any = (await import('heic2any')).default;
+            const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+            uploadFile = Array.isArray(converted) ? converted[0] : converted;
+            fileExt = 'jpg';
+            contentType = 'image/jpeg';
+          } catch (conversionErr) {
+            // Some HEIC variants (e.g. certain burst/live-photo profiles) aren't
+            // supported by the client-side decoder. Don't upload a file that
+            // will just show as broken - guide the user to convert it instead.
+            console.error('[PostEditor] HEIC conversion failed:', conversionErr);
+            window.alert(
+              "This photo's HEIC format couldn't be converted automatically. " +
+                'Please convert it to JPG or PNG first (e.g. open it in Photos and use "Export" or "Share" as JPEG), then try uploading again.'
+            );
+            return;
+          }
         }
 
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
