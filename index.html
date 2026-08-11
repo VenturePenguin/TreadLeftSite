@@ -240,108 +240,19 @@
                 </div>
             </div>
 
-            <!-- Right Column: Visual (Clean Card Design) -->
-            <div class="relative z-10 lg:ml-auto fade-in-up" style="animation-delay: 0.2s;">
-                <!-- Decorative Elements -->
-                <div class="absolute -top-12 -right-12 w-64 h-64 bg-brand-blue/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-12 -left-12 w-64 h-64 bg-brand-orange/10 rounded-full blur-3xl"></div>
+            <!-- Right Column: Device Mockup -->
+            <div class="relative z-10 lg:ml-auto fade-in-up flex justify-center" style="animation-delay: 0.2s;">
+                <div class="relative w-[270px] h-[550px] sm:w-[300px] sm:h-[610px] md:w-[340px] md:h-[690px]">
+                    <!-- Decorative glows -->
+                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-brand-blue/20 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-16 -left-16 w-72 h-72 bg-brand-orange/20 rounded-full blur-3xl"></div>
 
-                <!-- Main Card (App Mockup) -->
-                <div class="relative bg-white rounded-3xl p-8 shadow-2xl shadow-slate-200 border border-brand-border">
-
-                    <!-- Brand Selector Tabs -->
-                    <div class="flex gap-2 mb-6 flex-wrap" id="brand-tabs">
-                        <button onclick="switchBrand(0)" class="brand-tab active-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#0a0a0a">Nike</button>
-                        <button onclick="switchBrand(1)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#e8192c">Brooks</button>
-                        <button onclick="switchBrand(2)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#003da5">ASICS</button>
-                        <button onclick="switchBrand(3)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#5a9e2f">New Balance</button>
-                        <button onclick="switchBrand(4)" class="brand-tab px-3 py-1 rounded-full text-xs font-bold border transition" data-color="#1a1a1a">Saucony</button>
-                    </div>
-
-                    <!-- Card Header -->
-                    <div class="flex justify-between items-start mb-8">
-                        <div class="flex gap-4">
-                            <div id="brand-logo" class="w-14 h-14 rounded-2xl flex items-center justify-center border-2 font-black text-lg transition-all duration-300" style="background:#f8fafc; border-color:#0a0a0a; color:#0a0a0a">
-                                NK
-                            </div>
-                            <div>
-                                <h3 id="shoe-name" class="text-lg font-bold text-brand-navy">Nike Pegasus 41</h3>
-                                <p class="text-sm text-brand-slate">Primary Road Shoe</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">
-                            <i data-lucide="alert-circle" class="w-3 h-3"></i>
-                            CRITICAL
-                        </div>
-                    </div>
-
-                    <!-- Clean Stats -->
-                    <div class="flex justify-between items-end mb-4">
-                        <div>
-                            <p class="text-sm font-medium text-brand-slate mb-1">Mileage</p>
-                            <p class="text-3xl font-bold text-brand-navy tracking-tight">485<span class="text-lg text-slate-400 font-normal ml-1">/ 500 km</span></p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-medium text-brand-slate mb-1">Health</p>
-                            <p class="text-xl font-bold text-red-500">3%</p>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-brand-light rounded-full h-3 mb-8 overflow-hidden">
-                        <div id="progress-bar" class="h-3 rounded-full w-[97%] shadow-[0_0_10px_rgba(239,68,68,0.5)]" style="background:#ef4444"></div>
-                    </div>
-
-                    <!-- Action Area -->
-                    <div class="bg-brand-light rounded-2xl p-4 border border-brand-border">
-                        <div class="flex items-center justify-between mb-3">
-                            <p class="text-sm font-semibold text-slate-700">Recommended Replacement</p>
-                            <span class="text-xs font-bold text-brand-teal bg-teal-50 border border-teal-100 px-2 py-0.5 rounded">SAVE £40</span>
-                        </div>
-                        <button class="w-full py-3 bg-brand-navy text-white font-bold rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-md">
-                            <span>Check Deal: £89.99</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4 text-brand-orange"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <script>
-                    const brands = [
-                        { initials: 'NK', name: 'Nike Pegasus 41',        color: '#0a0a0a' },
-                        { initials: 'BR', name: 'Brooks Ghost 15',         color: '#e8192c' },
-                        { initials: 'AS', name: 'ASICS Gel-Kayano 31',     color: '#003da5' },
-                        { initials: 'NB', name: 'New Balance 1080v13',     color: '#5a9e2f' },
-                        { initials: 'SC', name: 'Saucony Ride 17',         color: '#1a1a1a' },
-                    ];
-                    function switchBrand(i) {
-                        const b = brands[i];
-                        document.getElementById('brand-logo').style.borderColor = b.color;
-                        document.getElementById('brand-logo').style.color = b.color;
-                        document.getElementById('brand-logo').textContent = b.initials;
-                        document.getElementById('shoe-name').textContent = b.name;
-                        document.querySelectorAll('.brand-tab').forEach((t, idx) => {
-                            if (idx === i) {
-                                t.style.backgroundColor = b.color;
-                                t.style.borderColor = b.color;
-                                t.style.color = '#fff';
-                            } else {
-                                t.style.backgroundColor = '';
-                                t.style.borderColor = '#e2e8f0';
-                                t.style.color = '#64748b';
-                            }
-                        });
-                    }
-                    switchBrand(0);
-                </script>
-
-                <!-- Floating Toast Notification -->
-                <div class="absolute -right-8 top-1/2 bg-white p-4 rounded-2xl shadow-xl border border-brand-border flex items-center gap-3 animate-bounce">
-                    <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-brand-teal border border-teal-100">
-                        <i data-lucide="check" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-brand-slate font-medium">Strava Sync</p>
-                        <p class="text-sm font-bold text-brand-navy">Run Imported</p>
+                    <!-- iPhone frame -->
+                    <div class="relative w-full h-full rounded-[3rem] bg-slate-950 border-[10px] border-slate-800 shadow-2xl overflow-hidden">
+                        <!-- Dynamic Island -->
+                        <div class="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20"></div>
+                        <!-- Screen image -->
+                        <img src="/images/hero-mockup.png" alt="TreadLeft app screenshot" class="w-full h-full object-cover" onerror="this.parentElement.classList.add('bg-slate-900'); this.style.display='none';">
                     </div>
                 </div>
             </div>
@@ -420,79 +331,68 @@
     </div>
 
     <!-- FEATURES SECTION -->
-    <section id="features" class="py-24 bg-white">
+    <section id="features" class="py-24 bg-slate-950">
         <div class="container mx-auto px-6">
             <div class="text-center max-w-2xl mx-auto mb-16 reveal">
-                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">The runner's modern tech stack.</h2>
-                <p class="text-lg text-brand-slate">Don't rely on memory or spreadsheets. Rely on automated data, AI, physical wear insights, and community benchmarks.</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">The runner's modern tech stack.</h2>
+                <p class="text-lg text-slate-400">Don't rely on memory or spreadsheets. Rely on automated data, AI, physical wear insights, and community benchmarks.</p>
             </div>
 
             <!-- Bento Grid -->
-            <div class="grid md:grid-cols-3 gap-4 auto-rows-auto">
+            <div class="grid md:grid-cols-3 gap-6 auto-rows-auto">
 
                 <!-- LARGE: Passive Sync -->
-                <div class="md:col-span-2 p-10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-1 group cursor-default"
-                     style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); box-shadow: 0 4px 24px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.07);">
-                    <!-- Decorative circle -->
-                    <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 group-hover:opacity-20 transition duration-500" style="background: radial-gradient(circle, #f97316, transparent)"></div>
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6 border border-white/20 relative z-10" style="background:rgba(255,255,255,0.08); box-shadow: 0 0 16px rgba(249,115,22,0.3);">
-                        <i data-lucide="refresh-cw" class="text-white w-6 h-6"></i>
+                <div class="md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-6 overflow-hidden">
+                        <img src="/images/bento-sync.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <div class="relative z-10">
+                    <div>
                         <h3 class="text-2xl font-bold text-white mb-3">Passive Sync</h3>
-                        <p class="text-slate-300 leading-relaxed max-w-md">Connect once and forget it. We passively monitor your Strava and Apple Health workouts in the background — every run automatically updates your shoe mileage. No manual entry, ever.</p>
+                        <p class="text-slate-400 leading-relaxed max-w-md">Connect once and forget it. We passively monitor your Strava and Apple Health workouts in the background — every run automatically updates your shoe mileage. No manual entry, ever.</p>
                     </div>
                 </div>
 
                 <!-- SMALL: Injury Prevention -->
-                <div class="p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300"
-                     style="background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%); box-shadow: 0 4px 20px rgba(249,115,22,0.10), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid #fed7aa;">
-                    <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-20 group-hover:opacity-30 transition duration-500" style="background: radial-gradient(circle, #f97316, transparent)"></div>
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 relative z-10" style="box-shadow: 0 0 0 4px rgba(249,115,22,0.12), 0 2px 8px rgba(249,115,22,0.15);">
-                        <i data-lucide="heart-pulse" class="text-brand-orange w-6 h-6"></i>
+                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                        <img src="/images/bento-injury.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <div class="relative z-10">
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">Injury Prevention</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Degraded midsole foam dramatically increases impact forces and injury risk. We alert you exactly when shock absorption is compromised, backed by ACWR injury-risk analytics and weekly mileage trends.</p>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Injury Prevention</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Degraded midsole foam dramatically increases impact forces and injury risk. We alert you exactly when shock absorption is compromised, backed by ACWR injury-risk analytics and weekly mileage trends.</p>
                     </div>
                 </div>
 
                 <!-- SMALL: Run History -->
-                <div class="p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300"
-                     style="background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%); box-shadow: 0 4px 20px rgba(59,130,246,0.10), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid #bfdbfe;">
-                    <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-20 group-hover:opacity-30 transition duration-500" style="background: radial-gradient(circle, #3b82f6, transparent)"></div>
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 relative z-10" style="box-shadow: 0 0 0 4px rgba(59,130,246,0.12), 0 2px 8px rgba(59,130,246,0.15);">
-                        <i data-lucide="list" class="text-brand-blue w-6 h-6"></i>
+                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                        <img src="/images/bento-history.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <div class="relative z-10">
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">Complete Run History</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Every run is logged with pace, distance, and the shoe you wore. Smart auto-assign rules can even tag runs by pace, time, or day. Search and filter in seconds.</p>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Complete Run History</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Every run is logged with pace, distance, and the shoe you wore. Smart auto-assign rules can even tag runs by pace, time, or day. Search and filter in seconds.</p>
                     </div>
                 </div>
 
                 <!-- LARGE: Shoe Deals -->
-                <div class="md:col-span-2 p-10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-2 group cursor-default"
-                     style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); box-shadow: 0 4px 24px rgba(13,148,136,0.22), inset 0 1px 0 rgba(255,255,255,0.1);">
-                    <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-10 group-hover:opacity-20 transition duration-500" style="background: radial-gradient(circle, #ffffff, transparent)"></div>
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6 border border-white/20 relative z-10" style="background:rgba(255,255,255,0.08); box-shadow: 0 0 16px rgba(255,255,255,0.15);">
-                        <i data-lucide="shopping-bag" class="text-white w-6 h-6"></i>
+                <div class="md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-6 overflow-hidden">
+                        <img src="/images/bento-deals.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <div class="relative z-10">
+                    <div>
                         <h3 class="text-2xl font-bold text-white mb-3">Shoe Deals</h3>
-                        <p class="text-teal-100 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers and can send price-drop alerts for your exact model — right inside the app.</p>
+                        <p class="text-slate-400 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers and can send price-drop alerts for your exact model — right inside the app.</p>
                     </div>
                 </div>
 
                 <!-- SMALL: Smart Price Finder -->
-                <div class="p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[240px] reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300"
-                     style="background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%); box-shadow: 0 4px 20px rgba(15,23,42,0.07), inset 0 1px 0 rgba(255,255,255,1); border: 1px solid #e2e8f0;">
-                    <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-10 group-hover:opacity-20 transition duration-500" style="background: radial-gradient(circle, #14b8a6, transparent)"></div>
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 relative z-10" style="box-shadow: 0 0 0 4px rgba(20,184,166,0.12), 0 2px 8px rgba(20,184,166,0.15);">
-                        <i data-lucide="tag" class="text-brand-teal w-6 h-6"></i>
+                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                        <img src="/images/bento-prices.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <div class="relative z-10">
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">Smart Price Finder</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Instantly compare prices across top retailers when your shoe hits its limit.</p>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Smart Price Finder</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Instantly compare prices across top retailers when your shoe hits its limit.</p>
                     </div>
                 </div>
 
@@ -501,69 +401,48 @@
     </section>
 
     <!-- AI & INSIGHTS SECTION -->
-    <section id="ai-and-insights" class="py-24 bg-brand-light border-y border-brand-border">
-        <div class="container mx-auto px-6">
-            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+    <section id="ai-and-insights" class="py-24 bg-slate-50 border-y border-slate-200">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center max-w-2xl mx-auto mb-20 reveal">
                 <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">Smarter than a mileage tracker.</h2>
-                <p class="text-lg text-brand-slate">AI, physical wear data, and community insights help you train better and buy smarter.</p>
+                <p class="text-lg text-brand-slate">AI and rotation intelligence help you train better and extend the life of your shoes.</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <!-- AI Running Coach -->
-                <div class="p-8 rounded-3xl bg-white border border-brand-border shadow-sm hover:-translate-y-1 transition duration-300 min-h-[260px] flex flex-col justify-between reveal reveal-delay-1">
-                    <div class="w-12 h-12 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="sparkles" class="text-violet-600 w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">AI Running Coach</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Analyses your weekly mileage, injury risk, and shoe wear to deliver personalised training tips you can rate and improve over time.</p>
+            <!-- Row 1: AI Running Coach — Image Left, Text Right -->
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-24 reveal">
+                <div class="order-1 lg:order-1">
+                    <div class="aspect-[4/5] w-full max-w-md mx-auto bg-slate-100 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
+                        <img src="/images/feature-ai-coach.png" alt="AI Running Coach" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
                 </div>
-
-                <!-- True Wear -->
-                <div class="p-8 rounded-3xl bg-white border border-brand-border shadow-sm hover:-translate-y-1 transition duration-300 min-h-[260px] flex flex-col justify-between reveal reveal-delay-2">
-                    <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-amber-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="camera" class="text-brand-orange w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">True Wear Tracking</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Go beyond Strava distance. Log the actual outsole wear on your shoes so retirement decisions match physical condition, not just numbers.</p>
-                    </div>
+                <div class="order-2 lg:order-2 space-y-6 max-w-lg">
+                    <span class="inline-block px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-bold uppercase tracking-wider">AI Powered</span>
+                    <h3 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">AI Running Coach</h3>
+                    <p class="text-lg text-brand-slate leading-relaxed">Your personal training assistant. TreadLeft analyses your weekly mileage, injury risk, and shoe wear to deliver actionable, rateable coaching tips that improve as you use the app.</p>
+                    <ul class="space-y-3 text-brand-slate list-disc pl-5 marker:text-brand-orange">
+                        <li>Weekly workload and recovery guidance</li>
+                        <li>Shoe-specific wear and injury risk context</li>
+                        <li>Thumbs-up / thumbs-down feedback loop</li>
+                    </ul>
                 </div>
-
-                <!-- Smart Shoe Rotation -->
-                <div class="p-8 rounded-3xl bg-white border border-brand-border shadow-sm hover:-translate-y-1 transition duration-300 min-h-[260px] flex flex-col justify-between reveal reveal-delay-3">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="shuffle" class="text-brand-blue w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">Smart Shoe Rotation</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Get a daily recommendation for which shoe to wear based on wear, foam recovery, days since last worn, and current injury risk.</p>
-                    </div>
-                </div>
-
-                <!-- Price Alerts & Benchmarks -->
-                <div class="p-8 rounded-3xl bg-white border border-brand-border shadow-sm hover:-translate-y-1 transition duration-300 min-h-[260px] flex flex-col justify-between reveal reveal-delay-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="bell" class="text-brand-teal w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-brand-navy mb-2">Price Alerts & Benchmarks</h3>
-                        <p class="text-brand-slate text-sm leading-relaxed">Get notified when your model drops in price, browse live retailer deals, and compare your shoe life and cost-per-km against the community.</p>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- Apple Health & Sign in with Apple -->
-            <div class="mt-6 p-8 rounded-3xl bg-white border border-brand-border shadow-sm flex flex-col md:flex-row items-center gap-6 reveal reveal-delay-5">
-                <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="heart" class="text-green-600 w-7 h-7"></i>
+            <!-- Row 2: Shoe Rotation Optimizer — Text Left, Image Right -->
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center reveal">
+                <div class="order-2 lg:order-1 space-y-6 max-w-lg">
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider">Daily Pick</span>
+                    <h3 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">Shoe Rotation Optimizer</h3>
+                    <p class="text-lg text-brand-slate leading-relaxed">Stop guessing which shoe to wear. TreadLeft scores every pair by wear, foam recovery, days since last worn, and current injury risk, then recommends the best shoe for today's run.</p>
+                    <ul class="space-y-3 text-brand-slate list-disc pl-5 marker:text-brand-orange">
+                        <li>Multi-factor wear and recovery scoring</li>
+                        <li>Automatic high-risk rotation penalties</li>
+                        <li>Fleet balance and retirement forecasting</li>
+                    </ul>
                 </div>
-                <div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-1">Apple Health & Sign in with Apple</h3>
-                    <p class="text-brand-slate leading-relaxed">Sign in with Apple for a fast, private login. Connect Apple Health to sync your running workouts from your Apple Watch or iPhone — your health data stays on-device and is never uploaded.</p>
+                <div class="order-1 lg:order-2">
+                    <div class="aspect-[4/5] w-full max-w-md mx-auto bg-slate-100 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
+                        <img src="/images/feature-rotation.png" alt="Shoe Rotation Optimizer" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    </div>
                 </div>
             </div>
 
@@ -645,6 +524,59 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </section>
+
+    <!-- FROM THE JOURNAL -->
+    <section id="journal" class="py-24 bg-slate-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-12 reveal">
+                <div class="max-w-2xl mb-6 md:mb-0">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">From the Journal</h2>
+                    <p class="text-lg text-brand-slate">Latest insights on gear, injury prevention, and training.</p>
+                </div>
+                <a href="https://treadleft-cms.netlify.app/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-brand-orange font-semibold hover:underline">
+                    Read all articles <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Post 1 -->
+                <article class="group bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:-translate-y-1 transition duration-300 reveal reveal-delay-1">
+                    <div class="aspect-video bg-slate-200 overflow-hidden">
+                        <img src="/images/journal-1.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-slate-400 font-medium mb-2">11 Aug 2026</p>
+                        <h3 class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-orange transition">How to know when your daily trainer is dead</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed line-clamp-3">We break down the visible and invisible signs of worn-out midsole foam, and how to use TreadLeft's true wear tracking to time your replacement perfectly.</p>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="group bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:-translate-y-1 transition duration-300 reveal reveal-delay-2">
+                    <div class="aspect-video bg-slate-200 overflow-hidden">
+                        <img src="/images/journal-2.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-slate-400 font-medium mb-2">4 Aug 2026</p>
+                        <h3 class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-orange transition">The science of shoe rotation for injury prevention</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed line-clamp-3">Research shows that rotating between two or more shoes can reduce injury risk. Here's how our rotation optimizer picks the right pair every morning.</p>
+                    </div>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="group bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:-translate-y-1 transition duration-300 reveal reveal-delay-3">
+                    <div class="aspect-video bg-slate-200 overflow-hidden">
+                        <img src="/images/journal-3.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-slate-400 font-medium mb-2">28 Jul 2026</p>
+                        <h3 class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-orange transition">Reading your AI Coach's weekly tips</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed line-clamp-3">TreadLeft's AI coach combines your mileage, injury risk, and shoe wear into a single tip. Here's how to interpret and rate it.</p>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
