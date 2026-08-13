@@ -452,78 +452,31 @@
     <!-- HOW IT WORKS -->
     <section id="how-it-works" class="py-24 bg-brand-light border-y border-brand-border">
         <div class="container mx-auto px-6">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                
-                <div class="space-y-10">
-                    <h2 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">Set it and forget it.</h2>
-                    
-                    <div class="flex gap-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full bg-brand-blue/10 text-brand-blue font-bold flex items-center justify-center border border-brand-blue/20">1</div>
-                            <div class="w-px h-full bg-brand-border my-2"></div>
-                        </div>
-                        <div class="pb-12">
-                            <h3 class="text-xl font-bold text-brand-navy mb-2">Connect Strava or Apple Health</h3>
-                            <p class="text-brand-slate">Securely link your Strava account or connect Apple Health. We pull in your historical shoe data automatically, and your health data stays on-device.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full bg-brand-orange/10 text-brand-orange font-bold flex items-center justify-center border border-brand-orange/20">2</div>
-                            <div class="w-px h-full bg-brand-border my-2"></div>
-                        </div>
-                        <div class="pb-12">
-                            <h3 class="text-xl font-bold text-brand-navy mb-2">Track Mileage</h3>
-                            <p class="text-brand-slate">Every run updates your gear's health status. View analytics on your dashboard.</p>
-                        </div>
-                    </div>
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">Set it and forget it.</h2>
+            </div>
 
-                    <div class="flex gap-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full bg-brand-teal/10 text-brand-teal font-bold flex items-center justify-center border border-brand-teal/20">3</div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2">Save on Replacements</h3>
-                            <p class="text-brand-slate">Get notified when a shoe is dead, and see a list of the best prices to buy the same model again.</p>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 reveal reveal-delay-1">
+                    <div class="bg-orange-500/10 text-orange-500 rounded-full w-10 h-10 flex items-center justify-center font-bold mb-4">1</div>
+                    <h3 class="text-white font-bold mb-2">Connect Strava or Apple Health</h3>
+                    <p class="text-slate-400">Securely link your Strava account or connect Apple Health. We pull in your historical shoe data automatically, and your health data stays on-device.</p>
                 </div>
 
-                <!-- Visual: Step cards -->
-                <div class="space-y-4 reveal reveal-delay-2">
-                    <div class="flex gap-4 items-start p-5 bg-white rounded-2xl border border-brand-border shadow-sm hover:shadow-md transition">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">
-                            <i data-lucide="link" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-brand-blue mb-1">Step 1</p>
-                            <h4 class="font-bold text-brand-navy mb-1">Connect Strava or Apple Health</h4>
-                            <p class="text-sm text-brand-slate">Securely link your account or connect Apple Health in seconds. Historical shoe data is pulled in automatically, with health data staying on-device.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4 items-start p-5 bg-white rounded-2xl border border-brand-border shadow-sm hover:shadow-md transition">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#f97316,#ea580c);">
-                            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-brand-orange mb-1">Step 2</p>
-                            <h4 class="font-bold text-brand-navy mb-1">Run as normal</h4>
-                            <p class="text-sm text-brand-slate">Every run automatically updates each shoe's health. Your dashboard stays current without any input.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4 items-start p-5 bg-white rounded-2xl border border-brand-border shadow-sm hover:shadow-md transition">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#0d9488,#0f766e);">
-                            <i data-lucide="bell" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-brand-teal mb-1">Step 3</p>
-                            <h4 class="font-bold text-brand-navy mb-1">Get alerted &amp; save</h4>
-                            <p class="text-sm text-brand-slate">Receive a push notification when a shoe nears its limit — with the best current deals ready to browse.</p>
-                        </div>
-                    </div>
+                <!-- Step 2 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 reveal reveal-delay-2">
+                    <div class="bg-orange-500/10 text-orange-500 rounded-full w-10 h-10 flex items-center justify-center font-bold mb-4">2</div>
+                    <h3 class="text-white font-bold mb-2">Track Mileage</h3>
+                    <p class="text-slate-400">Every run updates your gear's health status. View analytics on your dashboard.</p>
                 </div>
 
+                <!-- Step 3 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 reveal reveal-delay-3">
+                    <div class="bg-orange-500/10 text-orange-500 rounded-full w-10 h-10 flex items-center justify-center font-bold mb-4">3</div>
+                    <h3 class="text-white font-bold mb-2">Save on Replacements</h3>
+                    <p class="text-slate-400">Get notified when a shoe is dead, and see a list of the best prices to buy the same model again.</p>
+                </div>
             </div>
         </div>
     </section>
