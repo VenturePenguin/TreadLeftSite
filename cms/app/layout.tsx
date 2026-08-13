@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "TreadLeft CMS",
   description: "Admin CMS for TreadLeft blog posts",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
