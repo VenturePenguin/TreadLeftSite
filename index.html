@@ -497,14 +497,14 @@
             <div class="grid grid-cols-1 gap-6 max-w-3xl mx-auto">
                 <article class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-8 hover:-translate-y-1 transition duration-300 reveal">
                     <span class="inline-block px-2 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-4">Latest</span>
-                    <h3 class="text-2xl font-bold text-brand-navy mb-3 group-hover:text-brand-orange transition">The Invisible Danger: How Uneven Tread Wear Alters Your Biomechanics</h3>
-                    <p class="text-brand-slate leading-relaxed mb-6">Discover how uneven running shoe wear alters your biomechanics and causes kinetic chain injuries. Learn how to spot a structurally compromised midsole and protect your knees and Achilles before the pain starts.</p>
+                    <h3 id="journal-title" class="text-2xl font-bold text-brand-navy mb-3 group-hover:text-brand-orange transition">The Invisible Danger: How Uneven Tread Wear Alters Your Biomechanics</h3>
+                    <p id="journal-excerpt" class="text-brand-slate leading-relaxed mb-6">Discover how uneven running shoe wear alters your biomechanics and causes kinetic chain injuries. Learn how to spot a structurally compromised midsole and protect your knees and Achilles before the pain starts.</p>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2 text-sm text-slate-400">
                             <i data-lucide="calendar" class="w-4 h-4"></i>
-                            <span>13/08/2026</span>
+                            <span id="journal-date">13/08/2026</span>
                         </div>
-                        <a href="https://treadleft-cms.netlify.app/posts/the-invisible-danger-how-uneven-tread-wear-alters-your-biomechanics" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition">
+                        <a id="journal-link" href="https://treadleft-cms.netlify.app/posts/the-invisible-danger-how-uneven-tread-wear-alters-your-biomechanics" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition">
                             Read article <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </a>
                     </div>
@@ -760,6 +760,52 @@
             });
         }, { threshold: 0.1 });
         if (heroSection) stickyObserver.observe(heroSection);
+    </script>
+
+    <script>
+        (function () {
+            const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzY1NDQsImV4cCI6MjA4MDM1MjU0NH0.0E7C-mQZDRtzOIP-_MsQlpAt8RMo7IM7ZWUmZhRCELg';
+
+            async function loadLatestPost() {
+                try {
+                    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?status=eq.published&order=published_at.desc&limit=1`, {
+                        headers: {
+                            apikey: SUPABASE_ANON_KEY,
+                            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                            Accept: 'application/json'
+                        }
+                    });
+                    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+                    const posts = await res.json();
+                    if (!Array.isArray(posts) || !posts.length) return;
+
+                    const post = posts[0];
+                    const titleEl = document.getElementById('journal-title');
+                    const excerptEl = document.getElementById('journal-excerpt');
+                    const dateEl = document.getElementById('journal-date');
+                    const linkEl = document.getElementById('journal-link');
+
+                    if (titleEl) titleEl.textContent = post.title;
+                    if (excerptEl) excerptEl.textContent = post.excerpt || '';
+                    if (dateEl && post.published_at) {
+                        const d = new Date(post.published_at);
+                        dateEl.textContent = d.toLocaleDateString('en-GB');
+                    }
+                    if (linkEl) {
+                        linkEl.href = `https://treadleft-cms.netlify.app/posts/${post.slug}`;
+                    }
+                } catch (err) {
+                    console.error('Journal fetch failed:', err);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadLatestPost);
+            } else {
+                loadLatestPost();
+            }
+        })();
     </script>
 </body>
 </html>
