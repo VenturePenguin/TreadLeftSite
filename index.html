@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" style="scroll-behavior: smooth;">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTPW725M30"></script>
@@ -11,44 +11,34 @@
       gtag('config', 'G-HTPW725M30');
     </script>
 
-    <!-- Structured Data (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "TreadLeft",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "iOS, Android",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "GBP"
-      },
-      "description": "Automated shoe tracking for Strava users. Avoid injury and find the best deals on replacement gear."
-    }
-    </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TreadLeft - Smart Shoe Tracking</title>
-    <meta name="description" content="Automated shoe tracking for Strava users. Avoid injury and find the best deals on replacement gear.">
-    <link rel="canonical" href="https://www.treadleft.app/">
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-    <!-- Mobile Web App Settings -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="TreadLeft">
-    <meta name="theme-color" content="#f1f5f9">
-    <link rel="apple-touch-icon" href="favicon.png">
-    <link rel="manifest" href="manifest.json">
+    <title>TreadLeft – Running Shoe Tracker, Mileage & AI Coach</title>
+    <meta name="description" content="TreadLeft automatically tracks your running shoe mileage via Strava. Get AI coaching, true wear tracking, injury-risk analytics, and price-drop alerts before dead foam causes injury. Free on iOS & Android.">
+    <meta name="keywords" content="running shoe tracker, shoe mileage app, running injury prevention, Strava shoe tracking, when to replace running shoes, running gear tracker, shoe wear tracker, AI running coach, TreadLeft">
+    <meta name="author" content="TreadLeft">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://treadleft.app/">
+    <meta property="og:title" content="TreadLeft – Running Shoe Tracker, Mileage & AI Coach">
+    <meta property="og:description" content="Automatically track your running shoe mileage via Strava. Get AI coaching, true wear tracking, injury-risk analytics, and the best deals on replacements.">
+    <meta property="og:image" content="https://treadleft.app/favicon.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="TreadLeft – Running Shoe Tracker, Mileage & AI Coach">
+    <meta name="twitter:description" content="Track shoe mileage automatically via Strava. Get AI coaching, true wear tracking, and injury-risk analytics. Find the best deals on replacements.">
+    <meta name="twitter:image" content="https://treadleft.app/favicon.png">
+
+    <link rel="canonical" href="https://treadleft.app/">
+    <link rel="icon" type="image/png" href="/favicon.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
@@ -87,7 +77,7 @@
             background-size: 24px 24px;
         }
         
-        /* Smooth fade in for elements */
+        /* Smooth fade in for elements (hero - runs on load) */
         .fade-in-up {
             animation: fadeInUp 0.8s ease-out forwards;
             opacity: 0;
@@ -100,16 +90,41 @@
                 transform: translateY(0);
             }
         }
+
+        /* Scroll-triggered reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+
+        /* Sticky mobile CTA */
+        #sticky-cta {
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        #sticky-cta.visible {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="bg-brand-light text-brand-navy font-sans antialiased selection:bg-brand-orange selection:text-white">
 
     <!-- NAVIGATION -->
-    <nav class="fixed top-0 w-full bg-brand-light/80 backdrop-blur-md border-b border-brand-border z-50">
+    <nav id="main-nav" class="fixed top-0 w-full bg-brand-light/80 backdrop-blur-md border-b border-transparent z-50 transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
+            <a href="/" class="flex items-center gap-2 group" aria-label="TreadLeft home">
                 <!-- Logo: Orange Icon, Navy Text -->
-                <svg class="w-8 h-8 text-brand-orange" viewBox="0 0 100 100" fill="currentColor">
+                <svg class="w-11 h-11 text-brand-orange group-hover:scale-105 transition-transform" viewBox="0 0 100 120" fill="currentColor">
                     <rect x="45" y="10" width="30" height="8" rx="4" />
                     <circle cx="35" cy="24" r="4" />
                     <rect x="42" y="20" width="24" height="8" rx="4" />
@@ -131,14 +146,42 @@
                         <rect x="35" y="109" width="16" height="8" rx="4" />
                     </g>
                 </svg>
-                <span class="text-xl font-bold tracking-tight text-brand-navy">Tread<span class="text-brand-orange">Left</span></span>
-            </div>
+                <span class="text-2xl font-bold tracking-tight text-brand-navy">Tread<span class="text-brand-orange">Left</span></span>
+            </a>
             <div class="hidden md:flex gap-8 text-sm font-medium text-brand-slate">
-                <a href="#features" class="hover:text-brand-orange transition">Features</a>
-                <a href="#how-it-works" class="hover:text-brand-orange transition">How it Works</a>
+                <a href="#features" class="nav-link transition-colors duration-200 hover:text-brand-orange" data-section="features">Features</a>
+                <a href="#how-it-works" class="nav-link transition-colors duration-200 hover:text-brand-orange" data-section="how-it-works">How it Works</a>
+                <a href="https://treadleft-cms.netlify.app/" target="_blank" rel="noopener" class="nav-link transition-colors duration-200 hover:text-brand-orange">Blog</a>
+                <a href="#faq" class="nav-link transition-colors duration-200 hover:text-brand-orange" data-section="faq">FAQ</a>
             </div>
-            <!-- CTA -->
-            <!-- Removed Early Access Button -->
+            <!-- CTA + Hamburger -->
+            <div class="hidden md:flex items-center gap-3">
+                <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-full hover:bg-slate-800 transition shadow-lg shadow-brand-navy/20">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    App Store
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp&pcampaignid=web_share" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-brand-border text-brand-navy text-sm font-semibold rounded-full hover:bg-brand-light hover:border-brand-orange transition">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.2l13.12-7.58-2.83-2.83-11.28 10.21zm-1.9-20.7A1.99 1.99 0 001 4.5v15c0 .48.16.92.43 1.28l.07.08 8.41-8.41v-.2L1.28 3.06zm19.1 8.33-2.8-1.62-3.14 3.14 3.14 3.14 2.82-1.63a2 2 0 000-3.03zM3.18.24L14.46 7.82l-2.83 2.83L1.07.44A1.99 1.99 0 013.18.24z"/></svg>
+                    Google Play
+                </a>
+            </div>
+            <!-- Mobile: Only hamburger -->
+            <div class="md:hidden">
+                <button id="hamburger" onclick="toggleMobileMenu()" class="p-2 rounded-lg hover:bg-brand-border transition" aria-label="Menu">
+                    <i data-lucide="menu" class="w-5 h-5 text-brand-navy" id="hamburger-icon"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile dropdown menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brand-light/95 backdrop-blur-md border-t border-brand-border px-6 pb-4">
+            <div class="flex flex-col gap-1 pt-2">
+                <a href="#features" onclick="toggleMobileMenu()" class="px-3 py-3 text-sm font-medium text-brand-slate hover:text-brand-orange hover:bg-white rounded-xl transition">Features</a>
+                <a href="#how-it-works" onclick="toggleMobileMenu()" class="px-3 py-3 text-sm font-medium text-brand-slate hover:text-brand-orange hover:bg-white rounded-xl transition">How it Works</a>
+                <a href="https://treadleft-cms.netlify.app/" target="_blank" rel="noopener" class="px-3 py-3 text-sm font-medium text-brand-slate hover:text-brand-orange hover:bg-white rounded-xl transition">Blog</a>
+                <a href="#faq" onclick="toggleMobileMenu()" class="px-3 py-3 text-sm font-medium text-brand-slate hover:text-brand-orange hover:bg-white rounded-xl transition">FAQ</a>
+                <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener" class="mt-2 px-3 py-3 text-sm font-semibold text-white bg-brand-navy rounded-xl text-center">App Store</a>
+                <a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp&pcampaignid=web_share" target="_blank" rel="noopener" class="mt-2 px-3 py-3 text-sm font-semibold text-brand-navy bg-white border-2 border-brand-border rounded-xl text-center hover:bg-brand-light">Google Play</a>
+            </div>
         </div>
     </nav>
 
@@ -155,289 +198,626 @@
                 <!-- Badge -->
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-brand-orange text-xs font-bold uppercase tracking-wider">
                     <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
-                    Coming Early 2026
+                    Now Live on App Store & Google Play
                 </div>
                 
                 <h1 class="text-5xl lg:text-7xl font-bold text-brand-navy tracking-tight leading-[1.1]">
-                    Stop running in <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-red-500">dead shoes.</span>
+                    Stop Running on <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-red-500">Dead Shoes</span>
                 </h1>
                 
                 <p class="text-lg text-brand-slate leading-relaxed max-w-lg">
-                    TreadLeft passively monitors your shoe mileage via <strong>Strava</strong>. We alert you before the foam dies and instantly find the best price for your replacement pair.
+                    TreadLeft automatically tracks your shoe mileage via Strava and Apple Health. We combine true wear tracking with an AI running coach and injury-risk analytics to protect your legs. And when your foam is finally dead, we instantly scan the market to find you the best replacement price.
                 </p>
                 
-                <!-- Input Group -->
-                <form class="waitlist-form flex flex-col sm:flex-row gap-3 max-w-md pt-2" onsubmit="event.preventDefault(); alert('Thanks for joining!');">
-                    <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i data-lucide="mail" class="w-5 h-5"></i>
+                <!-- App Store CTA -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                    <!-- Apple App Store -->
+                    <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener" class="inline-flex items-center gap-3 px-6 py-4 bg-brand-navy text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg shadow-slate-300 transform active:scale-95">
+                        <svg class="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                        <div class="text-left">
+                            <div class="text-xs font-normal opacity-80">Download on the</div>
+                            <div class="text-base font-bold leading-tight">App Store</div>
                         </div>
-                        <input 
-                            type="email" 
-                            placeholder="Enter your email" 
-                            aria-label="Email address"
-                            required
-                            class="user-email-input w-full pl-10 px-4 py-4 rounded-xl bg-white border border-brand-border text-brand-navy placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition shadow-sm"
-                        >
-                    </div>
-                    <button type="submit" aria-label="Join Waitlist" class="px-8 py-4 bg-brand-orange text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-lg shadow-orange-200 transform active:scale-95">
-                        Join Waitlist
-                    </button>
-                </form>
+                    </a>
+                    <!-- Google Play -->
+                    <a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp&pcampaignid=web_share" target="_blank" rel="noopener" class="inline-flex items-center gap-3 px-6 py-4 bg-white border-2 border-brand-border text-brand-navy font-bold rounded-xl hover:bg-brand-light hover:border-brand-orange transition shadow-lg transform active:scale-95">
+                        <svg class="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.2l13.12-7.58-2.83-2.83-11.28 10.21zm-1.9-20.7A1.99 1.99 0 001 4.5v15c0 .48.16.92.43 1.28l.07.08 8.41-8.41v-.2L1.28 3.06zm19.1 8.33-2.8-1.62-3.14 3.14 3.14 3.14 2.82-1.63a2 2 0 000-3.03zM3.18.24L14.46 7.82l-2.83 2.83L1.07.44A1.99 1.99 0 013.18.24z"/></svg>
+                        <div class="text-left">
+                            <div class="text-xs font-normal opacity-70">Get it on</div>
+                            <div class="text-base font-bold leading-tight">Google Play</div>
+                        </div>
+                    </a>
+                </div>
                 
                 <div class="flex items-center gap-4 text-sm text-brand-slate">
                     <div class="flex -space-x-2">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="images/avatar1.jpg" alt="User">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="images/avatar2.jpg" alt="User">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="images/avatar3.jpg" alt="User">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar1.jpg" alt="User">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar2.jpg" alt="User">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar3.jpg" alt="User">
                     </div>
-                    <p>Join 400+ runners waiting for launch.</p>
+                    <p>Free to download. Trusted by runners.</p>
                 </div>
             </div>
 
-            <!-- Right Column: Visual (Clean Card Design) -->
-            <div class="relative z-10 lg:ml-auto fade-in-up" style="animation-delay: 0.2s;">
-                <!-- Decorative Elements -->
-                <div class="absolute -top-12 -right-12 w-64 h-64 bg-brand-blue/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-12 -left-12 w-64 h-64 bg-brand-orange/10 rounded-full blur-3xl"></div>
+            <!-- Right Column: Device Mockup -->
+            <div class="relative z-10 lg:ml-auto fade-in-up flex justify-center" style="animation-delay: 0.2s;">
+                <div class="relative w-[270px] h-[550px] sm:w-[300px] sm:h-[610px] md:w-[340px] md:h-[690px]">
+                    <!-- Decorative glows -->
+                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-brand-blue/20 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-16 -left-16 w-72 h-72 bg-brand-orange/20 rounded-full blur-3xl"></div>
 
-                <!-- Main Card (App Mockup) -->
-                <div class="relative bg-white rounded-3xl p-8 shadow-2xl shadow-slate-200 border border-brand-border">
-                    <!-- Card Header -->
-                    <div class="flex justify-between items-start mb-8">
-                        <div class="flex gap-4">
-                            <div class="w-14 h-14 bg-brand-light rounded-2xl flex items-center justify-center border border-brand-border">
-                                <i data-lucide="footprints" class="text-brand-orange w-7 h-7"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-brand-navy">Brooks Ghost 15</h3>
-                                <p class="text-sm text-brand-slate">Primary Road Shoe</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">
-                            <i data-lucide="alert-circle" class="w-3 h-3"></i>
-                            CRITICAL
-                        </div>
-                    </div>
-
-                    <!-- Clean Stats -->
-                    <div class="flex justify-between items-end mb-4">
-                        <div>
-                            <p class="text-sm font-medium text-brand-slate mb-1">Mileage</p>
-                            <p class="text-3xl font-bold text-brand-navy tracking-tight">485<span class="text-lg text-slate-400 font-normal ml-1">/ 500 km</span></p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-medium text-brand-slate mb-1">Health</p>
-                            <p class="text-xl font-bold text-red-500">3%</p>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-brand-light rounded-full h-3 mb-8 overflow-hidden">
-                        <div class="bg-red-500 h-3 rounded-full w-[97%] shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-                    </div>
-
-                    <!-- Action Area -->
-                    <div class="bg-brand-light rounded-2xl p-4 border border-brand-border">
-                        <div class="flex items-center justify-between mb-3">
-                            <p class="text-sm font-semibold text-slate-700">Recommended Replacement</p>
-                            <span class="text-xs font-bold text-brand-teal bg-teal-50 border border-teal-100 px-2 py-0.5 rounded">SAVE £40</span>
-                        </div>
-                        <button aria-label="Check Deal for Brooks Ghost 15" class="w-full py-3 bg-brand-navy text-white font-bold rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-md">
-                            <span>Check Deal: £89.99</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4 text-brand-orange"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Floating Toast Notification -->
-                <div class="absolute -right-8 top-1/2 bg-white p-4 rounded-2xl shadow-xl border border-brand-border flex items-center gap-3 animate-bounce">
-                    <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-brand-teal border border-teal-100">
-                        <i data-lucide="check" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-brand-slate font-medium">Strava Sync</p>
-                        <p class="text-sm font-bold text-brand-navy">Run Imported</p>
+                    <!-- iPhone frame -->
+                    <div class="relative w-full h-full rounded-[3rem] bg-slate-950 border-[10px] border-slate-800 shadow-2xl overflow-hidden">
+                        <!-- Dynamic Island -->
+                        <div class="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20"></div>
+                        <!-- Screen image -->
+                        <img src="/images/hero-mockup.png" alt="TreadLeft app screenshot" class="w-full h-full object-cover" onerror="this.parentElement.classList.add('bg-slate-900'); this.style.display='none';">
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- STATS BANNER -->
+    <div class="bg-brand-navy py-10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="stat-item reveal reveal-delay-1">
+                    <p class="text-3xl font-bold text-white" data-target="93">0</p>
+                    <p class="text-sm text-slate-400 mt-1">Shoe models tracked</p>
+                </div>
+                <div class="stat-item reveal reveal-delay-2">
+                    <p class="text-3xl font-bold text-white" data-target="19">0</p>
+                    <p class="text-sm text-slate-400 mt-1">Retail partners</p>
+                </div>
+                <div class="stat-item reveal reveal-delay-3">
+                    <p class="text-3xl font-bold text-brand-orange">Free</p>
+                    <p class="text-sm text-slate-400 mt-1">To download</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate stat counters when they scroll into view
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target.querySelector('[data-target]');
+                if (!el) return;
+                const target = parseInt(el.getAttribute('data-target'));
+                const duration = 1200;
+                const step = target / (duration / 16);
+                let current = 0;
+                const timer = setInterval(() => {
+                    current = Math.min(current + step, target);
+                    el.textContent = Math.floor(current);
+                    if (current >= target) clearInterval(timer);
+                }, 16);
+                statObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.stat-item').forEach(el => statObserver.observe(el));
+    </script>
+
     <!-- PARTNERS LOGO STRIP -->
     <div class="border-y border-brand-border bg-white py-8">
         <div class="container mx-auto px-6">
-            <p class="text-center text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Works with your favorite retailers</p>
-            <div class="flex justify-center gap-8 md:gap-16 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
-                <span class="font-bold text-xl text-slate-800">strava</span>
-                <span class="font-bold text-xl text-slate-800">amazon</span>
-                <span class="font-bold text-xl text-slate-800">sportsshoes.com</span>
-                <span class="font-bold text-xl text-slate-800">NIKE</span>
+            <p class="text-center text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Works with your favourite retailers</p>
+            <div class="flex flex-wrap justify-center gap-x-8 gap-y-3 md:gap-x-12 opacity-50 hover:opacity-80 transition-all duration-500">
+                <span class="font-bold text-sm text-slate-700">Zappos</span>
+                <span class="font-bold text-sm text-slate-700">DICK'S Sporting Goods</span>
+                <span class="font-bold text-sm text-slate-700">StockX</span>
+                <span class="font-bold text-sm text-slate-700">Walmart</span>
+                <span class="font-bold text-sm text-slate-700">Fleet Feet</span>
+                <span class="font-bold text-sm text-slate-700">DTLR</span>
+                <span class="font-bold text-sm text-slate-700">Secret Sales</span>
+                <span class="font-bold text-sm text-slate-700">Puma</span>
+                <span class="font-bold text-sm text-slate-700">John Lewis &amp; Partners</span>
+                <span class="font-bold text-sm text-slate-700">Outdoor Gear Exchange</span>
+                <span class="font-bold text-sm text-slate-700">REI</span>
+                <span class="font-bold text-sm text-slate-700">Very</span>
+                <span class="font-bold text-sm text-slate-700">Amazon</span>
+                <span class="font-bold text-sm text-slate-700">Bloomingdale's</span>
+                <span class="font-bold text-sm text-slate-700">Decathlon</span>
+                <span class="font-bold text-sm text-slate-700">Free People</span>
+                <span class="font-bold text-sm text-slate-700">Rack Room Shoes</span>
+                <span class="font-bold text-sm text-slate-700">Scheels</span>
+                <span class="font-bold text-sm text-slate-700">Anthropologie</span>
             </div>
         </div>
     </div>
 
     <!-- FEATURES SECTION -->
-    <section id="features" class="py-24 bg-white">
+    <section id="features" class="py-24 bg-slate-950">
         <div class="container mx-auto px-6">
-            <div class="text-center max-w-2xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">The runner's modern tech stack.</h2>
-                <p class="text-lg text-brand-slate">Don't rely on memory or spreadsheets. Rely on automated data.</p>
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">The runner's modern tech stack.</h2>
+                <p class="text-lg text-slate-400">Don't rely on memory or spreadsheets. Rely on automated data, AI, physical wear insights, and community benchmarks.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Feature 1: Passive Sync -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-blue/30 transition">
-                        <i data-lucide="refresh-cw" class="text-brand-blue w-6 h-6"></i>
+            <!-- Bento Grid -->
+            <div class="grid md:grid-cols-3 gap-6 auto-rows-auto">
+
+                <!-- LARGE: Passive Sync -->
+                <div class="md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-[21/4] bg-slate-800 rounded-xl mb-6 overflow-hidden">
+                        <img src="/images/bento-sync.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Passive Sync</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        Connect once and forget it. We passively monitor your Strava runs in the background. No manual entry required.
-                    </p>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-3">Passive Sync</h3>
+                        <p class="text-slate-400 leading-relaxed max-w-md">Connect once and forget it. We passively monitor your Strava and Apple Health workouts in the background — every run automatically updates your shoe mileage. No manual entry, ever.</p>
+                    </div>
                 </div>
 
-                <!-- Feature 2: Injury Prevention -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-orange/30 transition">
-                        <i data-lucide="heart-pulse" class="text-brand-orange w-6 h-6"></i>
+                <!-- SMALL: Injury Prevention -->
+                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                        <img src="/images/bento-injury.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Injury Prevention</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        Running on dead foam causes shin splints. We alert you exactly when your shoe hits its manufacturer mileage limit.
-                    </p>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Injury Prevention</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Degraded midsole foam dramatically increases impact forces and injury risk. We alert you exactly when shock absorption is compromised, backed by ACWR injury-risk analytics and weekly mileage trends.</p>
+                    </div>
                 </div>
 
-                <!-- Feature 3: Smart Price Finder -->
-                <div class="p-8 rounded-3xl bg-brand-light border border-brand-border hover:shadow-lg hover:-translate-y-1 transition duration-300 group">
-                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm border border-brand-border group-hover:border-brand-teal/30 transition">
-                        <i data-lucide="tag" class="text-brand-teal w-6 h-6"></i>
+                <!-- SMALL: Run History -->
+                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                        <img src="/images/bento-history.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
-                    <h3 class="text-xl font-bold text-brand-navy mb-3">Smart Price Finder</h3>
-                    <p class="text-brand-slate leading-relaxed">
-                        When it's time to replace, we instantly scan retailers to find the best price for your specific model.
-                    </p>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Complete Run History</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Every run is logged with pace, distance, and the shoe you wore. Smart auto-assign rules can even tag runs by pace, time, or day. Search and filter in seconds.</p>
+                    </div>
+                </div>
+
+                <!-- LARGE: Shoe Deals -->
+                <div class="md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-6 overflow-hidden">
+                        <img src="/images/bento-deals.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-3">Shoe Deals</h3>
+                        <p class="text-slate-400 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers and can send price-drop alerts for your exact model — right inside the app.</p>
+                    </div>
+                </div>
+
+                <!-- SMALL: Smart Price Finder -->
+                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                        <img src="/images/bento-prices.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">Smart Price Finder</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Instantly compare prices across top retailers when your shoe hits its limit.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- AI & INSIGHTS SECTION -->
+    <section id="ai-and-insights" class="py-24 bg-slate-50 border-y border-slate-200">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center max-w-2xl mx-auto mb-20 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">Smarter than a mileage tracker.</h2>
+                <p class="text-lg text-brand-slate">AI and rotation intelligence help you train better and extend the life of your shoes.</p>
+            </div>
+
+            <!-- Row 1: AI Running Coach — Image Left, Text Right -->
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-24 reveal">
+                <div class="order-1 lg:order-1">
+                    <div class="aspect-[4/5] w-full max-w-md mx-auto bg-slate-100 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
+                        <img src="/images/feature-ai-coach.png" alt="AI Running Coach" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    </div>
+                </div>
+                <div class="order-2 lg:order-2 space-y-6 max-w-lg">
+                    <span class="inline-block px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-bold uppercase tracking-wider">AI Powered</span>
+                    <h3 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">AI Running Coach</h3>
+                    <p class="text-lg text-brand-slate leading-relaxed">Your personal training assistant. TreadLeft analyses your weekly mileage, injury risk, and shoe wear to deliver actionable, rateable coaching tips that improve as you use the app.</p>
+                    <ul class="space-y-3 text-brand-slate list-disc pl-5 marker:text-brand-orange">
+                        <li>Weekly workload and recovery guidance</li>
+                        <li>Shoe-specific wear and injury risk context</li>
+                        <li>Thumbs-up / thumbs-down feedback loop</li>
+                    </ul>
                 </div>
             </div>
+
+            <!-- Row 2: Shoe Rotation Optimizer — Text Left, Image Right -->
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center reveal">
+                <div class="order-2 lg:order-1 space-y-6 max-w-lg">
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider">Daily Pick</span>
+                    <h3 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">Shoe Rotation Optimizer</h3>
+                    <p class="text-lg text-brand-slate leading-relaxed">Stop guessing which shoe to wear. TreadLeft scores every pair by wear, foam recovery, days since last worn, and current injury risk, then recommends the best shoe for today's run.</p>
+                    <ul class="space-y-3 text-brand-slate list-disc pl-5 marker:text-brand-orange">
+                        <li>Multi-factor wear and recovery scoring</li>
+                        <li>Automatic high-risk rotation penalties</li>
+                        <li>Fleet balance and retirement forecasting</li>
+                    </ul>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="aspect-[4/5] w-full max-w-md mx-auto bg-slate-100 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
+                        <img src="/images/feature-rotation.png" alt="Shoe Rotation Optimizer" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <!-- HOW IT WORKS -->
     <section id="how-it-works" class="py-24 bg-brand-light border-y border-brand-border">
         <div class="container mx-auto px-6">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                
-                <div class="space-y-10">
-                    <h2 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">Set it and forget it.</h2>
-                    
-                    <div class="flex gap-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full bg-brand-blue/10 text-brand-blue font-bold flex items-center justify-center border border-brand-blue/20">1</div>
-                            <div class="w-px h-full bg-brand-border my-2"></div>
-                        </div>
-                        <div class="pb-12">
-                            <h3 class="text-xl font-bold text-brand-navy mb-2">Connect Strava</h3>
-                            <p class="text-brand-slate">Securely link your Strava account. We pull in your historical shoe data automatically.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full bg-brand-orange/10 text-brand-orange font-bold flex items-center justify-center border border-brand-orange/20">2</div>
-                            <div class="w-px h-full bg-brand-border my-2"></div>
-                        </div>
-                        <div class="pb-12">
-                            <h3 class="text-xl font-bold text-brand-navy mb-2">Track Mileage</h3>
-                            <p class="text-brand-slate">Every run updates your gear's health status. View analytics on your dashboard.</p>
-                        </div>
-                    </div>
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy tracking-tight">Set it and forget it.</h2>
+            </div>
 
-                    <div class="flex gap-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full bg-brand-teal/10 text-brand-teal font-bold flex items-center justify-center border border-brand-teal/20">3</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 reveal reveal-delay-1">
+                    <div class="bg-orange-500/10 text-orange-500 rounded-full w-10 h-10 flex items-center justify-center font-bold mb-4">1</div>
+                    <h3 class="text-white font-bold mb-2">Connect Strava or Apple Health</h3>
+                    <p class="text-slate-400">Securely link your Strava account or connect Apple Health. We pull in your historical shoe data automatically, and your health data stays on-device.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 reveal reveal-delay-2">
+                    <div class="bg-orange-500/10 text-orange-500 rounded-full w-10 h-10 flex items-center justify-center font-bold mb-4">2</div>
+                    <h3 class="text-white font-bold mb-2">Track Mileage</h3>
+                    <p class="text-slate-400">Every run updates your gear's health status. View analytics on your dashboard.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 reveal reveal-delay-3">
+                    <div class="bg-orange-500/10 text-orange-500 rounded-full w-10 h-10 flex items-center justify-center font-bold mb-4">3</div>
+                    <h3 class="text-white font-bold mb-2">Save on Replacements</h3>
+                    <p class="text-slate-400">Get notified when a shoe is dead, and see a list of the best prices to buy the same model again.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FROM THE JOURNAL -->
+    <section id="journal" class="py-24 bg-slate-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-12 reveal">
+                <div class="max-w-2xl mb-6 md:mb-0">
+                    <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">From the Journal</h2>
+                    <p class="text-lg text-brand-slate">Latest insights on gear, injury prevention, and training.</p>
+                </div>
+                <a href="https://treadleft-cms.netlify.app/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-brand-orange font-semibold hover:underline">
+                    Read all articles <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 max-w-3xl mx-auto">
+                <article class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-8 hover:-translate-y-1 transition duration-300 reveal">
+                    <span class="inline-block px-2 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-4">Latest</span>
+                    <h3 id="journal-title" class="text-2xl font-bold text-brand-navy mb-3 group-hover:text-brand-orange transition">The Invisible Danger: How Uneven Tread Wear Alters Your Biomechanics</h3>
+                    <p id="journal-excerpt" class="text-brand-slate leading-relaxed mb-6">Discover how uneven running shoe wear alters your biomechanics and causes kinetic chain injuries. Learn how to spot a structurally compromised midsole and protect your knees and Achilles before the pain starts.</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-sm text-slate-400">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                            <span id="journal-date">13/08/2026</span>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2">Save on Replacements</h3>
-                            <p class="text-brand-slate">Get notified when a shoe is dead, and see a list of the best prices to buy the same model again.</p>
-                        </div>
+                        <a id="journal-link" href="https://treadleft-cms.netlify.app/posts/the-invisible-danger-how-uneven-tread-wear-alters-your-biomechanics" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition">
+                            Read article <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section id="faq" class="py-24 bg-white">
+        <div class="container mx-auto px-6 max-w-3xl">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">Frequently asked questions</h2>
+                <p class="text-lg text-brand-slate">Everything you need to know before downloading.</p>
+            </div>
+
+            <div class="space-y-3" id="faq-list">
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-1">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>Do I have to run with my phone?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        Not at all. TreadLeft syncs completely in the background. Whether you record on a Garmin, an Apple Watch, directly in Strava, or sync from Apple Health, your runs will automatically appear on your dashboard.
                     </div>
                 </div>
 
-                <!-- Visual: Phone Mockup ish -->
-                <div class="relative">
-                     <!-- Simple graphic representation -->
-                     <div class="bg-white p-6 rounded-3xl shadow-xl border border-brand-border rotate-3 hover:rotate-0 transition duration-500">
-                        <div class="space-y-4">
-                            <!-- Mock Notification -->
-                             <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
-                                <div class="p-2 bg-white rounded-lg shadow-sm">
-                                    <i data-lucide="bell" class="w-5 h-5 text-brand-orange"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-brand-navy">Shoe Retired</h4>
-                                    <p class="text-sm text-brand-slate">Your Brooks Ghost 15 has reached 500km.</p>
-                                </div>
-                             </div>
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-2">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>How does Strava sync work?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        Connect once to Strava and we'll automatically sync all your running activities. Every run you record on any device (Garmin, Apple Watch, phone) that appears in Strava will update your shoe mileage in real-time.
+                    </div>
+                </div>
 
-                             <!-- Mock Deal -->
-                             <div class="flex items-start gap-4 p-4 bg-teal-50 rounded-xl border border-teal-100">
-                                <div class="p-2 bg-white rounded-lg shadow-sm">
-                                    <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-teal"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-brand-navy">Price Drop Alert</h4>
-                                    <p class="text-sm text-brand-slate">Found Brooks Ghost 15 for £89.99 (was £130).</p>
-                                </div>
-                             </div>
-                        </div>
-                     </div>
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-3">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>What if I rotate multiple pairs of shoes?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        TreadLeft is built for shoe rotations. It acts as your digital armory. You can easily switch between your daily trainers, speed shoes, and trail runners, assigning specific mileage to the exact gear you wore that day.
+                    </div>
+                </div>
+
+                <div class="faq-item border border-brand-border rounded-2xl overflow-hidden reveal reveal-delay-1">
+                    <button onclick="toggleFaq(this)" class="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-brand-navy hover:bg-brand-light transition">
+                        <span>How does the app know my shoes are "dead"?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-brand-slate faq-icon transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-body hidden px-6 pb-5 text-brand-slate leading-relaxed">
+                        We use the manufacturer's maximum recommended lifespan (usually between 500km–800km) to track your gear's durability percentage, alerting you the moment the EVA foam enters the critical zone.
+                    </div>
                 </div>
 
             </div>
         </div>
     </section>
 
+    <script>
+        function toggleFaq(btn) {
+            const body = btn.nextElementSibling;
+            const icon = btn.querySelector('.faq-icon');
+            const isOpen = !body.classList.contains('hidden');
+            // Close all
+            document.querySelectorAll('.faq-body').forEach(b => b.classList.add('hidden'));
+            document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = '');
+            // Open clicked if it was closed
+            if (!isOpen) {
+                body.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    </script>
+
+    <!-- STICKY MOBILE CTA -->
+    <div id="sticky-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-brand-border px-4 py-3 shadow-lg">
+        <div class="grid grid-cols-2 gap-3">
+            <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener"
+               class="flex items-center justify-center gap-2 py-3 bg-brand-navy text-white font-bold rounded-xl shadow-md active:scale-95 transition text-sm">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <span>App Store</span>
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp&pcampaignid=web_share" target="_blank" rel="noopener"
+               class="flex items-center justify-center gap-2 py-3 bg-white border-2 border-brand-border text-brand-navy font-bold rounded-xl shadow-md active:scale-95 transition text-sm hover:bg-brand-light">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.2l13.12-7.58-2.83-2.83-11.28 10.21zm-1.9-20.7A1.99 1.99 0 001 4.5v15c0 .48.16.92.43 1.28l.07.08 8.41-8.41v-.2L1.28 3.06zm19.1 8.33-2.8-1.62-3.14 3.14 3.14 3.14 2.82-1.63a2 2 0 000-3.03zM3.18.24L14.46 7.82l-2.83 2.83L1.07.44A1.99 1.99 0 013.18.24z"/></svg>
+                <span>Google Play</span>
+            </a>
+        </div>
+    </div>
+
     <!-- FOOTER -->
-    <footer class="bg-white py-12 border-t border-brand-border">
-        <div class="container mx-auto px-6 text-center">
-            <div class="flex justify-center items-center gap-2 mb-8">
-                <svg class="w-6 h-6 text-brand-orange" viewBox="0 0 100 100" fill="currentColor">
-                    <rect x="45" y="10" width="30" height="8" rx="4" />
-                    <circle cx="35" cy="24" r="4" />
-                    <rect x="42" y="20" width="24" height="8" rx="4" />
-                    <rect x="70" y="20" width="15" height="8" rx="4" />
-                    <rect x="30" y="32" width="30" height="8" rx="4" />
-                    <rect x="64" y="32" width="22" height="8" rx="4" />
-                    <rect x="25" y="44" width="20" height="8" rx="4" />
-                    <circle cx="50" cy="48" r="4" />
-                    <rect x="58" y="44" width="24" height="8" rx="4" />
-                    <rect x="28" y="56" width="35" height="8" rx="4" />
-                    <rect x="67" y="56" width="14" height="8" rx="4" />
-                    <rect x="22" y="68" width="24" height="8" rx="4" />
-                    <rect x="50" y="68" width="28" height="8" rx="4" />
-                    <g transform="rotate(-15 40 95)">
-                        <rect x="25" y="85" width="25" height="8" rx="4" />
-                        <circle cx="56" cy="89" r="4" />
-                        <rect x="30" y="97" width="18" height="8" rx="4" />
-                        <circle cx="54" cy="101" r="4" />
-                        <rect x="35" y="109" width="16" height="8" rx="4" />
-                    </g>
-                </svg>
-                <span class="text-lg font-bold text-brand-navy">Tread<span class="text-brand-orange">Left</span></span>
+    <footer class="bg-brand-navy text-white">
+        <div class="container mx-auto px-6 py-16">
+            <div class="grid md:grid-cols-2 gap-12 mb-12">
+
+                <!-- Left: Brand -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-8 h-8 text-brand-orange" viewBox="0 0 100 120" fill="currentColor">
+                            <rect x="45" y="10" width="30" height="8" rx="4" />
+                            <circle cx="35" cy="24" r="4" />
+                            <rect x="42" y="20" width="24" height="8" rx="4" />
+                            <rect x="70" y="20" width="15" height="8" rx="4" />
+                            <rect x="30" y="32" width="30" height="8" rx="4" />
+                            <rect x="64" y="32" width="22" height="8" rx="4" />
+                            <rect x="25" y="44" width="20" height="8" rx="4" />
+                            <circle cx="50" cy="48" r="4" />
+                            <rect x="58" y="44" width="24" height="8" rx="4" />
+                            <rect x="28" y="56" width="35" height="8" rx="4" />
+                            <rect x="67" y="56" width="14" height="8" rx="4" />
+                            <rect x="22" y="68" width="24" height="8" rx="4" />
+                            <rect x="50" y="68" width="28" height="8" rx="4" />
+                            <g transform="rotate(-15 40 95)">
+                                <rect x="25" y="85" width="25" height="8" rx="4" />
+                                <circle cx="56" cy="89" r="4" />
+                                <rect x="30" y="97" width="18" height="8" rx="4" />
+                                <circle cx="54" cy="101" r="4" />
+                                <rect x="35" y="109" width="16" height="8" rx="4" />
+                            </g>
+                        </svg>
+                        <span class="text-xl font-bold tracking-tight">Tread<span class="text-brand-orange">Left</span></span>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-xs">
+                        Smart shoe tracking for runners. AI coaching, true wear tracking, injury-risk analytics, and the best deals.
+                    </p>
+                    <!-- App Store & Google Play buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition text-sm font-semibold">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                            App Store
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp&pcampaignid=web_share" target="_blank" rel="noopener"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition text-sm font-semibold">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.2l13.12-7.58-2.83-2.83-11.28 10.21zm-1.9-20.7A1.99 1.99 0 001 4.5v15c0 .48.16.92.43 1.28l.07.08 8.41-8.41v-.2L1.28 3.06zm19.1 8.33-2.8-1.62-3.14 3.14 3.14 3.14 2.82-1.63a2 2 0 000-3.03zM3.18.24L14.46 7.82l-2.83 2.83L1.07.44A1.99 1.99 0 013.18.24z"/></svg>
+                            Google Play
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right: Links -->
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Product</h4>
+                        <ul class="space-y-3 text-sm text-slate-400">
+                            <li><a href="#features" class="hover:text-white transition">Features</a></li>
+                            <li><a href="#how-it-works" class="hover:text-white transition">How it Works</a></li>
+                            <li><a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener" class="hover:text-white transition">App Store</a></li>
+                            <li><a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp&pcampaignid=web_share" target="_blank" rel="noopener" class="hover:text-white transition">Google Play</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Company</h4>
+                        <ul class="space-y-3 text-sm text-slate-400">
+                            <li><a href="/release-notes" class="hover:text-white transition">Release Notes</a></li>
+                            <li><a href="https://treadleft-cms.netlify.app/" target="_blank" rel="noopener" class="hover:text-white transition">Blog</a></li>
+                            <li><a href="/legal-terms.html" class="hover:text-white transition">Terms & Conditions</a></li>
+                            <li><a href="/legal-privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
+                            <li><a href="mailto:support@treadleft.app" class="hover:text-white transition">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <p class="text-brand-slate text-sm mb-8">
-                &copy; 2026 TreadLeft. Built for runners, by runners.
-            </p>
-            <div class="flex justify-center gap-6">
-                <a href="privacy.html" aria-label="Privacy Policy" class="text-brand-slate hover:text-brand-orange transition text-sm">Privacy Policy</a>
-                <a href="mailto:support@treadleft.app" aria-label="Contact Support" class="text-brand-slate hover:text-brand-orange transition"><i data-lucide="mail" class="w-5 h-5"></i></a>
+
+            <!-- Bottom bar -->
+            <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-slate-500 text-sm">&copy; 2026 TreadLeft. Built for runners, by runners.<a href="/admin.html" style="opacity:0.05;cursor:default;text-decoration:none;" title="">.</a></p>
+                <div class="flex items-center gap-4">
+                    <a href="mailto:support@treadleft.app" class="text-slate-500 hover:text-brand-orange transition" aria-label="Email">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </a>
+                    <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener" class="text-slate-500 hover:text-brand-orange transition" aria-label="App Store">
+                        <i data-lucide="smartphone" class="w-5 h-5"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
 
     <script>
         lucide.createIcons();
+
+        // Nav shadow appears on scroll
+        const mainNav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                mainNav.style.borderBottomColor = '#e2e8f0';
+                mainNav.style.boxShadow = '0 1px 12px rgba(15,23,42,0.08)';
+            } else {
+                mainNav.style.borderBottomColor = 'transparent';
+                mainNav.style.boxShadow = 'none';
+            }
+        }, { passive: true });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden');
+            document.getElementById('hamburger-icon').setAttribute('data-lucide', isOpen ? 'menu' : 'x');
+            lucide.createIcons();
+        }
+
+        // Scroll-spy: highlight active nav link
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = ['features', 'how-it-works', 'faq'].map(id => document.getElementById(id)).filter(Boolean);
+
+        function updateActiveNav() {
+            const scrollY = window.scrollY + 100;
+            let current = null;
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollY) current = section.id;
+            });
+            navLinks.forEach(link => {
+                if (link.dataset.section === current) {
+                    link.classList.add('text-brand-orange', 'font-semibold');
+                    link.classList.remove('text-brand-slate');
+                } else {
+                    link.classList.remove('text-brand-orange', 'font-semibold');
+                    link.classList.add('text-brand-slate');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav, { passive: true });
+        updateActiveNav();
+
+        // Scroll-triggered reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Sticky mobile CTA — show after scrolling past hero
+        const stickyCta = document.getElementById('sticky-cta');
+        const heroSection = document.querySelector('header');
+        const stickyObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    stickyCta.classList.add('visible');
+                } else {
+                    stickyCta.classList.remove('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        if (heroSection) stickyObserver.observe(heroSection);
+    </script>
+
+    <script>
+        (function () {
+            const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzY1NDQsImV4cCI6MjA4MDM1MjU0NH0.0E7C-mQZDRtzOIP-_MsQlpAt8RMo7IM7ZWUmZhRCELg';
+
+            async function loadLatestPost() {
+                try {
+                    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?status=eq.published&order=published_at.desc&limit=1`, {
+                        headers: {
+                            apikey: SUPABASE_ANON_KEY,
+                            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                            Accept: 'application/json'
+                        }
+                    });
+                    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+                    const posts = await res.json();
+                    if (!Array.isArray(posts) || !posts.length) return;
+
+                    const post = posts[0];
+                    const titleEl = document.getElementById('journal-title');
+                    const excerptEl = document.getElementById('journal-excerpt');
+                    const dateEl = document.getElementById('journal-date');
+                    const linkEl = document.getElementById('journal-link');
+
+                    if (titleEl) titleEl.textContent = post.title;
+                    if (excerptEl) excerptEl.textContent = post.excerpt || '';
+                    if (dateEl && post.published_at) {
+                        const d = new Date(post.published_at);
+                        dateEl.textContent = d.toLocaleDateString('en-GB');
+                    }
+                    if (linkEl) {
+                        linkEl.href = `https://treadleft-cms.netlify.app/posts/${post.slug}`;
+                    }
+                } catch (err) {
+                    console.error('Journal fetch failed:', err);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadLatestPost);
+            } else {
+                loadLatestPost();
+            }
+        })();
     </script>
 </body>
 </html>
+
+<!-- Deployed: Tue Jan 27 15:49:49 GMT 2026 -->
+
+<!-- Deployed to docs: Tue Jan 27 16:01:35 GMT 2026 -->
+
+<!-- Deployed: Tue Jan 27 17:01:36 GMT 2026 -->
+
+<!-- Flattened and Fixed: Tue Jan 27 17:08:19 GMT 2026 -->
+
+<!-- Force Re-Deploy: Tue Jan 27 17:27:40 GMT 2026 -->
+
+<!-- V: 1769536875 -->
