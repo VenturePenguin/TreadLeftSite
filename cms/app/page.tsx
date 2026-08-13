@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Running tips, shoe guides, and training insights from TreadLeft.',
 };
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function BlogIndexPage() {
   const { data: posts, error } = await supabase
@@ -46,73 +46,43 @@ export default async function BlogIndexPage() {
         {!posts || posts.length === 0 ? (
           <p className="text-center text-brand-slate">No published posts yet.</p>
         ) : (
-          <>
-            <article className="mb-12 overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition hover:shadow-md">
-              <div className="p-8 md:p-10">
-                <span className="mb-3 inline-block rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-orange">
-                  Latest
-                </span>
-                <h2 className="mb-3 text-2xl font-extrabold tracking-tight text-brand-navy md:text-3xl">
-                  <Link href={`/posts/${featured.slug}`} className="hover:text-brand-orange">
-                    {featured.title}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post, index) => (
+              <article
+                key={post.id}
+                className="flex h-full flex-col rounded-2xl border border-brand-border bg-white p-8 shadow-sm transition hover:shadow-md"
+              >
+                {index === 0 && (
+                  <span className="mb-3 inline-block rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-orange">
+                    Latest
+                  </span>
+                )}
+                <h2 className="mb-3 text-xl font-extrabold tracking-tight text-brand-navy line-clamp-2 md:text-2xl">
+                  <Link href={`/posts/${post.slug}`} className="hover:text-brand-orange">
+                    {post.title}
                   </Link>
                 </h2>
-                {featured.excerpt && (
-                  <p className="mb-5 max-w-2xl text-brand-slate">{featured.excerpt}</p>
+                {post.excerpt && (
+                  <p className="mb-5 line-clamp-3 flex-1 text-brand-slate">{post.excerpt}</p>
                 )}
-                <div className="flex items-center justify-between">
-                  {featured.published_at && (
+                <div className="mt-auto flex items-center justify-between">
+                  {post.published_at && (
                     <span className="inline-flex items-center gap-1.5 text-sm text-brand-slate">
                       <Calendar className="h-4 w-4" />
-                      {new Date(featured.published_at).toLocaleDateString()}
+                      {new Date(post.published_at).toLocaleDateString()}
                     </span>
                   )}
                   <Link
-                    href={`/posts/${featured.slug}`}
+                    href={`/posts/${post.slug}`}
                     className="inline-flex items-center gap-1.5 rounded-md bg-brand-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600"
                   >
                     Read article
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
-              </div>
-            </article>
-
-            {rest.length > 0 && (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {rest.map((post) => (
-                  <article
-                    key={post.id}
-                    className="flex flex-col rounded-xl border border-brand-border bg-white p-6 shadow-sm transition hover:shadow-md"
-                  >
-                    <h3 className="mb-2 text-lg font-bold text-brand-navy">
-                      <Link href={`/posts/${post.slug}`} className="hover:text-brand-orange">
-                        {post.title}
-                      </Link>
-                    </h3>
-                    {post.excerpt && (
-                      <p className="mb-4 line-clamp-3 flex-1 text-sm text-brand-slate">{post.excerpt}</p>
-                    )}
-                    <div className="mt-auto flex items-center justify-between">
-                      {post.published_at && (
-                        <span className="inline-flex items-center gap-1.5 text-xs text-brand-slate">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {new Date(post.published_at).toLocaleDateString()}
-                        </span>
-                      )}
-                      <Link
-                        href={`/posts/${post.slug}`}
-                        className="inline-flex items-center gap-1 text-sm font-medium text-brand-orange hover:underline"
-                      >
-                        Read
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </>
+              </article>
+            ))}
+          </div>
         )}
       </main>
 
