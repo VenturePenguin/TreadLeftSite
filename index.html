@@ -248,7 +248,7 @@
                     <div class="absolute -bottom-16 -left-16 w-72 h-72 bg-brand-orange/20 rounded-full blur-3xl"></div>
 
                     <!-- iPhone frame -->
-                    <div class="relative w-full h-full rounded-[3rem] bg-slate-950 border-[10px] border-slate-800 shadow-2xl overflow-hidden">
+                    <div class="relative w-full h-full rounded-[3rem] bg-slate-950 border-[10px] border-slate-800 drop-shadow-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] overflow-hidden">
                         <!-- Dynamic Island -->
                         <div class="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20"></div>
                         <!-- Screen image -->
@@ -339,11 +339,11 @@
             </div>
 
             <!-- Bento Grid -->
-            <div class="grid md:grid-cols-3 gap-6 auto-rows-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-auto">
 
-                <!-- LARGE: Passive Sync -->
-                <div class="md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
-                    <div class="aspect-[21/4] bg-slate-800 rounded-xl mb-6 overflow-hidden">
+                <!-- FULL WIDTH: Passive Sync -->
+                <div class="col-span-1 md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-[21/4] bg-slate-800 rounded-xl mb-6 overflow-hidden p-8">
                         <img src="/images/bento-sync.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
                     <div>
@@ -352,9 +352,9 @@
                     </div>
                 </div>
 
-                <!-- SMALL: Injury Prevention -->
-                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
-                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                <!-- SQUARE: Injury Prevention -->
+                <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
                         <img src="/images/bento-injury.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
                     <div>
@@ -363,9 +363,9 @@
                     </div>
                 </div>
 
-                <!-- SMALL: Run History -->
-                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
-                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                <!-- SQUARE: Run History -->
+                <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
                         <img src="/images/bento-history.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
                     <div>
@@ -374,20 +374,20 @@
                     </div>
                 </div>
 
-                <!-- LARGE: Shoe Deals -->
-                <div class="md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
-                    <div class="aspect-video bg-slate-800 rounded-xl mb-6 overflow-hidden">
+                <!-- SQUARE: Shoe Deals -->
+                <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
                         <img src="/images/bento-deals.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
                     <div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Shoe Deals</h3>
-                        <p class="text-slate-400 leading-relaxed max-w-md">When it's time to replace, we scan 19 retailers and can send price-drop alerts for your exact model — right inside the app.</p>
+                        <h3 class="text-xl font-bold text-white mb-2">Shoe Deals</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">When it's time to replace, we scan 19 retailers and can send price-drop alerts for your exact model — right inside the app.</p>
                     </div>
                 </div>
 
-                <!-- SMALL: Smart Price Finder -->
-                <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300">
-                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden">
+                <!-- SQUARE: Smart Price Finder -->
+                <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300">
+                    <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
                         <img src="/images/bento-prices.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
                     </div>
                     <div>
