@@ -16,7 +16,7 @@ module.exports = {
         brand: {
           orange: "#f97316", // Primary
           navy: "#0f172a", // Text Main
-          slate: "#64748b", // Text Secondary
+          slate: "#475569", // Text Secondary (darkened from #64748b for WCAG AA contrast)
           blue: "#3b82f6", // Accents
           teal: "#14b8a6", // Success
           light: "#f1f5f9", // App Background
