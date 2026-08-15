@@ -8,8 +8,17 @@
   <link rel="icon" type="image/png" href="/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@1.31.0/dist/umd/lucide.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Icons (replaces emoji) ── */
+    [data-lucide], svg.lucide {
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.15em;
+      stroke-width: 2.2;
+    }
 
     /* ── Dark Mode Variables ── */
     :root {
@@ -1926,7 +1935,7 @@
   <!-- LOGIN GATE -->
   <div id="login-gate">
     <div class="login-box">
-      <h1>🔐 TreadLeft Admin</h1>
+      <h1><i data-lucide="shield-check"></i> TreadLeft Admin</h1>
       <p>Admin Control Panel</p>
       <input type="password" id="password" class="password-input" placeholder="Enter admin password" autocomplete="off">
       <button class="login-btn" onclick="doLogin()">Access Panel</button>
@@ -1944,7 +1953,7 @@
         TreadLeft <span>/ Admin</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+        <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark mode"><i data-lucide="moon"></i></button>
         <button class="logout-btn" onclick="doLogout()">Logout</button>
       </div>
     </div>
@@ -1954,67 +1963,67 @@
       <div class="sidebar-section-label">Analytics</div>
 
       <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
-        <span class="nav-icon">📡</span>
+        <span class="nav-icon"><i data-lucide="activity"></i></span>
         Platform Pulse
       </button>
 
       <button class="nav-item" data-view="revenue-analytics" onclick="navigate('revenue-analytics')">
-        <span class="nav-icon">💸</span>
+        <span class="nav-icon"><i data-lucide="dollar-sign"></i></span>
         Revenue Analytics
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Catalog</div>
 
       <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
-        <span class="nav-icon">🔍</span>
+        <span class="nav-icon"><i data-lucide="search"></i></span>
         Discovery Queue
         <span class="nav-badge" id="sidebar-pending-count">0</span>
       </button>
 
       <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
-        <span class="nav-icon">💰</span>
+        <span class="nav-icon"><i data-lucide="percent"></i></span>
         Deal Engine
       </button>
 
       <button class="nav-item" data-view="lifespan-insights" onclick="navigate('lifespan-insights')">
-        <span class="nav-icon">🪦</span>
+        <span class="nav-icon"><i data-lucide="skull"></i></span>
         Lifespan Insights
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Data Governance</div>
 
       <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
-        <span class="nav-icon">🪤</span>
+        <span class="nav-icon"><i data-lucide="copy"></i></span>
         Duplicate Detection
       </button>
 
       <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
-        <span class="nav-icon">🏷️</span>
+        <span class="nav-icon"><i data-lucide="tag"></i></span>
         Brand Normalization
       </button>
 
       <button class="nav-item" data-view="system-ledger" onclick="navigate('system-ledger')">
-        <span class="nav-icon">📜</span>
+        <span class="nav-icon"><i data-lucide="file-text"></i></span>
         System Ledger
       </button>
 
       <div class="sidebar-section-label" style="margin-top:12px;">Content</div>
 
       <a class="nav-item" href="https://treadleft-cms.netlify.app/admin/posts" target="_blank" rel="noopener" id="cms-link" title="Manage blog posts in the CMS">
-        <span class="nav-icon">✍️</span>
+        <span class="nav-icon"><i data-lucide="edit-3"></i></span>
         Blog CMS
-        <span class="nav-icon" style="margin-left:auto;font-size:12px;opacity:.5">↗</span>
+        <span class="nav-icon" style="margin-left:auto;font-size:12px;opacity:.5"><i data-lucide="external-link"></i></span>
       </a>
 
       <div class="sidebar-section-label" style="margin-top:12px;">System</div>
 
       <button class="nav-item" data-view="system-health" onclick="navigate('system-health')">
-        <span class="nav-icon">❤️</span>
+        <span class="nav-icon"><i data-lucide="heart"></i></span>
         System Health
       </button>
 
       <button class="nav-item" data-view="strava-monitor" onclick="navigate('strava-monitor')">
-        <span class="nav-icon">🚴</span>
+        <span class="nav-icon"><i data-lucide="bike"></i></span>
         Strava Sync Monitor
         <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
       </button>
@@ -2022,12 +2031,12 @@
       <div class="sidebar-section-label" style="margin-top:12px;">Support</div>
 
       <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
-        <span class="nav-icon">👤</span>
+        <span class="nav-icon"><i data-lucide="user"></i></span>
         User Support
       </button>
 
       <button class="nav-item" data-view="user-cohorts" onclick="navigate('user-cohorts')">
-        <span class="nav-icon">🎯</span>
+        <span class="nav-icon"><i data-lucide="target"></i></span>
         User Cohorts
       </button>
     </nav>
@@ -2038,31 +2047,31 @@
       <!-- VIEW: Platform Pulse -->
       <div id="view-platform-pulse" class="view active">
         <div class="view-header">
-          <h2>📡 Platform Pulse</h2>
+          <h2><i data-lucide="activity"></i> Platform Pulse</h2>
           <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
         </div>
 
         <!-- ── TRIAGE ZONE ──────────────────────────────────────────────── -->
         <div class="triage-zone">
-          <div class="triage-title">⚡ Action Required</div>
+          <div class="triage-title"><i data-lucide="zap"></i> Action Required</div>
           <div class="triage-cards">
             <div class="triage-card triage-card--warning" onclick="navigate('discovery-queue')">
-              <div class="triage-card-icon">🔍</div>
+              <div class="triage-card-icon"><i data-lucide="search"></i></div>
               <div class="triage-card-body">
                 <div class="triage-card-value" id="triage-pending-count">—</div>
                 <div class="triage-card-label">Pending Shoe Discoveries</div>
                 <div class="triage-card-sub">Review &amp; approve catalog additions</div>
               </div>
-              <div class="triage-card-cta">Review →</div>
+              <div class="triage-card-cta">Review <i data-lucide="arrow-right"></i></div>
             </div>
             <div class="triage-card triage-card--alert" onclick="navigate('platform-pulse'); setTimeout(()=>document.getElementById('pulse-orphans').closest('.pulse-card').scrollIntoView({behavior:'smooth'}),300)">
-              <div class="triage-card-icon">👟</div>
+              <div class="triage-card-icon"><i data-lucide="footprints"></i></div>
               <div class="triage-card-body">
                 <div class="triage-card-value" id="triage-orphan-count">—</div>
                 <div class="triage-card-label">Orphan Activities</div>
                 <div class="triage-card-sub">Runs not assigned to a shoe</div>
               </div>
-              <div class="triage-card-cta">View →</div>
+              <div class="triage-card-cta">View <i data-lucide="arrow-right"></i></div>
             </div>
           </div>
         </div>
@@ -2232,13 +2241,13 @@
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Product Intelligence</div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px">
           <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏆 Top Shoe Models</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px"><i data-lucide="trophy"></i> Top Shoe Models</div>
             <div id="top-shoes-list" style="display:flex;flex-direction:column;gap:8px">
               <div style="color:#94a3b8;font-size:13px">Loading…</div>
             </div>
           </div>
           <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">🏷️ Brand Distribution</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px"><i data-lucide="tag"></i> Brand Distribution</div>
             <div id="brand-distribution-list" style="display:flex;flex-direction:column;gap:8px">
               <div style="color:#94a3b8;font-size:13px">Loading…</div>
             </div>
@@ -2253,7 +2262,7 @@
       <!-- VIEW: DiscoveryQueue -->
       <div id="view-discovery-queue" class="view">
         <div class="view-header">
-          <h2>🔍 Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
+          <h2><i data-lucide="search"></i> Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
         </div>
 
         <!-- Queue source tabs -->
@@ -2282,9 +2291,9 @@
         </div>
 
         <div class="batch-actions">
-          <button class="batch-btn" id="dq-approve-all-btn" onclick="approveAllHigh()">✓ Approve All</button>
-          <button class="batch-btn" onclick="refreshData()">🔄 Refresh</button>
-          <button class="batch-btn ai-btn" id="dq-ai-normalize-btn" onclick="aiNormalizeQueue()" title="Use AI to parse messy brand/model strings">🤖 AI Normalize Queue</button>
+          <button class="batch-btn" id="dq-approve-all-btn" onclick="approveAllHigh()"><i data-lucide="check"></i> Approve All</button>
+          <button class="batch-btn" onclick="refreshData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          <button class="batch-btn ai-btn" id="dq-ai-normalize-btn" onclick="aiNormalizeQueue()" title="Use AI to parse messy brand/model strings"><i data-lucide="bot"></i> AI Normalize Queue</button>
         </div>
 
         <div id="shoe-list" class="shoe-list">
@@ -2298,7 +2307,7 @@
       <!-- VIEW: DuplicateResolver -->
       <div id="view-duplicate-resolver" class="view">
         <div class="view-header">
-          <h2>🪞 Duplicate Detection <span class="badge" id="dup-group-count" style="background:#64748b;">—</span></h2>
+          <h2><i data-lucide="copy"></i> Duplicate Detection <span class="badge" id="dup-group-count" style="background:#64748b;">—</span></h2>
         </div>
 
         <div class="dup-toolbar">
@@ -2306,9 +2315,9 @@
             Shoes are grouped by identical brand + highly similar name. Select the <strong>master</strong> to keep, then merge the rest.
           </p>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <button class="dup-refresh-btn ai-btn" id="dup-ai-btn" onclick="aiSemanticClustering()" title="Use AI to find semantic duplicates SQL would miss">🧠 AI Semantic Clustering</button>
-            <button class="nuke-btn" id="nuke-btn" onclick="executeNuclearMerge()" disabled title="Auto-merges clusters where all non-master variants have 0 users and 0 deals">☢️ Nuclear Merge (0 safe)</button>
-            <button class="dup-refresh-btn" onclick="loadDuplicates()">🔄 Refresh</button>
+            <button class="dup-refresh-btn ai-btn" id="dup-ai-btn" onclick="aiSemanticClustering()" title="Use AI to find semantic duplicates SQL would miss"><i data-lucide="brain"></i> AI Semantic Clustering</button>
+            <button class="nuke-btn" id="nuke-btn" onclick="executeNuclearMerge()" disabled title="Auto-merges clusters where all non-master variants have 0 users and 0 deals"><i data-lucide="alert-triangle"></i> Nuclear Merge (0 safe)</button>
+            <button class="dup-refresh-btn" onclick="loadDuplicates()"><i data-lucide="refresh-cw"></i> Refresh</button>
           </div>
         </div>
 
@@ -2323,7 +2332,7 @@
       <!-- VIEW: User Cohorts CRM -->
       <div id="view-user-cohorts" class="view">
         <div class="view-header">
-          <h2>🎯 User Cohorts</h2>
+          <h2><i data-lucide="target"></i> User Cohorts</h2>
         </div>
 
         <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
@@ -2333,14 +2342,14 @@
         <!-- Control Bar -->
         <div class="cohort-control-bar">
           <select id="cohort-filter-select" class="cohort-select" onchange="loadUserCohorts(this.value)">
-            <option value="ALL">👥 All Users</option>
-            <option value="NO_SHOES">👟 Empty Lockers (0 active shoes)</option>
-            <option value="STALE_SYNC">💤 Stale Syncs (14+ days)</option>
-            <option value="POWER_USERS">⚡ Power Users (3+ shoes)</option>
+            <option value="ALL">All Users</option>
+            <option value="NO_SHOES">Empty Lockers (0 active shoes)</option>
+            <option value="STALE_SYNC">Stale Syncs (14+ days)</option>
+            <option value="POWER_USERS">Power Users (3+ shoes)</option>
           </select>
           <span class="cohort-count-pill" id="cohort-count-label">— users</span>
           <button class="cohort-export-btn" id="cohort-export-btn" onclick="exportCohortCSV()" disabled>
-            ⬇ Export CSV
+            <i data-lucide="download"></i> Export CSV
           </button>
         </div>
 
@@ -2368,8 +2377,8 @@
       <!-- VIEW: Lifespan Insights -->
       <div id="view-lifespan-insights" class="view">
         <div class="view-header">
-          <h2>🪦 Lifespan Insights <span class="badge" id="grave-model-count" style="background:#64748b;">—</span></h2>
-          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadLifespanInsights()">🔄 Refresh</button>
+          <h2><i data-lucide="skull"></i> Lifespan Insights <span class="badge" id="grave-model-count" style="background:#64748b;">—</span></h2>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadLifespanInsights()"><i data-lucide="refresh-cw"></i> Refresh</button>
         </div>
 
         <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
@@ -2379,17 +2388,17 @@
         <!-- KPI Cards -->
         <div class="grave-kpi-grid">
           <div class="grave-kpi-card">
-            <div class="grave-kpi-label">🪦 Total Shoes Retired</div>
+            <div class="grave-kpi-label"><i data-lucide="skull"></i> Total Shoes Retired</div>
             <div class="grave-kpi-value" id="grave-kpi-total">—</div>
             <div class="grave-kpi-sub" id="grave-kpi-total-sub">across all models</div>
           </div>
           <div class="grave-kpi-card green">
-            <div class="grave-kpi-label">🏆 Longest Lasting Model</div>
+            <div class="grave-kpi-label"><i data-lucide="trophy"></i> Longest Lasting Model</div>
             <div class="grave-kpi-value" id="grave-kpi-longest" style="font-size:16px;line-height:1.4;padding-top:2px;">—</div>
             <div class="grave-kpi-sub" id="grave-kpi-longest-sub">avg lifespan</div>
           </div>
           <div class="grave-kpi-card red">
-            <div class="grave-kpi-label">🔥 Fastest Burn Rate</div>
+            <div class="grave-kpi-label"><i data-lucide="flame"></i> Fastest Burn Rate</div>
             <div class="grave-kpi-value" id="grave-kpi-fastest" style="font-size:16px;line-height:1.4;padding-top:2px;">—</div>
             <div class="grave-kpi-sub" id="grave-kpi-fastest-sub">avg lifespan (sample &gt;5)</div>
           </div>
@@ -2421,24 +2430,24 @@
       <!-- VIEW: Revenue Analytics -->
       <div id="view-revenue-analytics" class="view">
         <div class="view-header">
-          <h2>💸 Revenue Analytics</h2>
-          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadRevenueAnalytics()">🔄 Refresh</button>
+          <h2><i data-lucide="dollar-sign"></i> Revenue Analytics</h2>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadRevenueAnalytics()"><i data-lucide="refresh-cw"></i> Refresh</button>
         </div>
 
         <!-- KPI Cards -->
         <div class="rev-kpi-grid">
           <div class="rev-kpi-card">
-            <div class="rev-kpi-label">🔗 Total Outbound Clicks (Last 30 Days)</div>
+            <div class="rev-kpi-label"><i data-lucide="link"></i> Total Outbound Clicks (Last 30 Days)</div>
             <div class="rev-kpi-value" id="rev-kpi-clicks">—</div>
             <div class="rev-kpi-sub" id="rev-kpi-clicks-sub">Loading…</div>
           </div>
           <div class="rev-kpi-card">
-            <div class="rev-kpi-label">🔥 Most Active Deal</div>
+            <div class="rev-kpi-label"><i data-lucide="flame"></i> Most Active Deal</div>
             <div class="rev-kpi-value" id="rev-kpi-top-deal" style="font-size:16px;line-height:1.3;padding-top:4px;">—</div>
             <div class="rev-kpi-sub" id="rev-kpi-top-deal-sub">Loading…</div>
           </div>
           <div class="rev-kpi-card highlight">
-            <div class="rev-kpi-label">💰 Estimated Conversion Value</div>
+            <div class="rev-kpi-label"><i data-lucide="percent"></i> Estimated Conversion Value</div>
             <div class="rev-kpi-value" id="rev-kpi-epc">—</div>
             <div class="rev-kpi-sub">Estimate: clicks × $0.50 EPC — not guaranteed revenue</div>
           </div>
@@ -2472,7 +2481,7 @@
       <!-- VIEW: System Ledger -->
       <div id="view-system-ledger" class="view">
         <div class="view-header">
-          <h2>📜 System Ledger <span class="badge" id="ledger-count-badge" style="background:#7c3aed;">—</span></h2>
+          <h2><i data-lucide="file-text"></i> System Ledger <span class="badge" id="ledger-count-badge" style="background:#7c3aed;">—</span></h2>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
@@ -2518,7 +2527,7 @@
       <!-- VIEW: SystemHealth -->
       <div id="view-system-health" class="view">
         <div class="view-header">
-          <h2>❤️ System Health</h2>
+          <h2><i data-lucide="heart"></i> System Health</h2>
         </div>
 
         <div class="health-toolbar">
@@ -2535,14 +2544,14 @@
         <!-- Summary cards -->
         <div class="health-grid">
           <div class="health-card accent-orange">
-            <div class="health-card-icon">🔍</div>
+            <div class="health-card-icon"><i data-lucide="search"></i></div>
             <div class="health-card-label">Pending Discovery Queue</div>
             <div class="health-card-value loading-val" id="h-queue-val">—</div>
             <div class="health-card-sub" id="h-queue-sub">shoes awaiting review</div>
           </div>
 
           <div class="health-card accent-red" id="h-orphan-card">
-            <div class="health-card-icon">🏃</div>
+            <div class="health-card-icon"><i data-lucide="footprints"></i></div>
             <div class="health-card-label">Orphaned Runs</div>
             <div class="health-card-value loading-val" id="h-orphan-val">—</div>
             <div class="health-card-sub">activities with no shoe assigned</div>
@@ -2556,7 +2565,7 @@
           </div>
 
           <div class="health-card accent-blue">
-            <div class="health-card-icon">👟</div>
+            <div class="health-card-icon"><i data-lucide="footprints"></i></div>
             <div class="health-card-label">Total Master Shoes</div>
             <div class="health-card-value loading-val" id="h-total-val">—</div>
             <div class="health-card-sub">in product catalog</div>
@@ -2585,14 +2594,14 @@
       <!-- VIEW: Strava Sync Monitor -->
       <div id="view-strava-monitor" class="view">
         <div class="view-header">
-          <h2>🚴 Strava Sync Monitor <span class="badge" id="sync-error-badge" style="background:#ef4444;display:none;">0 errors</span></h2>
+          <h2><i data-lucide="bike"></i> Strava Sync Monitor <span class="badge" id="sync-error-badge" style="background:#ef4444;display:none;">0 errors</span></h2>
         </div>
 
         <div class="sync-toolbar">
           <div class="sync-toolbar-left">
             <button class="sync-filter-btn active" data-filter="all"    onclick="setSyncFilter('all')">All</button>
-            <button class="sync-filter-btn"         data-filter="ok"     onclick="setSyncFilter('ok')">✅ OK</button>
-            <button class="sync-filter-btn"         data-filter="error"  onclick="setSyncFilter('error')">❌ Errors</button>
+            <button class="sync-filter-btn"         data-filter="ok"     onclick="setSyncFilter('ok')"><i data-lucide="check-circle"></i> OK</button>
+            <button class="sync-filter-btn"         data-filter="error"  onclick="setSyncFilter('error')"><i data-lucide="x-circle"></i> Errors</button>
             <button class="sync-filter-btn"         data-filter="skipped" onclick="setSyncFilter('skipped')">⏭ Skipped</button>
           </div>
           <button class="sync-refresh-btn" onclick="fetchWebhookLogs()">
@@ -2623,7 +2632,7 @@
       <!-- VIEW: Brand Normalization -->
       <div id="view-brand-normalization" class="view">
         <div class="view-header">
-          <h2>🏷️ Brand Normalization</h2>
+          <h2><i data-lucide="tag"></i> Brand Normalization</h2>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
@@ -2678,7 +2687,7 @@
       <!-- VIEW: User Support Console -->
       <div id="view-user-support" class="view">
         <div class="view-header">
-          <h2>👤 User Support Console</h2>
+          <h2><i data-lucide="user"></i> User Support Console</h2>
         </div>
 
         <!-- Search -->
@@ -2691,7 +2700,7 @@
             onkeydown="if(event.key==='Enter') lookupUser()"
           >
           <button class="support-search-btn" id="support-search-btn" onclick="lookupUser()">
-            🔍 Look Up User
+            <i data-lucide="search"></i> Look Up User
           </button>
         </div>
 
@@ -2700,7 +2709,7 @@
 
           <!-- Not-found state -->
           <div id="support-not-found" class="support-not-found" style="display:none;">
-            <div style="font-size:40px;margin-bottom:12px;">🕵️</div>
+            <div style="font-size:40px;margin-bottom:12px;"><i data-lucide="check-circle"></i></div>
             No user found matching that email or Athlete ID.
           </div>
 
@@ -2711,7 +2720,7 @@
               <!-- Card 1: Profile -->
               <div class="support-card">
                 <div class="support-card-header">
-                  <span class="support-card-header-icon">👤</span>
+                  <span class="support-card-header-icon"><i data-lucide="user"></i></span>
                   <span class="support-card-title">User Profile</span>
                 </div>
                 <div class="support-card-body" id="sc-profile">
@@ -2722,7 +2731,7 @@
               <!-- Card 2: Active Rotation -->
               <div class="support-card">
                 <div class="support-card-header">
-                  <span class="support-card-header-icon">👟</span>
+                  <span class="support-card-header-icon"><i data-lucide="footprints"></i></span>
                   <span class="support-card-title">Active Rotation</span>
                 </div>
                 <div class="support-card-body" id="sc-rotation">
@@ -2735,7 +2744,7 @@
             <!-- Card 3: Recent Activity Log -->
             <div class="support-full-card">
               <div class="support-card-header">
-                <span class="support-card-header-icon">🏃</span>
+                <span class="support-card-header-icon"><i data-lucide="footprints"></i></span>
                 <span class="support-card-title">Recent Activity Log <span id="sc-act-count" style="font-weight:400;color:#94a3b8;"></span></span>
               </div>
               <div id="sc-activities">
@@ -2746,7 +2755,7 @@
             <!-- Card 4: Webhook Audit Trail -->
             <div class="support-full-card">
               <div class="support-card-header">
-                <span class="support-card-header-icon">📡</span>
+                <span class="support-card-header-icon"><i data-lucide="activity"></i></span>
                 <span class="support-card-title">Webhook Audit Trail <span id="sc-wh-count" style="font-weight:400;color:#94a3b8;"></span></span>
               </div>
               <div id="sc-webhooks">
@@ -2761,7 +2770,7 @@
       <!-- VIEW: Deal Engine Monitor -->
       <div id="view-deal-engine" class="view">
         <div class="view-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <h2>💰 Deal Engine</h2>
+          <h2><i data-lucide="percent"></i> Deal Engine</h2>
           <div style="display:flex;gap:10px;">
             <button class="deal-btn-primary" onclick="openDealModal()">+ Create New Deal</button>
             <button class="health-refresh-btn" onclick="fetchDealMetrics()">
@@ -2774,21 +2783,21 @@
         <!-- Summary metric cards -->
         <div class="deal-metric-grid">
           <div class="deal-metric-card">
-            <div class="deal-metric-icon">📦</div>
+            <div class="deal-metric-icon"><i data-lucide="package"></i></div>
             <div>
               <div class="deal-metric-val orange" id="dm-active-deals">&mdash;</div>
               <div class="deal-metric-label">Active Deals (vs MSRP)</div>
             </div>
           </div>
           <div class="deal-metric-card">
-            <div class="deal-metric-icon">🔔</div>
+            <div class="deal-metric-icon"><i data-lucide="bell"></i></div>
             <div>
               <div class="deal-metric-val blue" id="dm-alerts-today">&mdash;</div>
               <div class="deal-metric-label">Alerts Triggered (last 24h)</div>
             </div>
           </div>
           <div class="deal-metric-card">
-            <div class="deal-metric-icon">🔥</div>
+            <div class="deal-metric-icon"><i data-lucide="flame"></i></div>
             <div>
               <div class="deal-metric-val green" id="dm-deepest">&mdash;</div>
               <div class="deal-metric-label">Deepest Discount Active</div>
@@ -2798,7 +2807,7 @@
 
         <!-- Table 1: Top Active Deals -->
         <div class="deal-section-title">
-          <span>🏷️ Top Active Deals</span>
+          <span><i data-lucide="tag"></i> Top Active Deals</span>
           <span id="dm-deals-count" style="font-weight:400;color:#94a3b8;"></span>
         </div>
         <div class="deal-table-wrap">
@@ -2822,7 +2831,7 @@
 
         <!-- Table 2: Recent User Alerts -->
         <div class="deal-section-title">
-          <span>🔔 Recent User Alerts Triggered</span>
+          <span><i data-lucide="bell"></i> Recent User Alerts Triggered</span>
           <span id="dm-alerts-count" style="font-weight:400;color:#94a3b8;"></span>
         </div>
         <div class="deal-table-wrap">
@@ -2850,7 +2859,7 @@
   <!-- Deal CRUD Modal -->
   <div class="deal-modal-overlay" id="deal-modal-overlay" onclick="closeDealModalOnOverlay(event)">
     <div class="deal-modal">
-      <h3>➕ Create New Deal</h3>
+      <h3><i data-lucide="plus"></i> Create New Deal</h3>
       <div class="deal-form-grid">
         <div class="deal-form-group full">
           <label>Master Product ID <span style="color:#94a3b8;font-weight:400;text-transform:none;">(UUID from master_shoe_products)</span></label>
@@ -2915,7 +2924,7 @@
   <!-- Payload inspector modal -->
   <div class="payload-modal" id="payload-modal" onclick="closePayloadModal(event)">
     <div class="payload-modal-box">
-      <h3>📦 Raw Webhook Payload</h3>
+      <h3><i data-lucide="package"></i> Raw Webhook Payload</h3>
       <pre id="payload-modal-content"></pre>
       <button class="payload-modal-close" onclick="closePayloadModal()">Close</button>
     </div>
@@ -2924,7 +2933,7 @@
   <!-- Diff / Payload Modal -->
   <div class="diff-modal-overlay" id="diff-modal-overlay" onclick="closeDiffModalOnOverlay(event)">
     <div class="diff-modal">
-      <h3>📋 Audit Log Payload</h3>
+      <h3><i data-lucide="clipboard-list"></i> Audit Log Payload</h3>
       <div class="diff-modal-meta">
         <span id="diff-meta-action"></span>
         <span id="diff-meta-entity"></span>
@@ -2933,11 +2942,11 @@
       </div>
       <div class="diff-panels">
         <div class="diff-panel">
-          <div class="diff-panel-header before">⬅ Previous State</div>
+          <div class="diff-panel-header before"><i data-lucide="arrow-left"></i> Previous State</div>
           <pre id="diff-previous"></pre>
         </div>
         <div class="diff-panel">
-          <div class="diff-panel-header after">➡ New State</div>
+          <div class="diff-panel-header after"><i data-lucide="arrow-right"></i> New State</div>
           <pre id="diff-new"></pre>
         </div>
       </div>
@@ -2946,11 +2955,21 @@
   </div>
 
   <div id="toast" class="toast">
-    <span id="toast-icon">✓</span>
+    <span id="toast-icon"><i data-lucide="check"></i></span>
     <span id="toast-message">Success</span>
   </div>
 
   <script>
+    // ── Icons: render Lucide icons on load, and auto-render any injected
+    //    later via innerHTML (dynamic tables/cards/buttons throughout this
+    //    dashboard use data-lucide tags). ──
+    (function() {
+      const renderIcons = () => { if (window.lucide) lucide.createIcons(); };
+      document.addEventListener('DOMContentLoaded', renderIcons);
+      const observer = new MutationObserver(renderIcons);
+      observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+    })();
+
     // ── Dark Mode ──
     (function() {
       const saved = localStorage.getItem('adminTheme');
@@ -2963,14 +2982,14 @@
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('adminTheme', isDark ? 'dark' : 'light');
       const btn = document.getElementById('theme-toggle-btn');
-      if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+      if (btn) btn.innerHTML = isDark ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
     }
 
     // Sync button icon on page load (after DOM ready)
     document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('theme-toggle-btn');
       if (btn && document.documentElement.classList.contains('dark')) {
-        btn.textContent = '☀️';
+        btn.innerHTML = '<i data-lucide="sun"></i>';
       }
     });
 
@@ -3219,7 +3238,7 @@
     function renderShoes() {
       const container = document.getElementById('shoe-list');
       if (pendingData.length === 0) {
-        container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
+        container.innerHTML = '<div class="empty"><div class="empty-icon"><i data-lucide="sparkles"></i></div><p>No pending shoe discoveries</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
         return;
       }
       container.innerHTML = pendingData.map(shoe => {
@@ -3229,14 +3248,14 @@
 
         const suggestedBlock = hasSuggestion ? `
           <div class="suggested-match-block">
-            <span class="suggested-match-label">✨ Suggested Match:</span>
+            <span class="suggested-match-label"><i data-lucide="sparkles"></i> Suggested Match:</span>
             <span class="suggested-match-name">${suggestedName}</span>
             ${fuseScore ? `<span class="suggested-match-score">Score: ${fuseScore}</span>` : ''}
           </div>` : '';
 
         const approveBtn = hasSuggestion
-          ? `<button class="btn btn-approve" onclick="quickApproveShoe('${shoe.id}','${shoe.suggested_master_product_id}')" id="btn-approve-${shoe.id}">⚡ Quick Approve</button>`
-          : `<button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>`;
+          ? `<button class="btn btn-approve" onclick="quickApproveShoe('${shoe.id}','${shoe.suggested_master_product_id}')" id="btn-approve-${shoe.id}"><i data-lucide="zap"></i> Quick Approve</button>`
+          : `<button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}"><i data-lucide="check"></i> Approve</button>`;
 
         return `
         <div class="shoe-card view-mode ${shoe.confidence}" id="card-${shoe.id}">
@@ -3250,20 +3269,20 @@
           ${suggestedBlock}
           <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;margin-top:${hasSuggestion ? '10px' : '0'};">
             ${hasSuggestion ? '' : `<select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;flex-shrink:0;">
-              <option value="EVA"   selected>🟡 EVA (Default)</option>
-              <option value="PEBAX"        >⚡ PEBAX (Supershoe)</option>
-              <option value="TPU"          >🔵 TPU (High Durability)</option>
+              <option value="EVA"   selected>EVA (Default)</option>
+              <option value="PEBAX"        >PEBAX (Supershoe)</option>
+              <option value="TPU"          >TPU (High Durability)</option>
             </select>`}
             ${approveBtn}
-            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
-            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
+            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}"><i data-lucide="x"></i> Reject</button>
+            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}"><i data-lucide="pencil"></i> Edit</button>
           </div>
         </div>
         <div class="shoe-card edit-mode" id="edit-${shoe.id}" style="display:none;">
           <input type="text" id="brand-${shoe.id}" value="${escapeHtml(shoe.brand_name)}" placeholder="Brand name">
           <input type="text" id="model-${shoe.id}" value="${escapeHtml(shoe.model_name)}" placeholder="Model name">
           <div class="edit-actions">
-            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save</button>
+            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')"><i data-lucide="save"></i> Save</button>
             <button class="btn btn-edit"    onclick="cancelEdit('${shoe.id}')">Cancel</button>
           </div>
         </div>`;
@@ -3303,7 +3322,7 @@
           body: JSON.stringify({ action: 'quick_approve', discovery_id: id, suggested_master_product_id: suggestedMasterProductId, token: ADMIN_TOKEN })
         });
         const result = await res.json();
-        if (result.success) { removeShoe(id); showToast('⚡ Quick approved — linked to existing product', 'success'); }
+        if (result.success) { removeShoe(id); showToast('<i data-lucide="zap"></i> Quick approved — linked to existing product', 'success'); }
         else throw new Error(result.message);
       } catch (err) {
         showToast('Error: ' + err.message, 'error');
@@ -3389,7 +3408,7 @@
       showToast(`Approved ${approved} shoes${failed ? `, ${failed} failed` : ''}`, failed ? 'error' : 'success');
       await loadPending();
       btn.disabled = false;
-      btn.textContent = '✓ Approve All';
+      btn.innerHTML = '<i data-lucide="check"></i> Approve All';
     }
 
     function removeShoe(id) {
@@ -3464,7 +3483,7 @@
       const container = document.getElementById('shoe-list');
       if (aliasData.length === 0) {
         container.innerHTML =
-          '<div class="empty"><div class="empty-icon">🎉</div><p>No pending affiliate aliases</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
+          '<div class="empty"><div class="empty-icon"><i data-lucide="sparkles"></i></div><p>No pending affiliate aliases</p><p style="font-size:12px;margin-top:8px;">All caught up!</p></div>';
         return;
       }
       container.innerHTML = `
@@ -3492,8 +3511,8 @@
                 <td>${match}</td>
                 <td><span style="${scoreCol}">${score}</span></td>
                 <td style="white-space:nowrap;">
-                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')">✓ Approve</button>
-                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')">✕ Reject</button>
+                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')"><i data-lucide="check"></i> Approve</button>
+                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')"><i data-lucide="x"></i> Reject</button>
                 </td>
               </tr>`;
             }).join('')}
@@ -3514,7 +3533,7 @@
         if (row) { row.style.opacity = '1'; row.querySelectorAll('button').forEach(b => b.disabled = false); }
         return;
       }
-      showToast(newStatus === 'approved' ? 'Alias approved ✓' : 'Alias rejected', 'success');
+      showToast(newStatus === 'approved' ? 'Alias approved <i data-lucide="check"></i>' : 'Alias rejected', 'success');
       aliasData = aliasData.filter(r => r.id !== aliasId);
       if (row) row.remove();
       updateAliasStats();
@@ -3555,7 +3574,7 @@
           .in('id', ids);
         if (error) { showToast('Batch approve failed: ' + error.message, 'error'); }
         else { showToast(`Approved ${ids.length} aliases`, 'success'); }
-        btn.disabled = false; btn.textContent = '✓ Approve All';
+        btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Approve All';
         loadDiscoveryQueue();
         return;
       }
@@ -3578,14 +3597,14 @@
       }
       showToast(`Approved ${approved} shoes${failed ? `, ${failed} failed` : ''}`, failed ? 'error' : 'success');
       await loadPending();
-      btn.disabled = false; btn.textContent = '✓ Approve All';
+      btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Approve All';
     }
 
     /* ── UTILITIES ── */
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
       toast.className = `toast ${type} show`;
-      document.getElementById('toast-icon').textContent    = type === 'success' ? '✓' : '✕';
+      document.getElementById('toast-icon').innerHTML    = type === 'success' ? '<i data-lucide="check"></i>' : '<i data-lucide="x"></i>';
       document.getElementById('toast-message').textContent = message;
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
@@ -3630,7 +3649,7 @@
 
       for (let batchIdx = 0; batchIdx < totalBatches; batchIdx++) {
         const slice = source.slice(batchIdx * AI_BATCH, (batchIdx + 1) * AI_BATCH);
-        btn.textContent = `🤖 Analyzing… (${Math.min((batchIdx + 1) * AI_BATCH, source.length)}/${source.length})`;
+        btn.innerHTML = `<i data-lucide="bot"></i> Analyzing… (${Math.min((batchIdx + 1) * AI_BATCH, source.length)}/${source.length})`;
 
         const payload = slice.map(item => ({
           id:       item.id,
@@ -3657,7 +3676,7 @@
       if (!allResults.length) {
         showToast('AI returned no results', 'error');
         btn.disabled = false;
-        btn.textContent = '🤖 AI Normalize Queue';
+        btn.innerHTML = '<i data-lucide="bot"></i> AI Normalize Queue';
         return;
       }
 
@@ -3669,7 +3688,7 @@
         const highConf  = allResults.filter(r => r.confidence >= 0.80);
         const lowConf   = allResults.filter(r => r.confidence <  0.80);
 
-        btn.textContent = `⚙️ Saving ${highConf.length} corrections…`;
+        btn.innerHTML = `<i data-lucide="settings"></i> Saving ${highConf.length} corrections…`;
 
         let approved = 0, edited = 0, failed = 0;
 
@@ -3688,7 +3707,7 @@
         }
 
         // 2. Auto-approve high-confidence results
-        btn.textContent = `✅ Approving ${highConf.length} high-confidence…`;
+        btn.innerHTML = `<i data-lucide="check-circle"></i> Approving ${highConf.length} high-confidence…`;
         for (const r of highConf) {
           try {
             const res = await fetch(`${SUPABASE_URL}/functions/v1/manage-shoe-discoveries`, {
@@ -3728,7 +3747,7 @@
         if (lowConf.length > 0) renderShoesWithAI();
 
         showToast(
-          `✨ Auto-approved ${approved} · ${lowConf.length} need manual review${failed ? ` · ${failed} failed` : ''}`,
+          `<i data-lucide="sparkles"></i> Auto-approved ${approved} · ${lowConf.length} need manual review${failed ? ` · ${failed} failed` : ''}`,
           failed > approved ? 'error' : 'success'
         );
 
@@ -3738,7 +3757,7 @@
         const ids      = highConf.map(r => r.id).filter(Boolean);
 
         if (ids.length) {
-          btn.textContent = `✅ Approving ${ids.length} aliases…`;
+          btn.innerHTML = `<i data-lucide="check-circle"></i> Approving ${ids.length} aliases…`;
           const { error } = await getSupabase()
             .from('retailer_product_aliases')
             .update({ status: 'approved' })
@@ -3764,18 +3783,18 @@
         });
 
         await loadDiscoveryQueue();
-        showToast(`✨ Approved ${ids.length} aliases · ${allResults.length - ids.length} need manual review`, 'success');
+        showToast(`<i data-lucide="sparkles"></i> Approved ${ids.length} aliases · ${allResults.length - ids.length} need manual review`, 'success');
       }
 
       btn.disabled = false;
-      btn.textContent = '🤖 AI Normalize Queue';
+      btn.innerHTML = '<i data-lucide="bot"></i> AI Normalize Queue';
     }
 
     // Re-render catalog shoes with AI annotations injected
     function renderShoesWithAI() {
       const container = document.getElementById('shoe-list');
       if (pendingData.length === 0) {
-        container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><p>No pending shoe discoveries</p></div>';
+        container.innerHTML = '<div class="empty"><div class="empty-icon"><i data-lucide="sparkles"></i></div><p>No pending shoe discoveries</p></div>';
         return;
       }
       container.innerHTML = pendingData.map(shoe => {
@@ -3783,7 +3802,7 @@
         const displayBrand = hasAI ? shoe._ai_brand : shoe.brand_name;
         const displayModel = hasAI ? shoe._ai_model : shoe.model_name;
         const aiBadge = hasAI
-          ? `<span class="ai-normalized-badge">✨ AI · ${Math.round((shoe._ai_confidence || 0) * 100)}%</span>`
+          ? `<span class="ai-normalized-badge"><i data-lucide="sparkles"></i> AI · ${Math.round((shoe._ai_confidence || 0) * 100)}%</span>`
           : '';
 
         const hasSuggestion = shoe.confidence === 'medium' && shoe.suggested_master_product_id && shoe.suggested_shoe;
@@ -3791,14 +3810,14 @@
         const fuseScore      = (hasSuggestion && shoe.fuse_score != null) ? Number(shoe.fuse_score).toFixed(2) : null;
         const suggestedBlock = hasSuggestion ? `
           <div class="suggested-match-block">
-            <span class="suggested-match-label">✨ Suggested Match:</span>
+            <span class="suggested-match-label"><i data-lucide="sparkles"></i> Suggested Match:</span>
             <span class="suggested-match-name">${suggestedName}</span>
             ${fuseScore ? `<span class="suggested-match-score">Score: ${fuseScore}</span>` : ''}
           </div>` : '';
 
         const approveBtn = hasSuggestion
-          ? `<button class="btn btn-approve" onclick="quickApproveShoe('${shoe.id}','${shoe.suggested_master_product_id}')" id="btn-approve-${shoe.id}">⚡ Quick Approve</button>`
-          : `<button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}">✓ Approve</button>`;
+          ? `<button class="btn btn-approve" onclick="quickApproveShoe('${shoe.id}','${shoe.suggested_master_product_id}')" id="btn-approve-${shoe.id}"><i data-lucide="zap"></i> Quick Approve</button>`
+          : `<button class="btn btn-approve" onclick="approveShoe('${shoe.id}')" id="btn-approve-${shoe.id}"><i data-lucide="check"></i> Approve</button>`;
 
         return `
         <div class="shoe-card view-mode ${shoe.confidence}" id="card-${shoe.id}">
@@ -3812,20 +3831,20 @@
           ${suggestedBlock}
           <div class="shoe-actions" style="flex-wrap:wrap;gap:8px;margin-top:${hasSuggestion ? '10px' : '0'};">
             ${hasSuggestion ? '' : `<select id="foam-${shoe.id}" title="Midsole Material" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;flex-shrink:0;">
-              <option value="EVA" selected>🟡 EVA (Default)</option>
-              <option value="PEBAX">⚡ PEBAX (Supershoe)</option>
-              <option value="TPU">🔵 TPU (High Durability)</option>
+              <option value="EVA" selected>EVA (Default)</option>
+              <option value="PEBAX">PEBAX (Supershoe)</option>
+              <option value="TPU">TPU (High Durability)</option>
             </select>`}
             ${approveBtn}
-            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}">✕ Reject</button>
-            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}">✏️ Edit</button>
+            <button class="btn btn-reject"  onclick="rejectShoe('${shoe.id}')"  id="btn-reject-${shoe.id}"><i data-lucide="x"></i> Reject</button>
+            <button class="btn btn-edit"    onclick="startEdit('${shoe.id}')"   id="btn-edit-${shoe.id}"><i data-lucide="pencil"></i> Edit</button>
           </div>
         </div>
         <div class="shoe-card edit-mode" id="edit-${shoe.id}" style="display:none;">
           <input type="text" id="brand-${shoe.id}" value="${escapeHtml(displayBrand)}" placeholder="Brand name">
           <input type="text" id="model-${shoe.id}" value="${escapeHtml(displayModel)}" placeholder="Model name">
           <div class="edit-actions">
-            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')">💾 Save</button>
+            <button class="btn btn-approve" onclick="saveEdit('${shoe.id}')"><i data-lucide="save"></i> Save</button>
             <button class="btn btn-edit"    onclick="cancelEdit('${shoe.id}')">Cancel</button>
           </div>
         </div>`;
@@ -3858,7 +3877,7 @@
                   ? 'color:#f59e0b;font-weight:700;'
                   : 'color:#ef4444;font-weight:700;';
               const aiCell = row._ai_normalized
-                ? `<span style="font-weight:600;color:#7c3aed;">✨ ${escapeHtml(row._ai_brand)} ${escapeHtml(row._ai_model)}</span><br><span style="font-size:10px;color:#94a3b8">${Math.round((row._ai_confidence||0)*100)}% conf</span>`
+                ? `<span style="font-weight:600;color:#7c3aed;"><i data-lucide="sparkles"></i> ${escapeHtml(row._ai_brand)} ${escapeHtml(row._ai_model)}</span><br><span style="font-size:10px;color:#94a3b8">${Math.round((row._ai_confidence||0)*100)}% conf</span>`
                 : '<span style="color:#94a3b8">—</span>';
               return `<tr id="alias-row-${row.id}">
                 <td style="font-family:monospace;font-size:12px;max-width:200px;word-break:break-all;">${escapeHtml(row.raw_string)}</td>
@@ -3866,8 +3885,8 @@
                 <td>${aiCell}</td>
                 <td><span style="${scoreCol}">${score}</span></td>
                 <td style="white-space:nowrap;">
-                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')">✓ Approve</button>
-                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')">✕ Reject</button>
+                  <button class="deal-action-btn verify"     onclick="resolveAlias('${row.id}','approved')"><i data-lucide="check"></i> Approve</button>
+                  <button class="deal-action-btn deactivate" onclick="resolveAlias('${row.id}','rejected')"><i data-lucide="x"></i> Reject</button>
                 </td>
               </tr>`;
             }).join('')}
@@ -3879,7 +3898,7 @@
     async function aiSemanticClustering() {
       const btn = document.getElementById('dup-ai-btn');
       btn.disabled = true;
-      btn.textContent = '🧠 Analyzing…';
+      btn.innerHTML = '<i data-lucide="brain"></i> Analyzing…';
 
       try {
         const sb = getSupabase();
@@ -3913,7 +3932,7 @@
 
         const clusters = json.clusters || [];
         if (!clusters.length) {
-          showToast('🧠 AI found no semantic duplicates in this batch', 'success');
+          showToast('<i data-lucide="brain"></i> AI found no semantic duplicates in this batch', 'success');
           return;
         }
 
@@ -3927,7 +3946,7 @@
           .filter(g => g.length >= 2);
 
         if (!groups.length) {
-          showToast('🧠 AI clusters did not match known shoe IDs', 'error');
+          showToast('<i data-lucide="brain"></i> AI clusters did not match known shoe IDs', 'error');
           return;
         }
 
@@ -3956,14 +3975,14 @@
         renderAIClusters(groups, cheapestDeal, dealCount, userCount);
 
         await writeAuditLog({ action_type: 'AI_CLUSTER', entity_type: 'master_shoe_products', entity_id: 'batch', admin_identifier: 'ai_janitor', previous_state: { shoes_analyzed: shoes.length }, new_state: { clusters_found: groups.length, cluster_ids: clusters } });
-        showToast(`🧠 AI found ${groups.length} semantic cluster${groups.length > 1 ? 's' : ''}`, 'success');
+        showToast(`<i data-lucide="brain"></i> AI found ${groups.length} semantic cluster${groups.length > 1 ? 's' : ''}`, 'success');
 
       } catch (err) {
         showToast('AI clustering error: ' + err.message, 'error');
         console.error(err);
       } finally {
         btn.disabled = false;
-        btn.textContent = '🧠 AI Semantic Clustering';
+        btn.innerHTML = '<i data-lucide="brain"></i> AI Semantic Clustering';
       }
     }
 
@@ -3977,7 +3996,7 @@
       // Prepend a header distinguishing AI clusters from SQL clusters
       const headerHtml = `
         <div style="background:linear-gradient(135deg,#ede9fe,#f3e8ff);border:1px solid #d8b4fe;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:22px;">🧠</span>
+          <span style="font-size:22px;"><i data-lucide="brain"></i></span>
           <div>
             <div style="font-size:13px;font-weight:700;color:#6d28d9;">AI Semantic Clusters — ${groups.length} found</div>
             <div style="font-size:12px;color:#7c3aed;margin-top:2px;">These clusters were identified by AI and may include variations that SQL similarity scoring would miss. Review carefully before merging.</div>
@@ -3996,7 +4015,7 @@
           const img = shoe.image_url
             ? `<img class="dup-card-img" src="${escapeHtml(shoe.image_url)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
             : '';
-          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}>👟</div>`;
+          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}><i data-lucide="footprints"></i></div>`;
           const users = userCount[shoe.id] || 0;
           const deals = dealCount[shoe.id]  || 0;
           return `
@@ -4008,13 +4027,13 @@
                 <div class="dup-card-name">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
                 <div class="dup-card-price">${escapeHtml(priceStr)}</div>
                 <div class="dup-card-telemetry">
-                  <span class="dup-card-stat ${users > 0 ? 'active' : 'zero'}">👥 ${users}</span>
-                  <span class="dup-card-stat ${deals > 0 ? 'active' : 'zero'}">🏷️ ${deals}</span>
+                  <span class="dup-card-stat ${users > 0 ? 'active' : 'zero'}"><i data-lucide="users"></i> ${users}</span>
+                  <span class="dup-card-stat ${deals > 0 ? 'active' : 'zero'}"><i data-lucide="tag"></i> ${deals}</span>
                 </div>
               </div>
               <div class="dup-card-right">
                 <div class="dup-card-radio"></div>
-                ${isMaster ? '<div class="master-label">⭐ Master</div>' : ''}
+                ${isMaster ? '<div class="master-label"><i data-lucide="star"></i> Master</div>' : ''}
               </div>
             </div>`;
         }).join('');
@@ -4023,14 +4042,14 @@
         return `
           <div class="dup-group" id="${key}">
             <div class="dup-group-header">
-              <h3>${escapeHtml(sorted[0].brand_name)} — ${escapeHtml(sorted[0].model_name)} <span class="ai-cluster-badge">🧠 AI</span></h3>
+              <h3>${escapeHtml(sorted[0].brand_name)} — ${escapeHtml(sorted[0].model_name)} <span class="ai-cluster-badge"><i data-lucide="brain"></i> AI</span></h3>
               <span>${group.length} variants · ${dupCount} to remove</span>
             </div>
             <div class="dup-cards">${cardsHtml}</div>
             <div class="dup-group-footer">
               <p>AI-identified semantic duplicate. Click a card to set it as the master record.</p>
               <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
-                🔀 Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+                <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
               </button>
             </div>
           </div>`;
@@ -4129,7 +4148,7 @@
             const name  = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
             const thumb = prod?.image_url
               ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
-              : `<div class="deal-shoe-thumb-placeholder">💟</div>`;
+              : `<div class="deal-shoe-thumb-placeholder"><i data-lucide="image"></i></div>`;
             const pillCls = discountPillClass(d.pct);
             return `<tr>
               <td style="display:flex;align-items:center;gap:10px;">
@@ -4139,11 +4158,11 @@
               <td>${escapeHtml(d.retailer_name)}</td>
               <td style="color:#94a3b8;text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
               <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
-              <td><span class="deal-discount-pill ${pillCls}">↓${d.pct}%</span></td>
+              <td><span class="deal-discount-pill ${pillCls}"><i data-lucide="arrow-down"></i>${d.pct}%</span></td>
               <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
               <td style="white-space:nowrap;">
-                <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)">✓ Verify</button>
-                <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)">✕ Deactivate</button>
+                <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)"><i data-lucide="check"></i> Verify</button>
+                <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)"><i data-lucide="x"></i> Deactivate</button>
               </td>
             </tr>`;
           }).join('');
@@ -4181,7 +4200,7 @@
 
       } catch(err) {
         ['dm-deals-tbody','dm-alerts-tbody'].forEach(id => {
-          document.getElementById(id).innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:28px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+          document.getElementById(id).innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:28px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         });
         showToast('Deal Engine error: ' + err.message, 'error');
       }
@@ -4254,7 +4273,7 @@
         .from('shoe_deals')
         .update({ last_verified_at: new Date().toISOString(), updated_at: new Date().toISOString() })
         .eq('id', dealId);
-      if (error) { showToast('Verify failed: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✓ Verify'; return; }
+      if (error) { showToast('Verify failed: ' + error.message, 'error'); btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Verify'; return; }
       showToast('Deal verified — staleness cleared.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
@@ -4268,7 +4287,7 @@
         .from('shoe_deals')
         .update({ is_active: false })
         .eq('id', dealId);
-      if (error) { showToast('Deactivate failed: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✕ Deactivate'; return; }
+      if (error) { showToast('Deactivate failed: ' + error.message, 'error'); btn.disabled = false; btn.innerHTML = '<i data-lucide="x"></i> Deactivate'; return; }
       showToast('Deal deactivated.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
@@ -4305,7 +4324,7 @@
         expBtn.disabled   = cohortData.length === 0;
 
         if (!cohortData.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">🎯 No users match this segment.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><i data-lucide="target"></i> No users match this segment.</td></tr>`;
           return;
         }
 
@@ -4332,7 +4351,7 @@
         }).join('');
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         showToast('Cohort load error: ' + err.message, 'error');
       }
     }
@@ -4416,7 +4435,7 @@
 
         // ─ Table ─
         if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;">🪦 No retired shoes with ≥3 samples yet.<br><span style="font-size:11px;">Retire some shoes in the app or add mock data to see insights.</span></td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;"><i data-lucide="skull"></i> No retired shoes with ≥3 samples yet.<br><span style="font-size:11px;">Retire some shoes in the app or add mock data to see insights.</span></td></tr>`;
           return;
         }
 
@@ -4426,13 +4445,13 @@
           const median = Number(row.median_lifespan_km) || 0;
           const pct    = Math.min(Math.round((avg / LIFESPAN_BENCHMARK_KM) * 100), 100);
           const barColor = pct >= 100 ? '#10b981' : pct >= 75 ? '#f59e0b' : pct >= 50 ? '#f97316' : '#ef4444';
-          const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+          const rank = i === 0 ? '<i data-lucide="medal" style="color:#eab308"></i>' : i === 1 ? '<i data-lucide="medal" style="color:#94a3b8"></i>' : i === 2 ? '<i data-lucide="medal" style="color:#b45309"></i>' : `${i + 1}`;
           return `<tr>
             <td>
               <div style="display:flex;align-items:center;gap:10px;">
                 ${row.image_url
                   ? `<img src="${escapeHtml(row.image_url)}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" loading="lazy" onerror="this.style.display='none'">`
-                  : `<div style="width:36px;height:36px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">👟</div>`
+                  : `<div style="width:36px;height:36px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;"><i data-lucide="footprints"></i></div>`
                 }
                 <div>
                   <div style="font-weight:600;">${rank} ${escapeHtml(row.brand_name)} ${escapeHtml(row.model_name)}</div>
@@ -4456,7 +4475,7 @@
         }).join('');
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:36px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:36px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         showToast('Lifespan insights error: ' + err.message, 'error');
       }
     }
@@ -4504,7 +4523,7 @@
 
         // ─ Performance Table ─
         if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">📦 No active deals found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><i data-lucide="package"></i> No active deals found.</td></tr>`;
           return;
         }
 
@@ -4533,14 +4552,14 @@
             <td>
               <a class="rev-verify-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer"
                  title="Open deal URL in new tab to verify link is live">
-                ↗️ Verify Link
+                <i data-lucide="external-link"></i> Verify Link
               </a>
             </td>
           </tr>`;
         }).join('');
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         showToast('Revenue analytics error: ' + err.message, 'error');
       }
     }
@@ -4572,7 +4591,7 @@
 
         renderLedger();
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         showToast('Ledger load error: ' + err.message, 'error');
       }
     }
@@ -4615,10 +4634,10 @@
       let row;
       try { row = JSON.parse(rowJson); } catch { return; }
 
-      document.getElementById('diff-meta-action').textContent  = '🔖 ' + (row.action_type || '—');
-      document.getElementById('diff-meta-entity').textContent  = '📦 ' + (row.entity_type || '—') + ' · ' + (row.entity_id || '—');
-      document.getElementById('diff-meta-time').textContent    = '🕐 ' + fmtDateTime(row.created_at);
-      document.getElementById('diff-meta-admin').textContent   = '👤 ' + (row.admin_identifier || '—');
+      document.getElementById('diff-meta-action').innerHTML  = '<i data-lucide="bookmark"></i> ' + escapeHtml(row.action_type || '—');
+      document.getElementById('diff-meta-entity').innerHTML  = '<i data-lucide="package"></i> ' + escapeHtml((row.entity_type || '—') + ' · ' + (row.entity_id || '—'));
+      document.getElementById('diff-meta-time').innerHTML    = '<i data-lucide="clock"></i> ' + escapeHtml(fmtDateTime(row.created_at));
+      document.getElementById('diff-meta-admin').innerHTML   = '<i data-lucide="user"></i> ' + escapeHtml(row.admin_identifier || '—');
 
       document.getElementById('diff-previous').textContent =
         row.previous_state != null ? JSON.stringify(row.previous_state, null, 2) : '(none)';
@@ -4813,7 +4832,7 @@
                   <td style="white-space:nowrap;font-size:12px;">${escapeHtml(fmtDateTime(w.created_at))}<br><span style="color:#94a3b8;font-size:11px;">${escapeHtml(timeAgo(w.created_at))}</span></td>
                   <td><span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:600;">${escapeHtml((w.object_type||'') + '.' + (w.aspect_type||''))}</span></td>
                   <td style="font-family:monospace;font-size:12px;">${escapeHtml(w.object_id || '—')}</td>
-                  <td><span class="sync-badge ${statusCls}">${w.status === 'ok' ? '✓ OK' : w.status === 'error' ? '✕ Error' : w.status}</span></td>
+                  <td><span class="sync-badge ${statusCls}">${w.status === 'ok' ? '<i data-lucide="check"></i> OK' : w.status === 'error' ? '<i data-lucide="x"></i> Error' : w.status}</span></td>
                   <td style="font-size:12px;color:#ef4444;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(w.error_message||'')}">${escapeHtml(w.error_message || '—')}</td>
                 </tr>`;
               }).join('')}
@@ -4823,12 +4842,12 @@
 
       } catch(err) {
         document.getElementById('support-not-found').style.display = 'block';
-        document.getElementById('support-not-found').innerHTML = `<div style="font-size:32px;margin-bottom:10px;">⚠️</div>${escapeHtml(err.message)}`;
+        document.getElementById('support-not-found').innerHTML = `<div style="font-size:32px;margin-bottom:10px;"><i data-lucide="alert-triangle"></i></div>${escapeHtml(err.message)}`;
         cards.style.display = 'none';
         showToast('Lookup error: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '🔍 Look Up User';
+        btn.innerHTML = '<i data-lucide="search"></i> Look Up User';
       }
     }
 
@@ -4871,7 +4890,7 @@
         document.getElementById('brand-list-meta').textContent = `${brandAllRows.length} brands`;
         renderBrandList(brandAllRows);
       } catch (err) {
-        scroll.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>${escapeHtml(err.message)}</p></div>`;
+        scroll.innerHTML = `<div class="empty"><div class="empty-icon"><i data-lucide="alert-triangle"></i></div><p>${escapeHtml(err.message)}</p></div>`;
         showToast('Error loading brands: ' + err.message, 'error');
       }
     }
@@ -4971,7 +4990,7 @@
 
         const updated = data ?? 0;
         resultBox.className = 'brand-result-box ok';
-        resultBox.textContent = `✓ ${updated} row${updated !== 1 ? 's' : ''} updated — "${aliases.join('", "')}" → "${master}"`;
+        resultBox.innerHTML = `<i data-lucide="check"></i> ${updated} row${updated !== 1 ? 's' : ''} updated — "${escapeHtml(aliases.join('", "'))}" <i data-lucide="arrow-right"></i> "${escapeHtml(master)}"`;
 
         showToast(`Normalized ${updated} rows to "${master}"`, 'success');
 
@@ -4985,7 +5004,7 @@
 
       } catch (err) {
         resultBox.className = 'brand-result-box error';
-        resultBox.textContent = '⚠️ ' + err.message;
+        resultBox.innerHTML = '<i data-lucide="alert-triangle"></i> ' + escapeHtml(err.message);
         showToast('Normalization failed: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
@@ -5043,7 +5062,7 @@
           sidebarBadge.style.display = 'none';
         }
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:32px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         showToast('Error loading webhook logs: ' + err.message, 'error');
       }
     }
@@ -5068,11 +5087,11 @@
           ? `${row.object_type}.${row.aspect_type}`
           : row.object_type || '—';
         const statusClass = row.status === 'ok' ? 'ok' : row.status === 'error' ? 'error' : 'skipped';
-        const statusIcon  = row.status === 'ok' ? '✓' : row.status === 'error' ? '✕' : '⏭';
+        const statusIcon  = row.status === 'ok' ? '<i data-lucide="check"></i>' : row.status === 'error' ? '<i data-lucide="x"></i>' : '⏭';
         const statusLabel = row.status === 'ok' ? '200 OK' : row.status === 'error' ? 'Error' : 'Skipped';
 
         const retryBtn = row.status === 'error'
-          ? `<button class="sync-retry-btn" id="retry-${row.id}" onclick="retryStravaSync('${row.id}', ${escapeHtml(JSON.stringify(JSON.stringify(row.payload)))})">↩ Retry</button>`
+          ? `<button class="sync-retry-btn" id="retry-${row.id}" onclick="retryStravaSync('${row.id}', ${escapeHtml(JSON.stringify(JSON.stringify(row.payload)))})"><i data-lucide="rotate-ccw"></i> Retry</button>`
           : '';
         const payloadBtn = `<button class="sync-payload-btn" onclick="showPayload('${row.id}')">{ }</button>`;
 
@@ -5123,7 +5142,7 @@
         setTimeout(fetchWebhookLogs, 2000);
       } catch (err) {
         showToast('Retry failed: ' + err.message, 'error');
-        if (btn) { btn.disabled = false; btn.textContent = '↩ Retry'; }
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="rotate-ccw"></i> Retry'; }
       }
     }
 
@@ -5252,11 +5271,11 @@
           cronTbody.innerHTML = `
             <tr>
               <td colspan="4" style="text-align:center;color:#94a3b8;padding:24px;font-size:12px;">
-                <div style="margin-bottom:6px">🔒 Cron details require service-role access</div>
+                <div style="margin-bottom:6px"><i data-lucide="lock"></i> Cron details require service-role access</div>
                 <a href="https://supabase.com/dashboard/project/vpeszlbrrqwsmnhqdtpf/database/query-runner"
                    target="_blank"
                    style="color:#f97316;text-decoration:underline;font-size:12px;">
-                  View in Supabase SQL Editor →
+                  View in Supabase SQL Editor <i data-lucide="arrow-right"></i>
                 </a>
               </td>
             </tr>`;
@@ -5286,7 +5305,7 @@
       }
     }
 
-    /* State: groupKey → { shoes[], masterId } */
+    /* State: groupKey <i data-lucide="arrow-right"></i> { shoes[], masterId } */
     const dupState = {};
     /* Cached telemetry for Nuclear Merge */
     let _nukeUserCount = {};
@@ -5327,7 +5346,7 @@
       return 1 - levenshtein(na, nb) / maxLen;
     }
 
-    const SIM_THRESHOLD = 0.80; // ≥80% similar → suspected duplicate
+    const SIM_THRESHOLD = 0.80; // ≥80% similar <i data-lucide="arrow-right"></i> suspected duplicate
 
     /** Group shoes into suspect clusters */
     function groupDuplicates(shoes) {
@@ -5405,7 +5424,7 @@
         renderDuplicates(groups, cheapestDeal, dealCount, userCount);
       } catch (err) {
         console.error('Dup load error:', err);
-        container.innerHTML = `<div class="dup-empty"><div class="dup-empty-icon">⚠️</div><p>Error: ${escapeHtml(err.message)}</p></div>`;
+        container.innerHTML = `<div class="dup-empty"><div class="dup-empty-icon"><i data-lucide="alert-triangle"></i></div><p>Error: ${escapeHtml(err.message)}</p></div>`;
         showToast('Error loading duplicates: ' + err.message, 'error');
       }
     }
@@ -5443,7 +5462,7 @@
       if (!btn) return;
       const eligible = getNukeableClusters(_nukeUserCount, _nukeDealCount);
       btn.disabled = eligible.length === 0;
-      btn.textContent = `☢️ Nuclear Merge (${eligible.length} safe)`;
+      btn.innerHTML = `<i data-lucide="alert-triangle"></i> Nuclear Merge (${eligible.length} safe)`;
     }
 
     async function executeNuclearMerge() {
@@ -5472,7 +5491,7 @@
         if (!masterCheck) {
           console.warn('Nuclear merge: master already gone, skipping cluster', key);
           done++; // treat as resolved — it no longer exists
-          btn.textContent = `☢️ Merging… ${done} / ${eligible.length}`;
+          btn.innerHTML = `<i data-lucide="alert-triangle"></i> Merging… ${done} / ${eligible.length}`;
           continue;
         }
 
@@ -5501,7 +5520,7 @@
         }
 
         if (clusterOk) done++;
-        btn.textContent = `☢️ Merging… ${done + clusterErrors.length} / ${eligible.length}`;
+        btn.innerHTML = `<i data-lucide="alert-triangle"></i> Merging… ${done + clusterErrors.length} / ${eligible.length}`;
       }
 
       if (clusterErrors.length > 0) {
@@ -5511,7 +5530,7 @@
         console.error('Nuclear merge failures:\n' + clusterErrors.join('\n'));
       } else {
         await writeAuditLog({ action_type: 'NUCLEAR_MERGE', entity_type: 'master_shoe_products', entity_id: 'batch', previous_state: { clusters_targeted: eligible.length }, new_state: { clusters_merged: done } });
-        showToast(`☢️ Nuclear Merge complete — ${done} cluster${done > 1 ? 's' : ''} resolved`, 'success');
+        showToast(`<i data-lucide="alert-triangle"></i> Nuclear Merge complete — ${done} cluster${done > 1 ? 's' : ''} resolved`, 'success');
       }
 
       /* Full reload to get clean state */
@@ -5527,7 +5546,7 @@
         badge.style.background = '#10b981';
         container.innerHTML = `
           <div class="dup-empty">
-            <div class="dup-empty-icon">✅</div>
+            <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
             <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">No duplicates found</p>
             <p>All ${escapeHtml(String(document.title))} shoe records appear to be unique.</p>
           </div>`;
@@ -5553,7 +5572,7 @@
           const img = shoe.image_url
             ? `<img class="dup-card-img" src="${escapeHtml(shoe.image_url)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
             : '';
-          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}>👟</div>`;
+          const placeholder = `<div class="dup-card-img-placeholder" ${shoe.image_url ? 'style="display:none"' : ''}><i data-lucide="footprints"></i></div>`;
 
           const users = userCount[shoe.id] || 0;
           const deals = dealCount[shoe.id]  || 0;
@@ -5567,13 +5586,13 @@
                 <div class="dup-card-name">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
                 <div class="dup-card-price">${escapeHtml(priceStr)}</div>
                 <div class="dup-card-telemetry">
-                  <span class="dup-card-stat ${users > 0 ? 'active' : 'zero'}">👥 ${users}</span>
-                  <span class="dup-card-stat ${deals > 0 ? 'active' : 'zero'}">🏷️ ${deals}</span>
+                  <span class="dup-card-stat ${users > 0 ? 'active' : 'zero'}"><i data-lucide="users"></i> ${users}</span>
+                  <span class="dup-card-stat ${deals > 0 ? 'active' : 'zero'}"><i data-lucide="tag"></i> ${deals}</span>
                 </div>
               </div>
               <div class="dup-card-right">
                 <div class="dup-card-radio"></div>
-                ${isMaster ? '<div class="master-label">⭐ Master</div>' : ''}
+                ${isMaster ? '<div class="master-label"><i data-lucide="star"></i> Master</div>' : ''}
               </div>
             </div>`;
         }).join('');
@@ -5589,7 +5608,7 @@
             <div class="dup-group-footer">
               <p>Click a card to set it as the master record. All child data (wear logs, deals, alerts) will be migrated.</p>
               <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
-                🔀 Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+                <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
               </button>
             </div>
           </div>`;
@@ -5661,7 +5680,7 @@
       if (!masterCheck) {
         showToast(`Master record no longer exists — reload duplicates to refresh`, 'error');
         btn.disabled = false;
-        btn.textContent = '🔀 Retry merge';
+        btn.innerHTML = '<i data-lucide="shuffle"></i> Retry merge';
         return;
       }
 
@@ -5708,7 +5727,7 @@
           badge.style.background = '#10b981';
           document.getElementById('dup-list').innerHTML = `
             <div class="dup-empty">
-              <div class="dup-empty-icon">✅</div>
+              <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
               <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
               <p>Great work — the catalog is clean.</p>
             </div>`;
@@ -5716,7 +5735,7 @@
         showToast(`Merged ${successCount} duplicate${successCount > 1 ? 's' : ''} into master`, 'success');
       } else {
         btn.disabled = false;
-        btn.textContent = `🔀 Retry merge`;
+        btn.innerHTML = `<i data-lucide="shuffle"></i> Retry merge`;
         showToast(`${errors.length} merge(s) failed: ${errors[0]}`, 'error');
       }
     }
