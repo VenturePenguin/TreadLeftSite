@@ -1,0 +1,12 @@
+{
+  "name": "treadleft-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TreadLeft marketing site (static HTML, served via GitHub Pages).",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./css/tailwind.min.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

@@ -34,43 +34,21 @@
 
     <link rel="canonical" href="https://www.treadleft.app/">
     <link rel="icon" type="image/png" href="/favicon.png">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+
+    <!-- Preconnect for faster third-party loads -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+
+    <!-- Tailwind CSS (precompiled, purged & minified — see tailwind.config.js) -->
+    <link rel="stylesheet" href="/css/tailwind.min.css">
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.31.0/dist/umd/lucide.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            orange: '#f97316', // Primary
-                            navy: '#0f172a',   // Text Main
-                            slate: '#64748b',  // Text Secondary
-                            blue: '#3b82f6',   // Accents
-                            teal: '#14b8a6',   // Success
-                            light: '#f1f5f9',  // App Background
-                            card: '#ffffff',   // App Card
-                            border: '#e2e8f0', // App Border
-                        }
-                    },
-                    backgroundImage: {
-                        'dot-pattern': "radial-gradient(#cbd5e1 1px, transparent 1px)",
-                    }
-                }
-            }
-        }
-    </script>
-    
     <style>
         /* Modern Dot Background Pattern */
         .bg-dots {
@@ -296,9 +274,9 @@
                 
                 <div class="flex items-center gap-4 text-sm text-brand-slate">
                     <div class="flex -space-x-2">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar1.jpg" alt="User">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar2.jpg" alt="User">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar3.jpg" alt="User">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar1.jpg" alt="Runner avatar" width="32" height="32" decoding="async">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar2.jpg" alt="Runner avatar" width="32" height="32" decoding="async">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="/images/avatar3.jpg" alt="Runner avatar" width="32" height="32" decoding="async">
                     </div>
                     <p>Free to download. Trusted by runners.</p>
                 </div>
@@ -316,7 +294,10 @@
                         <!-- Dynamic Island -->
                         <div class="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20"></div>
                         <!-- Screen image -->
-                        <img src="/images/hero-mockup.png" alt="TreadLeft app screenshot" class="w-full h-full object-cover" onerror="this.parentElement.classList.add('bg-slate-900'); this.style.display='none';">
+                        <picture>
+                            <source srcset="/images/hero-mockup.webp" type="image/webp">
+                            <img src="/images/hero-mockup.png" alt="TreadLeft app screenshot" class="w-full h-full object-cover" decoding="async" onerror="this.parentElement.classList.add('bg-slate-900'); this.style.display='none';">
+                        </picture>
                     </div>
                 </div>
             </div>
@@ -408,7 +389,10 @@
                 <!-- FULL WIDTH: Passive Sync -->
                 <div class="col-span-1 md:col-span-2 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
                     <div class="aspect-[21/4] bg-slate-800 rounded-xl mb-6 overflow-hidden p-8">
-                        <img src="/images/bento-sync.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/bento-sync.webp" type="image/webp">
+                            <img src="/images/bento-sync.png" alt="Passive Sync screenshot" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                     <div>
                         <h3 class="text-2xl font-bold text-white mb-3">Passive Sync</h3>
@@ -419,7 +403,10 @@
                 <!-- SQUARE: Injury Prevention -->
                 <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
                     <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
-                        <img src="/images/bento-injury.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/bento-injury.webp" type="image/webp">
+                            <img src="/images/bento-injury.png" alt="Injury Prevention screenshot" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Injury Prevention</h3>
@@ -430,7 +417,10 @@
                 <!-- SQUARE: Run History -->
                 <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-1 group cursor-default hover:-translate-y-1 transition duration-300">
                     <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
-                        <img src="/images/bento-history.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/bento-history.webp" type="image/webp">
+                            <img src="/images/bento-history.png" alt="Complete Run History screenshot" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Complete Run History</h3>
@@ -441,7 +431,10 @@
                 <!-- SQUARE: Shoe Deals -->
                 <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-2 group cursor-default hover:-translate-y-1 transition duration-300">
                     <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
-                        <img src="/images/bento-deals.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/bento-deals.webp" type="image/webp">
+                            <img src="/images/bento-deals.png" alt="Shoe Deals screenshot" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Shoe Deals</h3>
@@ -452,7 +445,10 @@
                 <!-- SQUARE: Smart Price Finder -->
                 <div class="col-span-1 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl min-h-[340px] flex flex-col justify-between reveal reveal-delay-3 group cursor-default hover:-translate-y-1 transition duration-300">
                     <div class="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden p-6">
-                        <img src="/images/bento-prices.png" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/bento-prices.webp" type="image/webp">
+                            <img src="/images/bento-prices.png" alt="Smart Price Finder screenshot" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Smart Price Finder</h3>
@@ -476,7 +472,10 @@
             <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-24 reveal">
                 <div class="order-1 lg:order-1">
                     <div class="aspect-[4/5] w-full max-w-md mx-auto bg-slate-100 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
-                        <img src="/images/feature-ai-coach.png" alt="AI Running Coach" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/feature-ai-coach.webp" type="image/webp">
+                            <img src="/images/feature-ai-coach.png" alt="AI Running Coach" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                 </div>
                 <div class="order-2 lg:order-2 space-y-6 max-w-lg">
@@ -505,7 +504,10 @@
                 </div>
                 <div class="order-1 lg:order-2">
                     <div class="aspect-[4/5] w-full max-w-md mx-auto bg-slate-100 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
-                        <img src="/images/feature-rotation.png" alt="Shoe Rotation Optimizer" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <picture>
+                            <source srcset="/images/feature-rotation.webp" type="image/webp">
+                            <img src="/images/feature-rotation.png" alt="Shoe Rotation Optimizer" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                        </picture>
                     </div>
                 </div>
             </div>

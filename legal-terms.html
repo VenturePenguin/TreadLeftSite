@@ -17,42 +17,15 @@
     <link rel="canonical" href="https://www.treadleft.app/legal-terms.html">
     <link rel="icon" type="image/png" href="/favicon.png">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <!-- Tailwind CSS (precompiled, purged & minified — see tailwind.config.js) -->
+    <link rel="stylesheet" href="/css/tailwind.min.css">
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.31.0/dist/umd/lucide.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            orange: '#f97316', // Primary
-                            navy: '#0f172a',   // Text Main
-                            slate: '#64748b',  // Text Secondary
-                            blue: '#3b82f6',   // Accents
-                            teal: '#14b8a6',   // Success
-                            light: '#f1f5f9',  // App Background
-                            card: '#ffffff',   // App Card
-                            border: '#e2e8f0', // App Border
-                        }
-                    },
-                    backgroundImage: {
-                        'dot-pattern': "radial-gradient(#cbd5e1 1px, transparent 1px)",
-                    }
-                }
-            }
-        }
-    </script>
-    
     <style>
         /* Modern Dot Background Pattern */
         .bg-dots {
