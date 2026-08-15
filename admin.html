@@ -2962,12 +2962,26 @@
   <script>
     // ── Icons: render Lucide icons on load, and auto-render any injected
     //    later via innerHTML (dynamic tables/cards/buttons throughout this
-    //    dashboard use data-lucide tags). ──
+    //    dashboard use data-lucide tags). Disconnect while converting so
+    //    the conversion's own DOM mutations don't re-trigger the observer
+    //    (avoids an infinite render loop). ──
     (function() {
-      const renderIcons = () => { if (window.lucide) lucide.createIcons(); };
+      const target = document.body || document.documentElement;
+      let pending = false;
+      const renderIcons = () => {
+        if (!window.lucide) return;
+        observer.disconnect();
+        lucide.createIcons();
+        observer.observe(target, { childList: true, subtree: true });
+      };
+      const scheduleRender = () => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => { pending = false; renderIcons(); });
+      };
       document.addEventListener('DOMContentLoaded', renderIcons);
-      const observer = new MutationObserver(renderIcons);
-      observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+      const observer = new MutationObserver(scheduleRender);
+      observer.observe(target, { childList: true, subtree: true });
     })();
 
     // ── Dark Mode ──
