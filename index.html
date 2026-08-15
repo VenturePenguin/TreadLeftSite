@@ -32,7 +32,7 @@
     <meta name="twitter:description" content="Track shoe mileage automatically via Strava. Get AI coaching, true wear tracking, and injury-risk analytics. Find the best deals on replacements.">
     <meta name="twitter:image" content="https://treadleft.app/favicon.png">
 
-    <link rel="canonical" href="https://treadleft.app/">
+    <link rel="canonical" href="https://www.treadleft.app/">
     <link rel="icon" type="image/png" href="/favicon.png">
     
     <!-- Tailwind CSS -->
@@ -116,6 +116,70 @@
             transform: translateY(0);
         }
     </style>
+
+    <!-- Structured Data: MobileApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MobileApplication",
+        "name": "TreadLeft",
+        "operatingSystem": "iOS, Android",
+        "applicationCategory": "HealthApplication",
+        "description": "TreadLeft automatically tracks your running shoe mileage via Strava and Apple Health. Get AI coaching, true wear tracking, injury-risk analytics, and price-drop alerts before dead foam causes injury.",
+        "url": "https://www.treadleft.app/",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "downloadUrl": [
+            "https://apps.apple.com/app/treadleft/id6756678478",
+            "https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp"
+        ]
+    }
+    </script>
+
+    <!-- Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Do I have to run with my phone?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Not at all. TreadLeft syncs completely in the background. Whether you record on a Garmin, an Apple Watch, directly in Strava, or sync from Apple Health, your runs will automatically appear on your dashboard."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does Strava sync work?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Connect once to Strava and we'll automatically sync all your running activities. Every run you record on any device (Garmin, Apple Watch, phone) that appears in Strava will update your shoe mileage in real-time."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What if I rotate multiple pairs of shoes?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "TreadLeft is built for shoe rotations. It acts as your digital armory. You can easily switch between your daily trainers, speed shoes, and trail runners, assigning specific mileage to the exact gear you wore that day."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the app know my shoes are \"dead\"?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "We use the manufacturer's maximum recommended lifespan (usually between 500km\u2013800km) to track your gear's durability percentage, alerting you the moment the EVA foam enters the critical zone."
+                }
+            }
+        ]
+    }
+    </script>
 </head>
 <body class="bg-brand-light text-brand-navy font-sans antialiased selection:bg-brand-orange selection:text-white">
 

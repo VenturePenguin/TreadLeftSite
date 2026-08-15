@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /admin-panel.html
+Disallow: /admin-v3.html
+Disallow: /manage.html
+Disallow: /panel.html
+Disallow: /shoe-admin.html
+Disallow: /test.html
+Disallow: /strava-callback.html
+Disallow: /privacy.html
 
 Sitemap: https://www.treadleft.app/sitemap.xml
