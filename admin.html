@@ -1977,7 +1977,6 @@
       <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
         <span class="nav-icon"><i data-lucide="search"></i></span>
         Discovery Queue
-        <span class="nav-badge" id="sidebar-pending-count">0</span>
       </button>
 
       <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
@@ -2064,12 +2063,12 @@
               </div>
               <div class="triage-card-cta">Review <i data-lucide="arrow-right"></i></div>
             </div>
-            <div class="triage-card triage-card--alert" onclick="navigate('platform-pulse'); setTimeout(()=>document.getElementById('pulse-orphans').closest('.pulse-card').scrollIntoView({behavior:'smooth'}),300)">
-              <div class="triage-card-icon"><i data-lucide="footprints"></i></div>
+            <div class="triage-card triage-card--alert" onclick="navigate('platform-pulse'); setTimeout(()=>document.getElementById('pulse-duplicates').closest('.pulse-card').scrollIntoView({behavior:'smooth'}),300)">
+              <div class="triage-card-icon"><i data-lucide="copy"></i></div>
               <div class="triage-card-body">
-                <div class="triage-card-value" id="triage-orphan-count">—</div>
-                <div class="triage-card-label">Orphan Activities</div>
-                <div class="triage-card-sub">Runs not assigned to a shoe</div>
+                <div class="triage-card-value" id="triage-dup-count">—</div>
+                <div class="triage-card-label">Duplicate Detection</div>
+                <div class="triage-card-sub">Suspected duplicate shoe models</div>
               </div>
               <div class="triage-card-cta">View <i data-lucide="arrow-right"></i></div>
             </div>
@@ -2157,10 +2156,10 @@
             <div class="pulse-label">7-Day Retention</div>
             <div class="pulse-sub">New users who synced again</div>
           </div>
-          <div class="pulse-card" style="--accent:#f59e0b">
-            <div class="pulse-value" id="pulse-orphans">—</div>
-            <div class="pulse-label">Orphan Activities</div>
-            <div class="pulse-sub">Runs without shoes assigned</div>
+          <div class="pulse-card" style="--accent:#7c3aed">
+            <div class="pulse-value" id="pulse-duplicates">—</div>
+            <div class="pulse-label">Duplicate Detection</div>
+            <div class="pulse-sub">Suspected duplicate shoe models</div>
           </div>
           <div class="pulse-card" style="--accent:#3b82f6">
             <div class="pulse-value" id="pulse-km-7d">—</div>
@@ -3109,7 +3108,6 @@
         const fmt = n => Number(n).toLocaleString();
         const pct = (a, b) => b > 0 ? Math.round((a / b) * 100) + '%' : '—%';
 
-        document.getElementById('triage-orphan-count').textContent  = fmt(t.orphan_activities || 0);
 
         document.getElementById('pulse-total-users').textContent    = fmt(t.total_users);
         document.getElementById('pulse-active-lockers').textContent = fmt(t.total_active_lockers);
@@ -3157,7 +3155,24 @@
 
         // ── NEW: Engagement & Activity Quality ──
         document.getElementById('pulse-retention-7d').textContent  = (t.retention_7d || 0) + '%';
-        document.getElementById('pulse-orphans').textContent       = fmt(t.orphan_activities || 0);
+        // Duplicate detection count (computed from master catalog)
+        (async () => {
+          try {
+            const { data: shoes, error } = await getSupabase()
+              .from('master_shoe_products')
+              .select('id, brand_name, model_name, image_url')
+              .order('brand_name')
+              .order('model_name');
+            if (error) throw error;
+            const dupCount = groupDuplicates(shoes || []).length;
+            document.getElementById('triage-dup-count').textContent = fmt(dupCount);
+            document.getElementById('pulse-duplicates').textContent = fmt(dupCount);
+          } catch (err) {
+            console.error('Dup count load error:', err);
+            document.getElementById('triage-dup-count').textContent = '—';
+            document.getElementById('pulse-duplicates').textContent = '—';
+          }
+        })();
         document.getElementById('pulse-km-7d').textContent         = (t.total_km_7d || 0) + 'km';
         document.getElementById('pulse-avg-distance').textContent  = (t.avg_distance_per_run || 0) + 'km';
 
@@ -3245,7 +3260,6 @@
       document.getElementById('stat-medium').textContent  = medium;
       document.getElementById('stat-low').textContent     = low;
       document.getElementById('pending-count').textContent         = `${total} pending`;
-      document.getElementById('sidebar-pending-count').textContent = total;
     }
 
     /* ── DISCOVERY QUEUE — RENDER ── */
@@ -3490,7 +3504,6 @@
       document.getElementById('stat-medium').textContent         = medium;
       document.getElementById('stat-low').textContent            = low;
       document.getElementById('pending-count').textContent       = `${total} pending`;
-      document.getElementById('sidebar-pending-count').textContent = total;
     }
 
     function renderAliasQueue() {
