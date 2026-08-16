@@ -2063,14 +2063,14 @@
               </div>
               <div class="triage-card-cta">Review <i data-lucide="arrow-right"></i></div>
             </div>
-            <div class="triage-card triage-card--alert" onclick="navigate('platform-pulse'); setTimeout(()=>document.getElementById('pulse-duplicates').closest('.pulse-card').scrollIntoView({behavior:'smooth'}),300)">
+            <div class="triage-card triage-card--alert" onclick="navigate('duplicate-resolver')">
               <div class="triage-card-icon"><i data-lucide="copy"></i></div>
               <div class="triage-card-body">
                 <div class="triage-card-value" id="triage-dup-count">—</div>
                 <div class="triage-card-label">Duplicate Detection</div>
                 <div class="triage-card-sub">Suspected duplicate shoe models</div>
               </div>
-              <div class="triage-card-cta">View <i data-lucide="arrow-right"></i></div>
+              <div class="triage-card-cta">Review <i data-lucide="arrow-right"></i></div>
             </div>
           </div>
         </div>
@@ -2156,7 +2156,7 @@
             <div class="pulse-label">7-Day Retention</div>
             <div class="pulse-sub">New users who synced again</div>
           </div>
-          <div class="pulse-card" style="--accent:#7c3aed">
+          <div class="pulse-card" style="--accent:#7c3aed;cursor:pointer" onclick="navigate('duplicate-resolver')">
             <div class="pulse-value" id="pulse-duplicates">—</div>
             <div class="pulse-label">Duplicate Detection</div>
             <div class="pulse-sub">Suspected duplicate shoe models</div>
