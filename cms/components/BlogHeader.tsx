@@ -7,7 +7,7 @@ export default function BlogHeader() {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Link href="/" className="flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-brand-navy">
           <Image src="/treadleft-logo.svg" alt="TreadLeft" width={28} height={34} className="h-8 w-auto" />
-          TreadLeft Journal
+          TreadLeft Blog
         </Link>
         <a
           href="https://treadleft.app"

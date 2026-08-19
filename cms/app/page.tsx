@@ -12,10 +12,16 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
+function getFirstImage(html: string | null): string | null {
+  if (!html) return null;
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match ? match[1] : null;
+}
+
 export default async function BlogIndexPage() {
   const { data: posts, error } = await supabase
     .from('blog_posts')
-    .select('id, title, slug, excerpt, published_at')
+    .select('id, title, slug, excerpt, published_at, content')
     .eq('status', 'published')
     .order('published_at', { ascending: false });
 
@@ -35,7 +41,7 @@ export default async function BlogIndexPage() {
 
       <section className="py-16 text-center">
         <div className="mx-auto max-w-3xl px-4">
-          <h1 className="text-4xl font-extrabold tracking-tight text-brand-navy md:text-5xl">TreadLeft Journal</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight text-brand-navy md:text-5xl">TreadLeft Blog</h1>
           <p className="mt-3 text-lg text-brand-slate">
             Running tips, shoe guides, and training insights.
           </p>
@@ -47,11 +53,24 @@ export default async function BlogIndexPage() {
           <p className="text-center text-brand-slate">No published posts yet.</p>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post, index) => (
+            {posts.map((post, index) => {
+              const image = getFirstImage(post.content);
+              return (
               <article
                 key={post.id}
-                className="flex h-full flex-col rounded-2xl border border-brand-border bg-white p-8 shadow-sm transition hover:shadow-md"
+                className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition hover:shadow-md"
               >
+                {image && (
+                  <div className="aspect-[16/9] w-full overflow-hidden bg-slate-100">
+                    <img
+                      src={image}
+                      alt={post.title}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div className="flex h-full flex-col p-8">
                 {index === 0 && (
                   <span className="mb-3 inline-block rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-orange">
                     Latest
@@ -80,8 +99,10 @@ export default async function BlogIndexPage() {
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
+                </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
