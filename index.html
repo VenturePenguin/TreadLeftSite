@@ -610,18 +610,23 @@
             </div>
 
             <div id="journal-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <article class="journal-card group h-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 hover:-translate-y-1 transition duration-300 flex flex-col">
-                    <span class="inline-block px-2 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-4">Latest</span>
-                    <h3 class="journal-title text-2xl font-bold text-brand-navy mb-3 group-hover:text-brand-orange transition line-clamp-2">The Invisible Danger: How Uneven Tread Wear Alters Your Biomechanics</h3>
-                    <p class="journal-excerpt text-brand-slate leading-relaxed mb-6 line-clamp-3 flex-1">Discover how uneven running shoe wear alters your biomechanics and causes kinetic chain injuries. Learn how to spot a structurally compromised midsole and protect your knees and Achilles before the pain starts.</p>
-                    <div class="mt-auto flex items-center justify-between">
-                        <div class="flex items-center gap-2 text-sm text-slate-400">
-                            <i data-lucide="calendar" class="w-4 h-4" aria-hidden="true"></i>
-                            <span class="journal-date">13/08/2026</span>
+                <article class="journal-card group h-full bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:-translate-y-1 transition duration-300 flex flex-col">
+                    <div class="aspect-[16/9] w-full overflow-hidden bg-slate-100">
+                        <img src="https://vpeszlbrrqwsmnhqdtpf.supabase.co/storage/v1/object/public/blog-assets/1787143452698-xtil2rgi9n.jpg" alt="The Invisible Danger: How Uneven Tread Wear Alters Your Biomechanics" class="h-full w-full object-cover" loading="lazy">
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <span class="inline-block px-2 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-4">Latest</span>
+                        <h3 class="journal-title text-2xl font-bold text-brand-navy mb-3 group-hover:text-brand-orange transition line-clamp-2">The Invisible Danger: How Uneven Tread Wear Alters Your Biomechanics</h3>
+                        <p class="journal-excerpt text-brand-slate leading-relaxed mb-6 line-clamp-3 flex-1">Discover how uneven running shoe wear alters your biomechanics and causes kinetic chain injuries. Learn how to spot a structurally compromised midsole and protect your knees and Achilles before the pain starts.</p>
+                        <div class="mt-auto flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm text-slate-400">
+                                <i data-lucide="calendar" class="w-4 h-4" aria-hidden="true"></i>
+                                <span class="journal-date">13/08/2026</span>
+                            </div>
+                            <a href="https://treadleft-cms.netlify.app/posts/the-invisible-danger-how-uneven-tread-wear-alters-your-biomechanics" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition" data-cta="blog_click" data-cta-location="journal_card">
+                                Read article <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
+                            </a>
                         </div>
-                        <a href="https://treadleft-cms.netlify.app/posts/the-invisible-danger-how-uneven-tread-wear-alters-your-biomechanics" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition" data-cta="blog_click" data-cta-location="journal_card">
-                            Read article <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
-                        </a>
                     </div>
                 </article>
             </div>
@@ -888,12 +893,18 @@
             const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzY1NDQsImV4cCI6MjA4MDM1MjU0NH0.0E7C-mQZDRtzOIP-_MsQlpAt8RMo7IM7ZWUmZhRCELg';
 
+            function getFirstImage(html) {
+                if (!html) return null;
+                const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+                return match ? match[1] : null;
+            }
+
             async function loadPosts() {
                 const grid = document.getElementById('journal-grid');
                 if (!grid) return;
 
                 try {
-                    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?status=eq.published&order=published_at.desc&limit=3`, {
+                    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?status=eq.published&order=published_at.desc&limit=3&select=title,slug,excerpt,published_at,content`, {
                         headers: {
                             apikey: SUPABASE_ANON_KEY,
                             Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -907,11 +918,17 @@
                     grid.innerHTML = '';
                     posts.forEach((post, index) => {
                         const article = document.createElement('article');
-                        article.className = 'journal-card group h-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 hover:-translate-y-1 transition duration-300 flex flex-col';
+                        article.className = 'journal-card group h-full bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:-translate-y-1 transition duration-300 flex flex-col';
                         const badge = index === 0 ? '<span class="inline-block px-2 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-4">Latest</span>' : '';
                         const date = post.published_at ? new Date(post.published_at).toLocaleDateString('en-GB') : '';
+                        const image = getFirstImage(post.content);
+                        const imageHtml = image
+                            ? '<div class="aspect-[16/9] w-full overflow-hidden bg-slate-100"><img src="' + image + '" alt="' + post.title + '" class="h-full w-full object-cover" loading="lazy"></div>'
+                            : '';
 
                         article.innerHTML = [
+                            imageHtml,
+                            '<div class="p-8 flex flex-col flex-1">',
                             badge,
                             '<h3 class="journal-title text-2xl font-bold text-brand-navy mb-3 group-hover:text-brand-orange transition line-clamp-2">' + post.title + '</h3>',
                             '<p class="journal-excerpt text-brand-slate leading-relaxed mb-6 line-clamp-3 flex-1">' + (post.excerpt || '') + '</p>',
@@ -923,6 +940,7 @@
                             '    <a href="https://treadleft-cms.netlify.app/posts/' + post.slug + '" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition" data-cta="blog_click" data-cta-location="journal_card">',
                             '        Read article <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>',
                             '    </a>',
+                            '</div>',
                             '</div>'
                         ].join('');
 
