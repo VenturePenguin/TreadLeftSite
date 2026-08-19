@@ -43,7 +43,7 @@ export default async function BlogIndexPage() {
         <div className="mx-auto max-w-3xl px-4">
           <h1 className="text-4xl font-extrabold tracking-tight text-brand-navy md:text-5xl">TreadLeft Blog</h1>
           <p className="mt-3 text-lg text-brand-slate">
-            Running tips, shoe guides, and training insights.
+            Running tips, shoe guides, and training insights from the TreadLeft team.
           </p>
         </div>
       </section>
