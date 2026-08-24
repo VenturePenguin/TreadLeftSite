@@ -1944,6 +1944,125 @@
     }
     .strava-dot.on  { background: #fc4c02; }
     .strava-dot.off { background: #475569; }
+
+    /* Merge Preview Modal */
+    .merge-preview-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .merge-preview-overlay.open { display: flex; }
+    .merge-preview-modal {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+    .merge-preview-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .merge-preview-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .merge-preview-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+    }
+    .merge-preview-body {
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .merge-preview-summary {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #e2e8f0;
+    }
+    .merge-preview-summary p {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #475569;
+    }
+    .merge-preview-summary p:last-child { margin-bottom: 0; }
+    .merge-preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .merge-preview-table th,
+    .merge-preview-table td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .merge-preview-table th {
+      font-weight: 600;
+      color: #64748b;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .merge-preview-table td { color: #334155; }
+    .merge-preview-table tr:last-child td { border-bottom: none; }
+    .merge-preview-master td { background: #f0fdf4; font-weight: 600; }
+    .merge-preview-count { text-align: center; }
+    .merge-preview-count.zero { color: #94a3b8; }
+    .merge-preview-actions {
+      padding: 16px 24px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .merge-preview-actions button {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+    .merge-preview-cancel { background: #f1f5f9; color: #475569; }
+    .merge-preview-cancel:hover { background: #e2e8f0; }
+    .merge-preview-confirm { background: #1e293b; color: #fff; }
+    .merge-preview-confirm:hover { background: #0f172a; }
+    .merge-preview-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+    .merge-preview-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      gap: 12px;
+      color: #64748b;
+      font-size: 14px;
+    }
+    .merge-preview-error {
+      color: #ef4444;
+      font-size: 14px;
+      padding: 24px;
+      text-align: center;
+    }
     </style>
 </head>
 <body>
@@ -4099,7 +4218,7 @@
                 <button class="ignore-btn" id="ignore-btn-${key}" onclick="ignoreCluster('${key}')">
                   <i data-lucide="x-circle"></i> Not a duplicate
                 </button>
-                <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                <button class="merge-btn" id="merge-btn-${key}" onclick="previewMerge('${key}')">
                   <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
                 </button>
               </div>
@@ -5360,6 +5479,7 @@
 
     /* State: groupKey <i data-lucide="arrow-right"></i> { shoes[], masterId } */
     const dupState = {};
+    let currentPreviewKey = null;
     const IGNORED_CLUSTERS_KEY = 'treadleft_ignored_dup_clusters';
 
     function getClusterKey(group) {
@@ -5741,7 +5861,7 @@
                 <button class="ignore-btn" id="ignore-btn-${key}" onclick="ignoreCluster('${key}')">
                   <i data-lucide="x-circle"></i> Not a duplicate
                 </button>
-                <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                <button class="merge-btn" id="merge-btn-${key}" onclick="previewMerge('${key}')">
                   <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
                 </button>
               </div>
@@ -5752,6 +5872,113 @@
       /* Update Nuclear Merge button count now that dupState is fully populated */
       updateNukeBtnState();
       updateIgnoredInfo();
+    }
+
+    /* ── Merge Preview ── */
+
+    async function getMergeImpact(productIds) {
+      const ids = productIds.filter(Boolean);
+      if (ids.length === 0) return {};
+      const sb = getSupabase();
+      const [dealsRes, gearRes, alertsRes] = await Promise.all([
+        sb.from('shoe_deals').select('master_product_id').in('master_product_id', ids),
+        sb.from('user_gear_items').select('master_product_id').in('master_product_id', ids),
+        sb.from('user_price_alerts').select('master_product_id').in('master_product_id', ids),
+      ]);
+      if (dealsRes.error) throw dealsRes.error;
+      if (gearRes.error) throw gearRes.error;
+      if (alertsRes.error) throw alertsRes.error;
+
+      const impact = {};
+      ids.forEach(id => { impact[id] = { deals: 0, gear: 0, alerts: 0 }; });
+      (dealsRes.data || []).forEach(r => { if (impact[r.master_product_id] !== undefined) impact[r.master_product_id].deals++; });
+      (gearRes.data || []).forEach(r => { if (impact[r.master_product_id] !== undefined) impact[r.master_product_id].gear++; });
+      (alertsRes.data || []).forEach(r => { if (impact[r.master_product_id] !== undefined) impact[r.master_product_id].alerts++; });
+      return impact;
+    }
+
+    async function previewMerge(groupKey) {
+      const state = dupState[groupKey];
+      if (!state) return;
+      currentPreviewKey = groupKey;
+
+      const master = state.shoes.find(s => s.id === state.masterId);
+      const duplicates = state.shoes.filter(s => s.id !== state.masterId);
+      const allIds = state.shoes.map(s => s.id);
+
+      const body = document.getElementById('merge-preview-body');
+      const confirmBtn = document.getElementById('merge-preview-confirm');
+      body.innerHTML = `
+        <div class="merge-preview-loading">
+          <div class="spinner"></div>
+          <span>Loading merge impact…</span>
+        </div>`;
+      confirmBtn.disabled = true;
+      document.getElementById('merge-preview-overlay').classList.add('open');
+
+      try {
+        const impact = await getMergeImpact(allIds);
+        const totalMigrated = duplicates.reduce((sum, d) => {
+          const i = impact[d.id] || { deals: 0, gear: 0, alerts: 0 };
+          return sum + i.deals + i.gear + i.alerts;
+        }, 0);
+
+        const rows = state.shoes.map((shoe, idx) => {
+          const isMaster = shoe.id === state.masterId;
+          const i = impact[shoe.id] || { deals: 0, gear: 0, alerts: 0 };
+          return `
+            <tr class="${isMaster ? 'merge-preview-master' : ''}">
+              <td>
+                <div style="font-weight:600;color:#1e293b;">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px;">${isMaster ? 'Master (kept)' : 'Will be deleted'}</div>
+              </td>
+              <td class="merge-preview-count ${i.deals === 0 ? 'zero' : ''}">${i.deals}</td>
+              <td class="merge-preview-count ${i.gear === 0 ? 'zero' : ''}">${i.gear}</td>
+              <td class="merge-preview-count ${i.alerts === 0 ? 'zero' : ''}">${i.alerts}</td>
+            </tr>`;
+        }).join('');
+
+        body.innerHTML = `
+          <div class="merge-preview-summary">
+            <p><strong>Master:</strong> ${escapeHtml(master ? `${master.brand_name} ${master.model_name}` : 'Selected master')}</p>
+            <p><strong>Duplicates to remove:</strong> ${duplicates.length}</p>
+            <p><strong>Linked records to migrate:</strong> ${totalMigrated}</p>
+            <p style="font-size:12px;color:#64748b;margin-top:8px;">Deals, user gear and price alerts pointing at the duplicate products will be repointed to the master.</p>
+          </div>
+          <table class="merge-preview-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th class="merge-preview-count">Deals</th>
+                <th class="merge-preview-count">User Gear</th>
+                <th class="merge-preview-count">Alerts</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>`;
+        confirmBtn.disabled = false;
+        if (window.lucide && lucide.createIcons) lucide.createIcons();
+      } catch (err) {
+        console.error('Merge preview error', err);
+        body.innerHTML = `<div class="merge-preview-error">Error loading merge preview: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function closeMergePreviewModal() {
+      document.getElementById('merge-preview-overlay').classList.remove('open');
+      currentPreviewKey = null;
+    }
+
+    function closeMergePreviewOnOverlay(event) {
+      if (event.target === document.getElementById('merge-preview-overlay')) closeMergePreviewModal();
+    }
+
+    function confirmMergeFromPreview() {
+      if (!currentPreviewKey) return;
+      closeMergePreviewModal();
+      mergeDuplicates(currentPreviewKey);
     }
 
     /* ── Interaction ── */
@@ -5797,8 +6024,6 @@
       const masterLabel = masterName
         ? `${masterName.brand_name} ${masterName.model_name}`
         : state.masterId;
-
-      if (!confirm(`Keep "${masterLabel}" as master and delete ${duplicates.length} duplicate(s)? This cannot be undone.`)) return;
 
       const btn = document.getElementById(`merge-btn-${groupKey}`);
       btn.disabled = true;
@@ -5876,5 +6101,29 @@
       }
     }
   </script>
+
+  <!-- Merge Preview Modal -->
+  <div class="merge-preview-overlay" id="merge-preview-overlay" onclick="closeMergePreviewOnOverlay(event)">
+    <div class="merge-preview-modal">
+      <div class="merge-preview-header">
+        <h3><i data-lucide="eye"></i> Merge Preview</h3>
+        <button class="merge-preview-close" onclick="closeMergePreviewModal()" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="merge-preview-body" id="merge-preview-body">
+        <div class="merge-preview-loading">
+          <div class="spinner"></div>
+          <span>Loading merge impact…</span>
+        </div>
+      </div>
+      <div class="merge-preview-actions">
+        <button class="merge-preview-cancel" onclick="closeMergePreviewModal()">Cancel</button>
+        <button class="merge-preview-confirm" id="merge-preview-confirm" onclick="confirmMergeFromPreview()">
+          <i data-lucide="shuffle"></i> Merge Now
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
