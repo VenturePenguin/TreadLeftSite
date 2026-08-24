@@ -2063,6 +2063,71 @@
       padding: 24px;
       text-align: center;
     }
+
+    /* Bulk merge action bar */
+    .dup-bulk-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 16px;
+      margin: 0 0 16px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .dup-bulk-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .dup-bulk-info span { font-weight: 600; }
+    .dup-bulk-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-family: inherit;
+    }
+    .dup-bulk-link:hover { color: #1e293b; }
+    .dup-bulk-merge-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      background: #7f1d1d;
+      color: #fecaca;
+      border: 1px solid #991b1b;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .dup-bulk-merge-btn:hover { background: #6a1818; }
+    .dup-bulk-merge-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .dup-bulk-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+    }
+    .dup-bulk-checkbox input {
+      width: 16px;
+      height: 16px;
+      accent-color: #1e293b;
+      cursor: pointer;
+    }
     </style>
 </head>
 <body>
@@ -2454,6 +2519,17 @@
             <button class="nuke-btn" id="nuke-btn" onclick="executeNuclearMerge()" disabled title="Auto-merges clusters where all non-master variants have 0 users and 0 deals"><i data-lucide="alert-triangle"></i> Nuclear Merge (0 safe)</button>
             <button class="dup-refresh-btn" onclick="loadDuplicates()"><i data-lucide="refresh-cw"></i> Refresh</button>
           </div>
+        </div>
+
+        <div class="dup-bulk-bar" id="dup-bulk-bar" style="display:none;">
+          <div class="dup-bulk-info">
+            <span id="dup-bulk-count">0 selected</span>
+            <button class="dup-bulk-link" onclick="selectAllClusters()">Select all</button>
+            <button class="dup-bulk-link" onclick="clearClusterSelection()">Clear</button>
+          </div>
+          <button class="dup-bulk-merge-btn" id="dup-bulk-merge-btn" onclick="bulkMergeClusters()">
+            <i data-lucide="shuffle"></i> Merge selected
+          </button>
         </div>
 
         <div id="dup-list">
@@ -4215,6 +4291,10 @@
             <div class="dup-group-footer">
               <p>AI-identified semantic duplicate. Click a card to set it as the master record.</p>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <label class="dup-bulk-checkbox" onclick="event.stopPropagation();">
+                  <input type="checkbox" id="dup-select-${key}" onclick="toggleClusterSelection('${key}', event)">
+                  <span>Select</span>
+                </label>
                 <button class="ignore-btn" id="ignore-btn-${key}" onclick="ignoreCluster('${key}')">
                   <i data-lucide="x-circle"></i> Not a duplicate
                 </button>
@@ -4229,6 +4309,7 @@
       container.innerHTML = headerHtml + clustersHtml;
       updateNukeBtnState();
       updateIgnoredInfo();
+      updateBulkBar();
     }
 
     /* ═══════════════════════════════════════════════════
@@ -5480,6 +5561,7 @@
     /* State: groupKey <i data-lucide="arrow-right"></i> { shoes[], masterId } */
     const dupState = {};
     let currentPreviewKey = null;
+    const selectedClusters = new Set();
     const IGNORED_CLUSTERS_KEY = 'treadleft_ignored_dup_clusters';
 
     function getClusterKey(group) {
@@ -5534,8 +5616,10 @@
         setTimeout(() => el.remove(), 350);
       }
       delete dupState[groupKey];
+      selectedClusters.delete(groupKey);
       updateNukeBtnState();
       updateIgnoredInfo();
+      updateBulkBar();
 
       const remaining = Object.keys(dupState).length;
       const badge = document.getElementById('dup-group-count');
@@ -5556,6 +5640,60 @@
       localStorage.removeItem(IGNORED_CLUSTERS_KEY);
       loadDuplicates();
       showToast('Ignored clusters reset', 'success');
+    }
+
+    /* ── Bulk cluster selection ── */
+
+    function syncClusterCheckboxes() {
+      document.querySelectorAll('[id^="dup-select-"]').forEach(cb => {
+        const key = cb.id.replace('dup-select-', '');
+        cb.checked = selectedClusters.has(key);
+      });
+    }
+
+    function toggleClusterSelection(groupKey, event) {
+      if (event) event.stopPropagation();
+      const cb = document.getElementById(`dup-select-${groupKey}`);
+      if (selectedClusters.has(groupKey)) {
+        selectedClusters.delete(groupKey);
+        if (cb) cb.checked = false;
+      } else {
+        selectedClusters.add(groupKey);
+        if (cb) cb.checked = true;
+      }
+      updateBulkBar();
+    }
+
+    function selectAllClusters() {
+      Object.keys(dupState).forEach(key => selectedClusters.add(key));
+      syncClusterCheckboxes();
+      updateBulkBar();
+    }
+
+    function clearClusterSelection() {
+      selectedClusters.clear();
+      syncClusterCheckboxes();
+      updateBulkBar();
+    }
+
+    function updateBulkBar() {
+      Array.from(selectedClusters).forEach(key => {
+        if (!dupState[key]) selectedClusters.delete(key);
+      });
+      const bar = document.getElementById('dup-bulk-bar');
+      const countSpan = document.getElementById('dup-bulk-count');
+      const btn = document.getElementById('dup-bulk-merge-btn');
+      const count = selectedClusters.size;
+      if (countSpan) countSpan.textContent = `${count} cluster${count === 1 ? '' : 's'} selected`;
+      if (btn) btn.disabled = count === 0;
+      if (bar) bar.style.display = count > 0 ? 'flex' : 'none';
+      syncClusterCheckboxes();
+    }
+
+    function pruneClusterSelection() {
+      Array.from(selectedClusters).forEach(key => {
+        if (!dupState[key]) selectedClusters.delete(key);
+      });
     }
     /* Cached telemetry for Nuclear Merge */
     let _nukeUserCount = {};
@@ -5858,6 +5996,10 @@
             <div class="dup-group-footer">
               <p>Click a card to set it as the master record. All child data (wear logs, deals, alerts) will be migrated.</p>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <label class="dup-bulk-checkbox" onclick="event.stopPropagation();">
+                  <input type="checkbox" id="dup-select-${key}" onclick="toggleClusterSelection('${key}', event)">
+                  <span>Select</span>
+                </label>
                 <button class="ignore-btn" id="ignore-btn-${key}" onclick="ignoreCluster('${key}')">
                   <i data-lucide="x-circle"></i> Not a duplicate
                 </button>
@@ -5872,6 +6014,7 @@
       /* Update Nuclear Merge button count now that dupState is fully populated */
       updateNukeBtnState();
       updateIgnoredInfo();
+      updateBulkBar();
     }
 
     /* ── Merge Preview ── */
@@ -6013,21 +6156,13 @@
       updateNukeBtnState();
     }
 
-    async function mergeDuplicates(groupKey) {
+    /* Core merge logic: returns { successCount, errors, duplicates, masterId, shoes } */
+    async function performClusterMerge(groupKey) {
       const state = dupState[groupKey];
-      if (!state) return;
+      if (!state) return { successCount: 0, errors: ['Cluster not found'], duplicates: [], masterId: null, shoes: [] };
 
       const duplicates = state.shoes.filter(s => s.id !== state.masterId);
-      if (!duplicates.length) { showToast('No duplicates to merge', 'error'); return; }
-
-      const masterName = state.shoes.find(s => s.id === state.masterId);
-      const masterLabel = masterName
-        ? `${masterName.brand_name} ${masterName.model_name}`
-        : state.masterId;
-
-      const btn = document.getElementById(`merge-btn-${groupKey}`);
-      btn.disabled = true;
-      btn.textContent = '⏳ Merging…';
+      if (!duplicates.length) return { successCount: 0, errors: ['No duplicates to merge'], duplicates: [], masterId: state.masterId, shoes: state.shoes };
 
       let successCount = 0;
       const errors = [];
@@ -6039,10 +6174,7 @@
         .eq('id', state.masterId)
         .maybeSingle();
       if (!masterCheck) {
-        showToast(`Master record no longer exists — reload duplicates to refresh`, 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="shuffle"></i> Retry merge';
-        return;
+        return { successCount: 0, errors: ['Master record no longer exists — reload duplicates to refresh'], duplicates, masterId: state.masterId, shoes: state.shoes };
       }
 
       for (const dup of duplicates) {
@@ -6068,36 +6200,117 @@
         }
       }
 
-      if (errors.length === 0) {
-        await writeAuditLog({ action_type: 'MERGE_CLUSTER', entity_type: 'master_shoe_products', entity_id: state.masterId, previous_state: { cluster: state.shoes.map(s => ({ id: s.id, brand_name: s.brand_name, model_name: s.model_name })) }, new_state: { master_id: state.masterId, merged_ids: duplicates.map(d => d.id), merged_count: successCount } });
-        /* Optimistic removal */
-        const groupEl = document.getElementById(groupKey);
-        if (groupEl) {
-          groupEl.style.transition = 'opacity 0.3s, max-height 0.4s';
-          groupEl.style.opacity = '0';
-          setTimeout(() => groupEl.remove(), 350);
-        }
-        delete dupState[groupKey];
-        updateNukeBtnState();
+      return { successCount, errors, duplicates, masterId: state.masterId, shoes: state.shoes };
+    }
 
-        /* Update badge */
-        const remaining = Object.keys(dupState).length;
-        const badge = document.getElementById('dup-group-count');
-        badge.textContent = remaining;
-        if (remaining === 0) {
-          badge.style.background = '#10b981';
-          document.getElementById('dup-list').innerHTML = `
-            <div class="dup-empty">
-              <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
-              <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
-              <p>Great work — the catalog is clean.</p>
-            </div>`;
-        }
-        showToast(`Merged ${successCount} duplicate${successCount > 1 ? 's' : ''} into master`, 'success');
+    /* UI cleanup after a successful cluster merge */
+    async function completeClusterMerge(groupKey, result) {
+      if (result.errors.length > 0) return false;
+
+      await writeAuditLog({
+        action_type: 'MERGE_CLUSTER',
+        entity_type: 'master_shoe_products',
+        entity_id: result.masterId,
+        previous_state: { cluster: result.shoes.map(s => ({ id: s.id, brand_name: s.brand_name, model_name: s.model_name })) },
+        new_state: { master_id: result.masterId, merged_ids: result.duplicates.map(d => d.id), merged_count: result.successCount }
+      });
+
+      /* Optimistic removal */
+      const groupEl = document.getElementById(groupKey);
+      if (groupEl) {
+        groupEl.style.transition = 'opacity 0.3s, max-height 0.4s';
+        groupEl.style.opacity = '0';
+        setTimeout(() => groupEl.remove(), 350);
+      }
+      delete dupState[groupKey];
+      selectedClusters.delete(groupKey);
+      updateNukeBtnState();
+      updateBulkBar();
+
+      /* Update badge */
+      const remaining = Object.keys(dupState).length;
+      const badge = document.getElementById('dup-group-count');
+      badge.textContent = remaining;
+      if (remaining === 0) {
+        badge.style.background = '#10b981';
+        document.getElementById('dup-list').innerHTML = `
+          <div class="dup-empty">
+            <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
+            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
+            <p>Great work — the catalog is clean.</p>
+          </div>`;
+      }
+      return true;
+    }
+
+    async function mergeDuplicates(groupKey) {
+      const state = dupState[groupKey];
+      if (!state) return;
+
+      const duplicates = state.shoes.filter(s => s.id !== state.masterId);
+      if (!duplicates.length) { showToast('No duplicates to merge', 'error'); return; }
+
+      const btn = document.getElementById(`merge-btn-${groupKey}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Merging…';
+      }
+
+      const result = await performClusterMerge(groupKey);
+
+      if (result.errors.length === 0) {
+        await completeClusterMerge(groupKey, result);
+        showToast(`Merged ${result.successCount} duplicate${result.successCount > 1 ? 's' : ''} into master`, 'success');
       } else {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="shuffle"></i> Retry merge`;
-        showToast(`${errors.length} merge(s) failed: ${errors[0]}`, 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="shuffle"></i> Retry merge';
+          if (window.lucide && lucide.createIcons) lucide.createIcons();
+        }
+        showToast(`${result.errors.length} merge(s) failed: ${result.errors[0]}`, 'error');
+      }
+    }
+
+    async function bulkMergeClusters() {
+      const keys = Array.from(selectedClusters).filter(key => dupState[key]);
+      if (keys.length === 0) return;
+
+      const dupCount = keys.reduce((sum, key) => sum + (dupState[key].shoes.length - 1), 0);
+      if (!confirm(`Merge ${keys.length} selected cluster${keys.length === 1 ? '' : 's'} (${dupCount} duplicate${dupCount === 1 ? '' : 's'})? This will repoint all linked records and cannot be undone.`)) return;
+
+      const btn = document.getElementById('dup-bulk-merge-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = `⏳ Merging 0 / ${keys.length}…`;
+      }
+
+      let done = 0;
+      let failed = 0;
+      let firstError = null;
+
+      for (const key of keys) {
+        const result = await performClusterMerge(key);
+        if (result.errors.length === 0) {
+          await completeClusterMerge(key, result);
+          done++;
+        } else {
+          failed++;
+          if (!firstError) firstError = result.errors[0];
+          break;
+        }
+        if (btn) btn.textContent = `⏳ Merging ${done} / ${keys.length}…`;
+      }
+
+      if (btn) {
+        btn.disabled = selectedClusters.size === 0;
+        btn.innerHTML = '<i data-lucide="shuffle"></i> Merge selected';
+        if (window.lucide && lucide.createIcons) lucide.createIcons();
+      }
+
+      if (failed > 0) {
+        showToast(`${failed} cluster merge(s) failed: ${firstError}`, 'error', 6000);
+      } else {
+        showToast(`Merged ${done} cluster${done === 1 ? '' : 's'} successfully`, 'success');
       }
     }
   </script>
