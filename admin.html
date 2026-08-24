@@ -692,6 +692,21 @@
     }
     .merge-btn:hover { background: #0f172a; }
     .merge-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .ignore-btn {
+      padding: 9px 20px;
+      background: #fff;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .ignore-btn:hover { background: #f8fafc; color: #475569; border-color: #cbd5e1; }
+    .ignore-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .nuke-btn {
       padding: 9px 18px;
       background: #7f1d1d;
@@ -2313,6 +2328,7 @@
         <div class="dup-toolbar">
           <p class="dup-toolbar-info">
             Shoes are grouped by identical brand + highly similar name. Select the <strong>master</strong> to keep, then merge the rest.
+            <span id="dup-ignored-info" style="display:flex;align-items:center;gap:8px;margin-left:12px;"></span>
           </p>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <button class="dup-refresh-btn ai-btn" id="dup-ai-btn" onclick="aiSemanticClustering()" title="Use AI to find semantic duplicates SQL would miss"><i data-lucide="brain"></i> AI Semantic Clustering</button>
@@ -3165,7 +3181,7 @@
               .order('brand_name')
               .order('model_name');
             if (error) throw error;
-            const dupCount = groupDuplicates(shoes || []).length;
+            const dupCount = filterIgnoredGroups(groupDuplicates(shoes || [])).length;
             document.getElementById('triage-dup-count').textContent = fmt(dupCount);
             document.getElementById('pulse-duplicates').textContent = fmt(dupCount);
           } catch (err) {
@@ -3998,11 +4014,14 @@
         _nukeUserCount = { ..._nukeUserCount, ...userCount };
         _nukeDealCount = { ..._nukeDealCount, ...dealCount };
 
+        // Filter ignored clusters before rendering
+        const visibleGroups = filterIgnoredGroups(groups);
+
         // Navigate to dup view and inject AI clusters
         navigate('duplicate-resolver');
-        renderAIClusters(groups, cheapestDeal, dealCount, userCount);
+        renderAIClusters(visibleGroups, cheapestDeal, dealCount, userCount);
 
-        await writeAuditLog({ action_type: 'AI_CLUSTER', entity_type: 'master_shoe_products', entity_id: 'batch', admin_identifier: 'ai_janitor', previous_state: { shoes_analyzed: shoes.length }, new_state: { clusters_found: groups.length, cluster_ids: clusters } });
+        await writeAuditLog({ action_type: 'AI_CLUSTER', entity_type: 'master_shoe_products', entity_id: 'batch', admin_identifier: 'ai_janitor', previous_state: { shoes_analyzed: shoes.length }, new_state: { clusters_found: groups.length, clusters_visible: visibleGroups.length, cluster_ids: clusters } });
         showToast(`<i data-lucide="brain"></i> AI found ${groups.length} semantic cluster${groups.length > 1 ? 's' : ''}`, 'success');
 
       } catch (err) {
@@ -4031,8 +4050,8 @@
           </div>
         </div>`;
 
-      const clustersHtml = groups.map((group, gi) => {
-        const key = `ai-group-${gi}`;
+      const clustersHtml = groups.map((group) => {
+        const key = getClusterKey(group);
         const sorted = [...group].sort((a, b) => scoreVariant(b, userCount, dealCount) - scoreVariant(a, userCount, dealCount));
         dupState[key] = { shoes: sorted, masterId: sorted[0].id };
 
@@ -4076,15 +4095,21 @@
             <div class="dup-cards">${cardsHtml}</div>
             <div class="dup-group-footer">
               <p>AI-identified semantic duplicate. Click a card to set it as the master record.</p>
-              <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
-                <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
-              </button>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button class="ignore-btn" id="ignore-btn-${key}" onclick="ignoreCluster('${key}')">
+                  <i data-lucide="x-circle"></i> Not a duplicate
+                </button>
+                <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                  <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+                </button>
+              </div>
             </div>
           </div>`;
       }).join('');
 
       container.innerHTML = headerHtml + clustersHtml;
       updateNukeBtnState();
+      updateIgnoredInfo();
     }
 
     /* ═══════════════════════════════════════════════════
@@ -5335,6 +5360,83 @@
 
     /* State: groupKey <i data-lucide="arrow-right"></i> { shoes[], masterId } */
     const dupState = {};
+    const IGNORED_CLUSTERS_KEY = 'treadleft_ignored_dup_clusters';
+
+    function getClusterKey(group) {
+      return group.map(s => s.id).sort().join('-');
+    }
+
+    function getIgnoredClusters() {
+      try {
+        const raw = localStorage.getItem(IGNORED_CLUSTERS_KEY);
+        return new Set(raw ? JSON.parse(raw) : []);
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveIgnoredClusters(set) {
+      localStorage.setItem(IGNORED_CLUSTERS_KEY, JSON.stringify([...set]));
+    }
+
+    function filterIgnoredGroups(groups) {
+      const ignored = getIgnoredClusters();
+      return groups.filter(g => !ignored.has(getClusterKey(g)));
+    }
+
+    function updateIgnoredInfo() {
+      const ignored = getIgnoredClusters();
+      const el = document.getElementById('dup-ignored-info');
+      if (!el) return;
+      if (ignored.size === 0) {
+        el.innerHTML = '';
+      } else {
+        el.innerHTML = `<span style="color:#64748b;font-size:13px;">${ignored.size} ignored</span>
+          <button class="dup-refresh-btn" style="padding:4px 10px;font-size:12px;" onclick="resetIgnoredClusters()">Reset</button>`;
+      }
+    }
+
+    function ignoreCluster(groupKey) {
+      const state = dupState[groupKey];
+      if (!state) return;
+      const masterName = state.shoes.find(s => s.id === state.masterId);
+      const label = masterName ? `${masterName.brand_name} ${masterName.model_name}` : 'this cluster';
+      if (!confirm(`Mark "${label}" as not a duplicate? It will be hidden until you reset ignored clusters.`)) return;
+
+      const ignored = getIgnoredClusters();
+      ignored.add(getClusterKey(state.shoes));
+      saveIgnoredClusters(ignored);
+
+      const el = document.getElementById(groupKey);
+      if (el) {
+        el.style.transition = 'opacity 0.3s, max-height 0.4s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 350);
+      }
+      delete dupState[groupKey];
+      updateNukeBtnState();
+      updateIgnoredInfo();
+
+      const remaining = Object.keys(dupState).length;
+      const badge = document.getElementById('dup-group-count');
+      badge.textContent = remaining;
+      if (remaining === 0) {
+        badge.style.background = '#10b981';
+        document.getElementById('dup-list').innerHTML = `
+          <div class="dup-empty">
+            <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
+            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
+            <p>Great work — the catalog is clean.</p>
+          </div>`;
+      }
+      showToast('Cluster ignored', 'success');
+    }
+
+    function resetIgnoredClusters() {
+      localStorage.removeItem(IGNORED_CLUSTERS_KEY);
+      loadDuplicates();
+      showToast('Ignored clusters reset', 'success');
+    }
     /* Cached telemetry for Nuclear Merge */
     let _nukeUserCount = {};
     let _nukeDealCount = {};
@@ -5448,7 +5550,7 @@
 
         _nukeUserCount = userCount;
         _nukeDealCount = dealCount;
-        const groups = groupDuplicates(shoes);
+        const groups = filterIgnoredGroups(groupDuplicates(shoes));
         renderDuplicates(groups, cheapestDeal, dealCount, userCount);
       } catch (err) {
         console.error('Dup load error:', err);
@@ -5584,8 +5686,8 @@
       badge.textContent = groups.length;
       badge.style.background = '#ef4444';
 
-      container.innerHTML = groups.map((group, gi) => {
-        const key = `group-${gi}`;
+      container.innerHTML = groups.map((group) => {
+        const key = getClusterKey(group);
 
         /* Sort by score descending — index 0 is always best candidate */
         const sorted = [...group].sort((a, b) => scoreVariant(b, userCount, dealCount) - scoreVariant(a, userCount, dealCount));
@@ -5635,15 +5737,21 @@
             <div class="dup-cards">${cardsHtml}</div>
             <div class="dup-group-footer">
               <p>Click a card to set it as the master record. All child data (wear logs, deals, alerts) will be migrated.</p>
-              <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
-                <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
-              </button>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button class="ignore-btn" id="ignore-btn-${key}" onclick="ignoreCluster('${key}')">
+                  <i data-lucide="x-circle"></i> Not a duplicate
+                </button>
+                <button class="merge-btn" id="merge-btn-${key}" onclick="mergeDuplicates('${key}')">
+                  <i data-lucide="shuffle"></i> Merge ${dupCount} duplicate${dupCount > 1 ? 's' : ''}
+                </button>
+              </div>
             </div>
           </div>`;
       }).join('');
 
       /* Update Nuclear Merge button count now that dupState is fully populated */
       updateNukeBtnState();
+      updateIgnoredInfo();
     }
 
     /* ── Interaction ── */
