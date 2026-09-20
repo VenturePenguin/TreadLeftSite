@@ -311,6 +311,11 @@
     .triage-card--alert   { background: #fff7ed; border-left-color: #ef4444; }
     html.dark .triage-card--warning { background: rgba(245,158,11,0.1); }
     html.dark .triage-card--alert   { background: rgba(239,68,68,0.1); }
+    .triage-card--empty { background: #f8fafc; border-left-color: #cbd5e1; opacity: .8; cursor: default; }
+    html.dark .triage-card--empty { background: rgba(148,163,184,0.08); border-left-color: #475569; }
+    .triage-card--empty:hover { transform: none; box-shadow: none; }
+    .triage-card--empty .triage-card-cta { display: none; }
+    .triage-card-preview { margin-top: 6px; font-size: 11px; color: var(--text-muted); line-height: 1.35; }
     .triage-card-icon  { font-size: 26px; flex-shrink: 0; }
     .triage-card-body  { flex: 1; }
     .triage-card-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1; margin-bottom: 2px; }
@@ -326,6 +331,47 @@
       letter-spacing: 0.08em; color: #94a3b8;
       margin-bottom: 12px; margin-top: 4px;
     }
+
+    /* ── Sync Source Breakdown chart ─────────────────────────── */
+    .sync-breakdown-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .sync-stacked-bar {
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 16px;
+    }
+    .sync-segment { height: 100%; transition: width .4s ease; }
+    .sync-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .sync-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .sync-legend-count { font-weight: 700; color: var(--text-primary); }
+    .sync-legend-pct { color: var(--text-muted); margin-left: auto; }
+
+    /* ── Header health pill ──────────────────────────────────── */
+    .health-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; color: #15803d;
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px;
+      padding: 4px 10px; margin-right: 10px; cursor: pointer;
+    }
+    .health-pill.warning { color: #9a3412; background: #fff7ed; border-color: #fed7aa; }
+    .health-pill.error { color: #991b1b; background: #fef2f2; border-color: #fca5a5; }
+    html.dark .health-pill { color: #86efac; background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.2); }
+    html.dark .health-pill.warning { color: #fdba74; background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.3); }
+    html.dark .health-pill.error { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); }
+    .health-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* Clickable metric cards */
+    .pulse-card.clickable { cursor: pointer; }
+    .pulse-card.clickable:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
 
     /* ── Funnel ──────────────────────────────────────────────── */
     .funnel {
@@ -2247,14 +2293,21 @@
       <div id="view-platform-pulse" class="view active">
         <div class="view-header">
           <h2><i data-lucide="activity"></i> Platform Pulse</h2>
-          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
+          <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+            <div id="pulse-health-pill" class="health-pill" onclick="navigate('system-health')" style="display:none">
+              <span class="health-dot"></span>
+              <span id="pulse-health-text">Operational</span>
+            </div>
+            <span id="pulse-last-updated" style="font-size:12px;color:var(--text-muted)"></span>
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
+          </div>
         </div>
 
         <!-- ── TRIAGE ZONE ──────────────────────────────────────────────── -->
         <div class="triage-zone">
           <div class="triage-title"><i data-lucide="zap"></i> Action Required</div>
           <div class="triage-cards">
-            <div class="triage-card triage-card--warning" onclick="navigate('discovery-queue')">
+            <div id="triage-pending-card" class="triage-card triage-card--warning" onclick="navigate('discovery-queue')">
               <div class="triage-card-icon"><i data-lucide="search"></i></div>
               <div class="triage-card-body">
                 <div class="triage-card-value" id="triage-pending-count">—</div>
@@ -2263,12 +2316,13 @@
               </div>
               <div class="triage-card-cta">Review <i data-lucide="arrow-right"></i></div>
             </div>
-            <div class="triage-card triage-card--alert" onclick="navigate('duplicate-resolver')">
+            <div id="triage-dup-card" class="triage-card triage-card--alert" onclick="navigate('duplicate-resolver')">
               <div class="triage-card-icon"><i data-lucide="copy"></i></div>
               <div class="triage-card-body">
                 <div class="triage-card-value" id="triage-dup-count">—</div>
                 <div class="triage-card-label">Duplicate Detection</div>
                 <div class="triage-card-sub">Suspected duplicate shoe models</div>
+                <div class="triage-card-preview" id="triage-dup-preview"></div>
               </div>
               <div class="triage-card-cta">Review <i data-lucide="arrow-right"></i></div>
             </div>
@@ -2278,19 +2332,19 @@
         <!-- ── AUDIENCE & GROWTH ──────────────────────────────────────────── -->
         <div class="pulse-section-label">Audience &amp; Growth</div>
         <div class="pulse-grid" style="margin-bottom:24px">
-          <div class="pulse-card" style="--accent:#10b981">
+          <div class="pulse-card clickable" style="--accent:#10b981" onclick="navigate('user-cohorts')">
             <div class="pulse-value" id="pulse-total-users">—</div>
             <div class="pulse-label">Total Users</div>
             <div class="pulse-sub">All-time accounts</div>
             <div class="pulse-delta" id="pulse-users-delta"></div>
           </div>
-          <div class="pulse-card" style="--accent:#6366f1">
+          <div class="pulse-card clickable" style="--accent:#6366f1" onclick="navigate('user-cohorts')">
             <div class="pulse-value" id="pulse-active-lockers">—</div>
             <div class="pulse-label">Active Lockers</div>
             <div class="pulse-sub">Users with ≥1 active shoe</div>
             <div class="pulse-delta" id="pulse-lockers-delta"></div>
           </div>
-          <div class="pulse-card" style="--accent:#10b981">
+          <div class="pulse-card clickable" style="--accent:#10b981" onclick="navigate('user-cohorts')">
             <div class="pulse-value" id="pulse-dau">—</div>
             <div class="pulse-label">Daily Active Users</div>
             <div class="pulse-sub">Users who synced today</div>
@@ -2300,73 +2354,89 @@
         <!-- ── SYSTEM THROUGHPUT ──────────────────────────────────────────── -->
         <div class="pulse-section-label">System Throughput</div>
         <div class="pulse-grid" style="margin-bottom:24px">
-          <div class="pulse-card" style="--accent:#f97316">
+          <div class="pulse-card clickable" style="--accent:#f97316" onclick="navigate('lifespan-insights')">
             <div class="pulse-value" id="pulse-retired-24h">—</div>
             <div class="pulse-label">Data Engine Feed</div>
             <div class="pulse-sub">Shoes retired last 24h</div>
           </div>
-          <div class="pulse-card" style="--accent:#f59e0b">
+          <div class="pulse-card clickable" style="--accent:#f59e0b" onclick="navigate('strava-monitor')">
             <div class="pulse-value" id="pulse-activities-24h">—</div>
             <div class="pulse-label">Syncs Today</div>
             <div class="pulse-sub">Activities logged last 24h</div>
           </div>
-          <div class="pulse-card" style="--accent:#22c55e">
+          <div class="pulse-card clickable" style="--accent:#22c55e" onclick="navigate('strava-monitor')">
             <div class="pulse-value" id="pulse-healthkit-users">—</div>
             <div class="pulse-label">Apple Health Users</div>
             <div class="pulse-sub" id="pulse-healthkit-pct">— % of accounts</div>
           </div>
-          <div class="pulse-card" style="--accent:#a78bfa">
+          <div class="pulse-card clickable" style="--accent:#a78bfa" onclick="navigate('system-health')">
             <div class="pulse-value" id="pulse-healthkit-acts-24h">—</div>
-            <div class="pulse-label">HK Syncs Today</div>
-            <div class="pulse-sub" id="pulse-healthkit-acts-total">— total</div>
+            <div class="pulse-label">HealthKit Syncs Today</div>
+            <div class="pulse-sub" id="pulse-healthkit-acts-total">— total HealthKit activities</div>
           </div>
-          <div class="pulse-card" style="--accent:#ec4899">
+          <div class="pulse-card clickable" style="--accent:#ec4899" onclick="navigate('system-health')">
             <div class="pulse-value" id="pulse-ai-calls-24h">—</div>
-            <div class="pulse-label">AI Calls Today</div>
+            <div class="pulse-label">AI Insights Generated</div>
             <div class="pulse-sub" id="pulse-ai-calls-sub">— calls / — tokens / — errors</div>
           </div>
         </div>
 
         <!-- Sync Source Breakdown -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Sync Source Breakdown</div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-          <div style="text-align:center">
-            <div style="font-size:26px;font-weight:800;color:#f97316" id="breakdown-strava">—</div>
-            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Strava</div>
+        <div class="pulse-section-label">Sync Source Breakdown</div>
+        <div class="sync-breakdown-card">
+          <div class="sync-stacked-bar" id="sync-breakdown-bar">
+            <div class="sync-segment" id="breakdown-bar-strava" style="background:#f97316;width:0"></div>
+            <div class="sync-segment" id="breakdown-bar-healthkit" style="background:#22c55e;width:0"></div>
+            <div class="sync-segment" id="breakdown-bar-manual" style="background:#6366f1;width:0"></div>
+            <div class="sync-segment" id="breakdown-bar-none" style="background:#cbd5e1;width:0"></div>
           </div>
-          <div style="text-align:center">
-            <div style="font-size:26px;font-weight:800;color:#22c55e" id="breakdown-healthkit">—</div>
-            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Apple Health</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:26px;font-weight:800;color:#6366f1" id="breakdown-manual">—</div>
-            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Manual</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:26px;font-weight:800;color:#cbd5e1" id="breakdown-none">—</div>
-            <div style="font-size:11px;color:#64748b;margin-top:4px;font-weight:500">Not connected</div>
+          <div class="sync-legend">
+            <div class="sync-legend-item">
+              <span class="sync-dot" style="background:#f97316"></span>
+              <span style="color:var(--text-secondary)">Strava</span>
+              <span class="sync-legend-count" id="breakdown-strava">—</span>
+              <span class="sync-legend-pct" id="breakdown-pct-strava">0%</span>
+            </div>
+            <div class="sync-legend-item">
+              <span class="sync-dot" style="background:#22c55e"></span>
+              <span style="color:var(--text-secondary)">Apple Health</span>
+              <span class="sync-legend-count" id="breakdown-healthkit">—</span>
+              <span class="sync-legend-pct" id="breakdown-pct-healthkit">0%</span>
+            </div>
+            <div class="sync-legend-item">
+              <span class="sync-dot" style="background:#6366f1"></span>
+              <span style="color:var(--text-secondary)">Manual</span>
+              <span class="sync-legend-count" id="breakdown-manual">—</span>
+              <span class="sync-legend-pct" id="breakdown-pct-manual">0%</span>
+            </div>
+            <div class="sync-legend-item">
+              <span class="sync-dot" style="background:#cbd5e1"></span>
+              <span style="color:var(--text-secondary)">Not connected</span>
+              <span class="sync-legend-count" id="breakdown-none">—</span>
+              <span class="sync-legend-pct" id="breakdown-pct-none">0%</span>
+            </div>
           </div>
         </div>
 
         <!-- Engagement & Activity Quality -->
         <div class="pulse-section-label">Engagement &amp; Activity Quality</div>
         <div class="pulse-grid" style="margin-bottom:24px">
-          <div class="pulse-card" style="--accent:#14b8a6">
+          <div class="pulse-card clickable" style="--accent:#14b8a6" onclick="navigate('user-cohorts')">
             <div class="pulse-value" id="pulse-retention-7d">—%</div>
             <div class="pulse-label">7-Day Retention</div>
             <div class="pulse-sub">New users who synced again</div>
           </div>
-          <div class="pulse-card" style="--accent:#7c3aed;cursor:pointer" onclick="navigate('duplicate-resolver')">
+          <div class="pulse-card clickable" style="--accent:#7c3aed" onclick="navigate('duplicate-resolver')">
             <div class="pulse-value" id="pulse-duplicates">—</div>
             <div class="pulse-label">Duplicate Detection</div>
             <div class="pulse-sub">Suspected duplicate shoe models</div>
           </div>
-          <div class="pulse-card" style="--accent:#3b82f6">
+          <div class="pulse-card clickable" style="--accent:#3b82f6" onclick="navigate('lifespan-insights')">
             <div class="pulse-value" id="pulse-km-7d">—</div>
             <div class="pulse-label">KM Tracked (7d)</div>
             <div class="pulse-sub">Total distance logged</div>
           </div>
-          <div class="pulse-card" style="--accent:#8b5cf6">
+          <div class="pulse-card clickable" style="--accent:#8b5cf6" onclick="navigate('lifespan-insights')">
             <div class="pulse-value" id="pulse-avg-distance">—</div>
             <div class="pulse-label">Avg Run Distance</div>
             <div class="pulse-sub">KM per run (last 7 days)</div>
@@ -3339,17 +3409,46 @@
         document.getElementById('pulse-healthkit-users').textContent    = fmt(t.healthkit_connected || 0);
         document.getElementById('pulse-healthkit-pct').textContent      = pct(t.healthkit_connected || 0, t.total_users) + ' of accounts';
         document.getElementById('pulse-healthkit-acts-24h').textContent  = fmt(t.healthkit_activities_24h || 0);
-        document.getElementById('pulse-healthkit-acts-total').textContent = fmt(t.healthkit_activities_total || 0) + ' total HK activities';
+        document.getElementById('pulse-healthkit-acts-total').textContent = fmt(t.healthkit_activities_total || 0) + ' total HealthKit activities';
 
         document.getElementById('pulse-ai-calls-24h').textContent = fmt(t.ai_calls_24h || 0);
         document.getElementById('pulse-ai-calls-sub').textContent =
           fmt(t.ai_calls_24h || 0) + ' calls / ' + fmt(t.ai_tokens_24h || 0) + ' tokens / ' + fmt(t.ai_errors_24h || 0) + ' errors';
 
         const bd = t.sync_source_breakdown || {};
-        document.getElementById('breakdown-strava').textContent    = fmt(bd.strava    || 0);
-        document.getElementById('breakdown-healthkit').textContent = fmt(bd.healthkit || 0);
-        document.getElementById('breakdown-manual').textContent    = fmt(bd.manual    || 0);
-        document.getElementById('breakdown-none').textContent      = fmt(bd.none      || 0);
+        const breakdownTotal = (bd.strava || 0) + (bd.healthkit || 0) + (bd.manual || 0) + (bd.none || 0) || 1;
+        const breakdownParts = [
+          { key: 'strava', color: '#f97316', value: bd.strava || 0 },
+          { key: 'healthkit', color: '#22c55e', value: bd.healthkit || 0 },
+          { key: 'manual', color: '#6366f1', value: bd.manual || 0 },
+          { key: 'none', color: '#cbd5e1', value: bd.none || 0 },
+        ];
+        breakdownParts.forEach(part => {
+          const pct = breakdownTotal > 0 ? Math.round((part.value / breakdownTotal) * 100) : 0;
+          document.getElementById('breakdown-' + part.key).textContent = fmt(part.value);
+          document.getElementById('breakdown-pct-' + part.key).textContent = pct + '%';
+          document.getElementById('breakdown-bar-' + part.key).style.width = pct + '%';
+        });
+
+        // Header health pill & last updated
+        const errorCount = Number(document.getElementById('sidebar-error-count')?.textContent || 0);
+        const healthPill = document.getElementById('pulse-health-pill');
+        const healthText = document.getElementById('pulse-health-text');
+        if (healthPill && healthText) {
+          healthPill.style.display = 'inline-flex';
+          if (errorCount > 0) {
+            healthPill.className = 'health-pill error';
+            healthText.textContent = `${errorCount} system issue${errorCount === 1 ? '' : 's'}`;
+          } else if (t.ai_errors_24h > 0 || t.healthkit_activities_24h === 0) {
+            healthPill.className = 'health-pill warning';
+            healthText.textContent = 'Needs attention';
+          } else {
+            healthPill.className = 'health-pill';
+            healthText.textContent = 'All systems operational';
+          }
+        }
+        document.getElementById('pulse-last-updated').textContent =
+          'Updated ' + new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
         document.getElementById('funnel-accounts').textContent     = fmt(t.total_users);
         document.getElementById('funnel-strava').textContent       = fmt(t.strava_connected || 0);
@@ -3376,9 +3475,28 @@
               .order('brand_name')
               .order('model_name');
             if (error) throw error;
-            const dupCount = filterIgnoredGroups(groupDuplicates(shoes || [])).length;
+            const dupGroups = filterIgnoredGroups(groupDuplicates(shoes || []));
+            const dupCount = dupGroups.length;
             document.getElementById('triage-dup-count').textContent = fmt(dupCount);
             document.getElementById('pulse-duplicates').textContent = fmt(dupCount);
+            const dupCard = document.getElementById('triage-dup-card');
+            if (dupCard) {
+              dupCard.classList.toggle('triage-card--empty', dupCount === 0);
+              dupCard.classList.toggle('triage-card--alert', dupCount > 0);
+            }
+            const dupPreview = document.getElementById('triage-dup-preview');
+            if (dupPreview) {
+              if (dupCount === 0) {
+                dupPreview.textContent = 'No suspected duplicates';
+              } else {
+                const previews = dupGroups.slice(0, 2).map(g => {
+                  const first = g[0];
+                  const names = g.slice(0, 3).map(s => escapeHtml(s.model_name)).join(', ');
+                  return `<span title="${escapeHtml(first.brand_name)} — ${names}">${escapeHtml(first.brand_name)} ${escapeHtml(first.model_name)}</span>`;
+                }).join(' · ');
+                dupPreview.innerHTML = `${previews}${dupCount > 2 ? ` · +${dupCount - 2} more` : ''}`;
+              }
+            }
           } catch (err) {
             console.error('Dup count load error:', err);
             document.getElementById('triage-dup-count').textContent = '—';
@@ -3466,7 +3584,13 @@
       const medium = pendingData.filter(s => s.confidence === 'medium').length;
       const low    = pendingData.filter(s => s.confidence === 'low').length;
       const triagePending = document.getElementById('triage-pending-count');
+      const pendingCard = document.getElementById('triage-pending-card');
       if (triagePending) triagePending.textContent = total > 0 ? total : '0';
+      if (pendingCard) {
+        pendingCard.classList.toggle('triage-card--empty', total === 0);
+        pendingCard.classList.toggle('triage-card--warning', total > 0);
+        pendingCard.setAttribute('onclick', total > 0 ? "navigate('discovery-queue')" : '');
+      }
       document.getElementById('stat-total').textContent   = total;
       document.getElementById('stat-high').textContent    = high;
       document.getElementById('stat-medium').textContent  = medium;
