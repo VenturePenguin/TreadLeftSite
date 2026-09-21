@@ -28,6 +28,7 @@
       --bg-subtle:     #f8fafc;
       --border:        #e2e8f0;
       --border-subtle: #f1f5f9;
+      --bg-card:       #f8fafc;
       --text-primary:  #1e293b;
       --text-secondary:#64748b;
       --text-muted:    #94a3b8;
@@ -40,6 +41,7 @@
       --bg-subtle:     #1c2230;
       --border:        #30363d;
       --border-subtle: #21262d;
+      --bg-card:       #1c2230;
       --text-primary:  #e6edf3;
       --text-secondary:#8b949e;
       --text-muted:    #6e7681;
@@ -519,6 +521,54 @@
     }
     .deploy-badge a { color: var(--text-muted); text-decoration: underline; }
 
+    /* ── Hamburger menu button ─────────────────────────────── */
+    .hamburger-btn {
+      display: none; background: none; border: 1px solid var(--border);
+      border-radius: 8px; width: 34px; height: 34px;
+      cursor: pointer; align-items: center; justify-content: center;
+      color: var(--text-secondary); font-size: 18px; flex-shrink: 0;
+    }
+    .hamburger-btn:hover { border-color: #f97316; color: #f97316; }
+    .sidebar-overlay {
+      position: fixed; inset: 0; z-index: 98;
+      background: rgba(0,0,0,.3); display: none;
+    }
+    .sidebar-overlay.open { display: block; }
+
+    /* ── Skeleton shimmer ─────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--border-subtle) 50%, var(--bg-subtle) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-value { height: 32px; width: 60px; margin-bottom: 6px; }
+    .skeleton-label { height: 12px; width: 90px; margin-bottom: 4px; }
+    .skeleton-sub   { height: 10px; width: 70px; }
+
+    /* ── Cmd+K hint badge ─────────────────────────────────── */
+    .cmdk-hint {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      padding: 3px 8px; border-radius: 6px; cursor: pointer;
+      transition: all .15s;
+    }
+    .cmdk-hint:hover { border-color: #f97316; color: #f97316; }
+    .cmdk-hint kbd {
+      font-family: inherit; font-size: 10px; background: var(--bg-surface);
+      border: 1px solid var(--border); border-radius: 3px;
+      padding: 0 3px; margin: 0 1px;
+    }
+
+    /* ── Breadcrumb in topbar ─────────────────────────────── */
+    .topbar-breadcrumb {
+      font-size: 13px; color: var(--text-muted); font-weight: 500;
+      margin-left: 8px; display: none;
+    }
+    .topbar-breadcrumb.visible { display: inline; }
+
     /* ── Responsive grid for smaller screens ──────────────── */
     @media (max-width: 900px) {
       .sidebar { width: 180px; }
@@ -526,7 +576,9 @@
       .deploy-badge { padding-left: 200px; }
     }
     @media (max-width: 700px) {
-      .sidebar { display: none; }
+      .hamburger-btn { display: flex; }
+      .sidebar { display: none; z-index: 99; width: 220px; }
+      .sidebar.open { display: flex; }
       .main-content { left: 0; padding: 16px; }
       .deploy-badge { padding-left: 20px; }
     }
@@ -2373,18 +2425,26 @@
 
     <!-- Top Bar -->
     <div class="topbar">
-      <div class="topbar-brand">
-        <img src="/favicon.png" alt="TreadLeft" style="width:22px;height:22px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.18);flex-shrink:0;">
-        TreadLeft <span>/ Admin</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-brand">
+          <img src="/favicon.png" alt="TreadLeft" style="width:22px;height:22px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.18);flex-shrink:0;">
+          TreadLeft <span>/ Admin</span>
+        </div>
+        <span class="topbar-breadcrumb" id="topbar-breadcrumb"></span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
+        <span class="cmdk-hint" onclick="openCmdPalette()" title="Search"><kbd>⌘</kbd><kbd>K</kbd></span>
         <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark mode"><i data-lucide="moon"></i></button>
         <button class="logout-btn" onclick="doLogout()">Logout</button>
       </div>
     </div>
 
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
     <!-- Sidebar -->
-    <nav class="sidebar">
+    <nav class="sidebar" id="sidebar-nav">
       <div class="sidebar-section-label">Analytics</div>
 
       <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
@@ -2829,7 +2889,7 @@
           <h2><i data-lucide="target"></i> User Cohorts</h2>
         </div>
 
-        <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 20px;">
           Segment the user base for targeted re-engagement campaigns. Export any cohort as CSV.
         </p>
 
@@ -2862,7 +2922,7 @@
               </tr>
             </thead>
             <tbody id="cohort-tbody">
-              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">Select a segment above to load users…</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;">Select a segment above to load users…</td></tr>
             </tbody>
           </table>
         </div>
@@ -2872,10 +2932,13 @@
       <div id="view-lifespan-insights" class="view">
         <div class="view-header">
           <h2><i data-lucide="skull"></i> Lifespan Insights <span class="badge" id="grave-model-count" style="background:#64748b;">—</span></h2>
-          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadLifespanInsights()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          <div style="display:flex;gap:8px">
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadLifespanInsights()"><i data-lucide="refresh-cw"></i> Refresh</button>
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px;font-size:11px" onclick="exportTableToCSV('grave-table','lifespan-insights.csv')" title="Export to CSV"><i data-lucide="download"></i> CSV</button>
+          </div>
         </div>
 
-        <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 20px;">
           Real-world lifespan aggregated from retired shoes in the wild. Only models with ≥3 retired samples are shown.
         </p>
 
@@ -2901,10 +2964,10 @@
         <!-- Graveyard Table -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <h3 style="margin:0;font-size:15px;font-weight:700;">Model Lifespan Breakdown</h3>
-          <span style="font-size:12px;color:#64748b;">Benchmark: 800 km standard lifespan</span>
+          <span style="font-size:12px;color:var(--text-secondary);">Benchmark: 800 km standard lifespan</span>
         </div>
         <div class="grave-table-wrap">
-          <table class="grave-table">
+          <table class="grave-table" id="grave-table">
             <thead>
               <tr>
                 <th>Brand &amp; Model</th>
@@ -2915,7 +2978,7 @@
               </tr>
             </thead>
             <tbody id="grave-tbody">
-              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;">Click Refresh to load…</td></tr>
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:36px;">Click Refresh to load…</td></tr>
             </tbody>
           </table>
         </div>
@@ -2925,7 +2988,10 @@
       <div id="view-revenue-analytics" class="view">
         <div class="view-header">
           <h2><i data-lucide="dollar-sign"></i> Revenue Analytics</h2>
-          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadRevenueAnalytics()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          <div style="display:flex;gap:8px">
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadRevenueAnalytics()"><i data-lucide="refresh-cw"></i> Refresh</button>
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px;font-size:11px" onclick="exportTableToCSV('rev-perf-table','revenue-performance.csv')" title="Export to CSV"><i data-lucide="download"></i> CSV</button>
+          </div>
         </div>
 
         <!-- KPI Cards -->
@@ -2950,10 +3016,10 @@
         <!-- Performance Table -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <h3 style="margin:0;font-size:15px;font-weight:700;">Deal Performance</h3>
-          <span style="font-size:12px;color:#64748b;">Active deals only · ordered by total clicks</span>
+          <span style="font-size:12px;color:var(--text-secondary);">Active deals only · ordered by total clicks</span>
         </div>
         <div class="rev-perf-table-wrap">
-          <table class="rev-perf-table">
+          <table class="rev-perf-table" id="rev-perf-table">
             <thead>
               <tr>
                 <th>Shoe Deal</th>
@@ -2966,7 +3032,7 @@
               </tr>
             </thead>
             <tbody id="rev-perf-tbody">
-              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;">Click Refresh to load…</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;">Click Refresh to load…</td></tr>
             </tbody>
           </table>
         </div>
@@ -2979,7 +3045,7 @@
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <p style="font-size:13px;color:#64748b;margin:0;">Immutable append-only log of every admin mutation. Rows cannot be edited or deleted.</p>
+          <p style="font-size:13px;color:var(--text-secondary);margin:0;">Immutable append-only log of every admin mutation. Rows cannot be edited or deleted.</p>
           <div style="display:flex;gap:8px;">
             <select id="ledger-filter-action" onchange="renderLedger()" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-surface);color:var(--text-primary);cursor:pointer;">
               <option value="">All Actions</option>
@@ -3012,7 +3078,7 @@
               </tr>
             </thead>
             <tbody id="ledger-tbody">
-              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">Click Refresh to load…</td></tr>
             </tbody>
           </table>
         </div>
@@ -3079,7 +3145,7 @@
               </tr>
             </thead>
             <tbody id="h-cron-table">
-              <tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;">Loading…</td></tr>
+              <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">Loading…</td></tr>
             </tbody>
           </table>
         </div>
@@ -3117,7 +3183,7 @@
               </tr>
             </thead>
             <tbody id="sync-table-body">
-              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Loading…</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">Loading…</td></tr>
             </tbody>
           </table>
         </div>
@@ -3130,7 +3196,7 @@
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <p style="font-size:13px;color:#64748b;margin:0;">Check messy aliases on the left, type the canonical name on the right, then normalize.</p>
+          <p style="font-size:13px;color:var(--text-secondary);margin:0;">Check messy aliases on the left, type the canonical name on the right, then normalize.</p>
           <button class="health-refresh-btn" onclick="loadBrands()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
             Refresh
@@ -3142,7 +3208,7 @@
           <div class="brand-list-panel">
             <div class="brand-list-header">
               <span id="brand-list-title">All Brands</span>
-              <span id="brand-list-meta" style="color:#94a3b8;"></span>
+              <span id="brand-list-meta" style="color:var(--text-muted);"></span>
             </div>
             <input class="brand-search" id="brand-search" type="text" placeholder="Search brands…" oninput="filterBrands()">
             <div class="brand-scroll" id="brand-scroll">
@@ -3155,12 +3221,12 @@
             <h3>Normalize Selected</h3>
             <p>Select one or more aliases from the list, then enter the canonical brand name to replace them all.</p>
 
-            <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Selected Aliases</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Selected Aliases</div>
             <div class="brand-selected-chips" id="brand-chips">
               <span class="brand-chips-placeholder">No brands selected</span>
             </div>
 
-            <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Master Brand Name</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Master Brand Name</div>
             <input
               class="brand-master-input"
               id="brand-master-input"
@@ -3239,7 +3305,7 @@
             <div class="support-full-card">
               <div class="support-card-header">
                 <span class="support-card-header-icon"><i data-lucide="footprints"></i></span>
-                <span class="support-card-title">Recent Activity Log <span id="sc-act-count" style="font-weight:400;color:#94a3b8;"></span></span>
+                <span class="support-card-title">Recent Activity Log <span id="sc-act-count" style="font-weight:400;color:var(--text-muted);"></span></span>
               </div>
               <div id="sc-activities">
                 <div class="loading"><div class="spinner"></div></div>
@@ -3250,7 +3316,7 @@
             <div class="support-full-card">
               <div class="support-card-header">
                 <span class="support-card-header-icon"><i data-lucide="activity"></i></span>
-                <span class="support-card-title">Webhook Audit Trail <span id="sc-wh-count" style="font-weight:400;color:#94a3b8;"></span></span>
+                <span class="support-card-title">Webhook Audit Trail <span id="sc-wh-count" style="font-weight:400;color:var(--text-muted);"></span></span>
               </div>
               <div id="sc-webhooks">
                 <div class="loading"><div class="spinner"></div></div>
@@ -3302,7 +3368,7 @@
         <!-- Table 1: Top Active Deals -->
         <div class="deal-section-title">
           <span><i data-lucide="tag"></i> Top Active Deals</span>
-          <span id="dm-deals-count" style="font-weight:400;color:#94a3b8;"></span>
+          <span id="dm-deals-count" style="font-weight:400;color:var(--text-muted);"></span>
         </div>
         <div class="deal-table-wrap">
           <table class="deal-table">
@@ -3318,7 +3384,7 @@
               </tr>
             </thead>
             <tbody id="dm-deals-tbody">
-              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">Click Refresh to load…</td></tr>
             </tbody>
           </table>
         </div>
@@ -3326,7 +3392,7 @@
         <!-- Table 2: Recent User Alerts -->
         <div class="deal-section-title">
           <span><i data-lucide="bell"></i> Recent User Alerts Triggered</span>
-          <span id="dm-alerts-count" style="font-weight:400;color:#94a3b8;"></span>
+          <span id="dm-alerts-count" style="font-weight:400;color:var(--text-muted);"></span>
         </div>
         <div class="deal-table-wrap">
           <table class="deal-table">
@@ -3341,7 +3407,7 @@
               </tr>
             </thead>
             <tbody id="dm-alerts-tbody">
-              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">Click Refresh to load…</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">Click Refresh to load…</td></tr>
             </tbody>
           </table>
         </div>
@@ -3356,7 +3422,7 @@
       <h3><i data-lucide="plus"></i> Create New Deal</h3>
       <div class="deal-form-grid">
         <div class="deal-form-group full">
-          <label>Master Product ID <span style="color:#94a3b8;font-weight:400;text-transform:none;">(UUID from master_shoe_products)</span></label>
+          <label>Master Product ID <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(UUID from master_shoe_products)</span></label>
           <input id="df-master-id" type="text" placeholder="e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6">
         </div>
         <div class="deal-form-group">
@@ -3400,11 +3466,11 @@
           </select>
         </div>
         <div class="deal-form-group">
-          <label>Label <span style="color:#94a3b8;font-weight:400;text-transform:none;">(optional)</span></label>
+          <label>Label <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(optional)</span></label>
           <input id="df-label" type="text" placeholder="e.g. Flash Sale">
         </div>
         <div class="deal-form-group">
-          <label>Rank <span style="color:#94a3b8;font-weight:400;text-transform:none;">(display order)</span></label>
+          <label>Rank <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(display order)</span></label>
           <input id="df-rank" type="number" min="1" value="1">
         </div>
       </div>
@@ -3551,12 +3617,25 @@
 
     /* ── NAVIGATION ── */
     let dupLoaded = false;
+    const VIEW_LABELS = {
+      'platform-pulse': 'Platform Pulse', 'revenue-analytics': 'Revenue Analytics',
+      'discovery-queue': 'Discovery Queue', 'deal-engine': 'Deal Engine',
+      'lifespan-insights': 'Lifespan Insights', 'duplicate-resolver': 'Duplicate Detection',
+      'brand-normalization': 'Brand Normalization', 'system-ledger': 'System Ledger',
+      'system-health': 'System Health', 'strava-monitor': 'Strava Monitor',
+      'user-support': 'User Support', 'user-cohorts': 'User Cohorts',
+    };
     function navigate(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById('view-' + viewId).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.toggle('active', item.dataset.view === viewId);
       });
+      // Update breadcrumb
+      const bc = document.getElementById('topbar-breadcrumb');
+      if (bc) { bc.textContent = '/ ' + (VIEW_LABELS[viewId] || viewId); bc.classList.add('visible'); }
+      // Close mobile sidebar
+      closeSidebar();
       if (viewId === 'duplicate-resolver' && !dupLoaded) {
         dupLoaded = true;
         loadDuplicates();
@@ -3596,6 +3675,7 @@
     /* ── PLATFORM PULSE — TELEMETRY ── */
     async function loadTelemetry() {
       document.getElementById('pulse-loading').style.display = 'block';
+      if (typeof showPulseSkeleton === 'function') showPulseSkeleton();
       try {
         const { data, error } = await getSupabase().rpc('get_platform_telemetry');
         if (error) throw error;
@@ -3733,14 +3813,14 @@
     function renderTopShoes(models) {
       const container = document.getElementById('top-shoes-list');
       if (!models || models.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8;font-size:13px">No data available</div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No data available</div>';
         return;
       }
       container.innerHTML = models.map((m, i) => `
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:20px;height:20px;border-radius:50%;background:${i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#b45309' : '#e2e8f0'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i < 3 ? '#fff' : '#64748b'}">${i + 1}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.brand)} ${escapeHtml(m.model)}</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.brand)} ${escapeHtml(m.model)}</div>
           </div>
           <div style="font-size:12px;font-weight:600;color:#10b981">${Number(m.active_lockers).toLocaleString()}</div>
         </div>
@@ -3750,7 +3830,7 @@
     function renderBrandDistribution(brands) {
       const container = document.getElementById('brand-distribution-list');
       if (!brands || brands.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8;font-size:13px">No data available</div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No data available</div>';
         return;
       }
       const max = Math.max(...brands.map(b => b.count));
@@ -3759,12 +3839,12 @@
         return `
         <div style="display:flex;align-items:center;gap:10px">
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:#1e293b">${escapeHtml(b.brand)}</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text-primary)">${escapeHtml(b.brand)}</div>
           </div>
-          <div style="width:80px;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
+          <div style="width:80px;height:6px;background:var(--border-subtle);border-radius:3px;overflow:hidden">
             <div style="width:${pct}%;height:100%;background:#f97316;border-radius:3px"></div>
           </div>
-          <div style="font-size:12px;font-weight:600;color:#64748b;width:30px;text-align:right">${Number(b.count).toLocaleString()}</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-secondary);width:30px;text-align:right">${Number(b.count).toLocaleString()}</div>
         </div>
         `;
       }).join('');
@@ -4076,7 +4156,7 @@
           <tbody>
             ${aliasData.map(row => {
               const prod    = row.master_shoe_products;
-              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:#94a3b8">No match</span>';
+              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:var(--text-muted)">No match</span>';
               const score   = row.confidence_score != null ? Math.round(row.confidence_score * 100) + '%' : '—';
               const scoreCol = row.confidence_score >= 0.80
                 ? 'color:#10b981;font-weight:700;'
@@ -4447,7 +4527,7 @@
           <tbody>
             ${aliasData.map(row => {
               const prod    = row.master_shoe_products;
-              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:#94a3b8">No match</span>';
+              const match   = prod ? `${escapeHtml(prod.brand_name)} ${escapeHtml(prod.model_name)}` : '<span style="color:var(--text-muted)">No match</span>';
               const score   = row.confidence_score != null ? Math.round(row.confidence_score * 100) + '%' : '—';
               const scoreCol = row.confidence_score >= 0.80
                 ? 'color:#10b981;font-weight:700;'
@@ -4455,8 +4535,8 @@
                   ? 'color:#f59e0b;font-weight:700;'
                   : 'color:#ef4444;font-weight:700;';
               const aiCell = row._ai_normalized
-                ? `<span style="font-weight:600;color:#7c3aed;"><i data-lucide="sparkles"></i> ${escapeHtml(row._ai_brand)} ${escapeHtml(row._ai_model)}</span><br><span style="font-size:10px;color:#94a3b8">${Math.round((row._ai_confidence||0)*100)}% conf</span>`
-                : '<span style="color:#94a3b8">—</span>';
+                ? `<span style="font-weight:600;color:#7c3aed;"><i data-lucide="sparkles"></i> ${escapeHtml(row._ai_brand)} ${escapeHtml(row._ai_model)}</span><br><span style="font-size:10px;color:var(--text-muted)">${Math.round((row._ai_confidence||0)*100)}% conf</span>`
+                : '<span style="color:var(--text-muted)">—</span>';
               return `<tr id="alias-row-${row.id}">
                 <td style="font-family:monospace;font-size:12px;max-width:200px;word-break:break-all;">${escapeHtml(row.raw_string)}</td>
                 <td>${match}</td>
@@ -4677,7 +4757,7 @@
     async function fetchDealMetrics() {
       dealEngineLoaded = true;
       /* Loading state */
-      const loadingRow = (cols) => `<tr><td colspan="${cols}" style="text-align:center;color:#94a3b8;padding:28px;"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</td></tr>`;
+      const loadingRow = (cols) => `<tr><td colspan="${cols}" style="text-align:center;color:var(--text-muted);padding:28px;"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</td></tr>`;
       document.getElementById('dm-deals-tbody').innerHTML  = loadingRow(7);
       document.getElementById('dm-alerts-tbody').innerHTML = loadingRow(6);
       ['dm-active-deals','dm-alerts-today','dm-deepest'].forEach(id => {
@@ -4733,7 +4813,7 @@
         document.getElementById('dm-deals-count').textContent = `· ${topDeals.length} of ${allDeals.length} shown`;
         if (topDeals.length === 0) {
           document.getElementById('dm-deals-tbody').innerHTML =
-            '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
+            '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
         } else {
           document.getElementById('dm-deals-tbody').innerHTML = topDeals.map(d => {
             const prod  = d.master_shoe_products;
@@ -4748,10 +4828,10 @@
                 <span style="font-weight:500;">${escapeHtml(name)}</span>
               </td>
               <td>${escapeHtml(d.retailer_name)}</td>
-              <td style="color:#94a3b8;text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
+              <td style="color:var(--text-muted);text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
               <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
               <td><span class="deal-discount-pill ${pillCls}"><i data-lucide="arrow-down"></i>${d.pct}%</span></td>
-              <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
+              <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
               <td style="white-space:nowrap;">
                 <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)"><i data-lucide="check"></i> Verify</button>
                 <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)"><i data-lucide="x"></i> Deactivate</button>
@@ -4764,7 +4844,7 @@
         document.getElementById('dm-alerts-count').textContent = `· ${allAlerts.length} shown`;
         if (allAlerts.length === 0) {
           document.getElementById('dm-alerts-tbody').innerHTML =
-            '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No triggered alerts found.</td></tr>';
+            '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">No triggered alerts found.</td></tr>';
         } else {
           document.getElementById('dm-alerts-tbody').innerHTML = allAlerts.map(a => {
             const prod   = a.master_shoe_products;
@@ -4774,14 +4854,14 @@
               ? escapeHtml(user.email)
               : user?.first_name
               ? escapeHtml(`${user.first_name} ${user.last_name||''}`.trim())
-              : `<span style="color:#94a3b8;font-family:monospace;font-size:11px;">${escapeHtml(a.id.slice(0,8))}…</span>`;
+              : `<span style="color:var(--text-muted);font-family:monospace;font-size:11px;">${escapeHtml(a.id.slice(0,8))}…</span>`;
             const isToday = a.last_alerted_at >= yesterday;
             return `<tr>
               <td>${userLabel}</td>
               <td style="font-weight:500;">${escapeHtml(shoeName)}</td>
               <td style="font-weight:600;color:#10b981;">${fmtCents(a.target_price_cents, a.currency)}</td>
-              <td style="color:#64748b;">${escapeHtml(a.currency || 'USD')}</td>
-              <td style="font-size:12px;color:#94a3b8;white-space:nowrap;">${escapeHtml(fmtDateTime(a.created_at))}</td>
+              <td style="color:var(--text-secondary);">${escapeHtml(a.currency || 'USD')}</td>
+              <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${escapeHtml(fmtDateTime(a.created_at))}</td>
               <td style="white-space:nowrap;">
                 <span style="font-size:12px;">${escapeHtml(fmtDateTime(a.last_alerted_at))}</span>
                 ${isToday ? '<span style="margin-left:5px;font-size:10px;background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:10px;font-weight:600;">TODAY</span>' : ''}
@@ -4902,7 +4982,7 @@
       const label  = document.getElementById('cohort-count-label');
       const expBtn = document.getElementById('cohort-export-btn');
 
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
       label.textContent  = '— users';
       expBtn.disabled    = true;
       cohortData         = [];
@@ -4916,7 +4996,7 @@
         expBtn.disabled   = cohortData.length === 0;
 
         if (!cohortData.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><i data-lucide="target"></i> No users match this segment.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="target"></i> No users match this segment.</td></tr>`;
           return;
         }
 
@@ -4929,7 +5009,7 @@
             : '—';
           const stravaOn = row.strava_connected;
           return `<tr>
-            <td style="color:#64748b;font-size:11px;">${i + 1}</td>
+            <td style="color:var(--text-secondary);font-size:11px;">${i + 1}</td>
             <td style="font-family:monospace;font-size:12px;">${escapeHtml(row.email || '—')}</td>
             <td style="font-size:12px;">${escapeHtml(row.first_name || '—')}</td>
             <td><span class="cohort-shoe-pill ${shoeClass}">${shoes}</span></td>
@@ -4937,8 +5017,8 @@
               <span class="strava-dot ${stravaOn ? 'on' : 'off'}"></span>
               <span style="font-size:11px;color:${stravaOn ? '#fc4c02' : '#64748b'}">${stravaOn ? 'Connected' : 'None'}</span>
             </td>
-            <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(syncText)}</td>
-            <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(joinedText)}</td>
+            <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(syncText)}</td>
+            <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(joinedText)}</td>
           </tr>`;
         }).join('');
 
@@ -4988,7 +5068,7 @@
     async function loadLifespanInsights() {
       lifespanLoaded = true;
       const tbody = document.getElementById('grave-tbody');
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
       ['grave-kpi-total','grave-kpi-longest','grave-kpi-fastest'].forEach(id => {
         document.getElementById(id).textContent = '—';
       });
@@ -5027,7 +5107,7 @@
 
         // ─ Table ─
         if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:36px;"><i data-lucide="skull"></i> No retired shoes with ≥3 samples yet.<br><span style="font-size:11px;">Retire some shoes in the app or add mock data to see insights.</span></td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="skull"></i> No retired shoes with ≥3 samples yet.<br><span style="font-size:11px;">Retire some shoes in the app or add mock data to see insights.</span></td></tr>`;
           return;
         }
 
@@ -5037,7 +5117,7 @@
           const median = Number(row.median_lifespan_km) || 0;
           const pct    = Math.min(Math.round((avg / LIFESPAN_BENCHMARK_KM) * 100), 100);
           const barColor = pct >= 100 ? '#10b981' : pct >= 75 ? '#f59e0b' : pct >= 50 ? '#f97316' : '#ef4444';
-          const rank = i === 0 ? '<i data-lucide="medal" style="color:#eab308"></i>' : i === 1 ? '<i data-lucide="medal" style="color:#94a3b8"></i>' : i === 2 ? '<i data-lucide="medal" style="color:#b45309"></i>' : `${i + 1}`;
+          const rank = i === 0 ? '<i data-lucide="medal" style="color:#eab308"></i>' : i === 1 ? '<i data-lucide="medal" style="color:var(--text-muted)"></i>' : i === 2 ? '<i data-lucide="medal" style="color:#b45309"></i>' : `${i + 1}`;
           return `<tr>
             <td>
               <div style="display:flex;align-items:center;gap:10px;">
@@ -5047,7 +5127,7 @@
                 }
                 <div>
                   <div style="font-weight:600;">${rank} ${escapeHtml(row.brand_name)} ${escapeHtml(row.model_name)}</div>
-                  <div style="font-size:11px;color:#94a3b8;">${escapeHtml(row.master_product_id?.slice(0,8) || '')}…</div>
+                  <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(row.master_product_id?.slice(0,8) || '')}…</div>
                 </div>
               </div>
             </td>
@@ -5058,11 +5138,11 @@
                   <div class="grave-bar-fill" style="width:${pct}%;background:${barColor};"></div>
                 </div>
                 <span style="font-weight:700;font-size:13px;">${avg.toLocaleString()} km</span>
-                <span style="font-size:10px;color:#94a3b8;">${pct}%</span>
+                <span style="font-size:10px;color:var(--text-muted);">${pct}%</span>
               </div>
             </td>
             <td style="font-weight:600;color:#10b981;">${max.toLocaleString()} km</td>
-            <td style="font-size:12px;color:#64748b;">${median.toLocaleString()} km</td>
+            <td style="font-size:12px;color:var(--text-secondary);">${median.toLocaleString()} km</td>
           </tr>`;
         }).join('');
 
@@ -5082,7 +5162,7 @@
     async function loadRevenueAnalytics() {
       revenueAnalyticsLoaded = true;
       const tbody = document.getElementById('rev-perf-tbody');
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
       document.getElementById('rev-kpi-clicks').textContent     = '—';
       document.getElementById('rev-kpi-top-deal').textContent   = '—';
       document.getElementById('rev-kpi-epc').textContent        = '—';
@@ -5115,7 +5195,7 @@
 
         // ─ Performance Table ─
         if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:36px;"><i data-lucide="package"></i> No active deals found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="package"></i> No active deals found.</td></tr>`;
           return;
         }
 
@@ -5131,7 +5211,7 @@
           const safeUrl   = escapeHtml(row.deal_url || '#');
           return `<tr>
             <td style="font-weight:600;max-width:200px;">${escapeHtml(row.shoe_name)}</td>
-            <td style="font-size:12px;color:#64748b;">${escapeHtml(row.retailer || '—')}</td>
+            <td style="font-size:12px;color:var(--text-secondary);">${escapeHtml(row.retailer || '—')}</td>
             <td style="font-size:12px;">${escapeHtml(price)}</td>
             <td>
               <div class="rev-clicks-bar-wrap">
@@ -5140,7 +5220,7 @@
               </div>
             </td>
             <td style="font-size:13px;">${uniq.toLocaleString()}</td>
-            <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(lastClick)}</td>
+            <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(lastClick)}</td>
             <td>
               <a class="rev-verify-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer"
                  title="Open deal URL in new tab to verify link is live">
@@ -5166,7 +5246,7 @@
     async function loadLedger() {
       ledgerLoaded = true;
       const tbody = document.getElementById('ledger-tbody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
 
       try {
         const { data, error } = await getSupabase()
@@ -5194,7 +5274,7 @@
       const rows = filter ? ledgerAllRows.filter(r => r.action_type === filter) : ledgerAllRows;
 
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;">No audit entries found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">No audit entries found.</td></tr>';
         return;
       }
 
@@ -5209,12 +5289,12 @@
         return `<tr>
           <td style="white-space:nowrap;font-size:11px;">
             ${escapeHtml(fmtDateTime(row.created_at))}<br>
-            <span style="color:#94a3b8">${escapeHtml(timeAgo(row.created_at))}</span>
+            <span style="color:var(--text-muted)">${escapeHtml(timeAgo(row.created_at))}</span>
           </td>
           <td><span class="ledger-action-pill ${pillClass}">${escapeHtml(row.action_type)}</span></td>
-          <td style="font-size:11px;color:#64748b;">${escapeHtml(row.entity_type)}</td>
+          <td style="font-size:11px;color:var(--text-secondary);">${escapeHtml(row.entity_type)}</td>
           <td style="font-family:monospace;font-size:11px;" title="${escapeHtml(row.entity_id)}">${escapeHtml(shortId)}</td>
-          <td style="font-size:11px;color:#64748b;">${escapeHtml(row.admin_identifier)}</td>
+          <td style="font-size:11px;color:var(--text-secondary);">${escapeHtml(row.admin_identifier)}</td>
           <td>
             <button class="ledger-view-btn" onclick="openDiffModal(${escapeHtml(JSON.stringify(JSON.stringify(row)))})">View Payload</button>
           </td>
@@ -5368,7 +5448,7 @@
         if (gearRes.error) throw gearRes.error;
         const shoes = gearRes.data || [];
         if (shoes.length === 0) {
-          document.getElementById('sc-rotation').innerHTML = '<p style="color:#94a3b8;font-size:13px;">No active shoes.</p>';
+          document.getElementById('sc-rotation').innerHTML = '<p style="color:var(--text-muted);font-size:13px;">No active shoes.</p>';
         } else {
           document.getElementById('sc-rotation').innerHTML = shoes.map(s => {
             const product = s.master_shoe_products;
@@ -5388,7 +5468,7 @@
         const acts = actRes.data || [];
         document.getElementById('sc-act-count').textContent = `· ${acts.length} shown`;
         if (acts.length === 0) {
-          document.getElementById('sc-activities').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No activities found.</p>';
+          document.getElementById('sc-activities').innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No activities found.</p>';
         } else {
           document.getElementById('sc-activities').innerHTML = `
             <table class="support-table">
@@ -5411,9 +5491,9 @@
         const whs = whRes.data || [];
         document.getElementById('sc-wh-count').textContent = `· ${whs.length} shown`;
         if (!user.strava_athlete_id) {
-          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No Strava Athlete ID — cannot query webhook logs.</p>';
+          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No Strava Athlete ID — cannot query webhook logs.</p>';
         } else if (whs.length === 0) {
-          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No webhook events found for this athlete.</p>';
+          document.getElementById('sc-webhooks').innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No webhook events found for this athlete.</p>';
         } else {
           document.getElementById('sc-webhooks').innerHTML = `
             <table class="support-table">
@@ -5421,7 +5501,7 @@
               <tbody>${whs.map(w => {
                 const statusCls = w.status === 'ok' ? 'ok' : w.status === 'error' ? 'error' : 'unknown';
                 return `<tr>
-                  <td style="white-space:nowrap;font-size:12px;">${escapeHtml(fmtDateTime(w.created_at))}<br><span style="color:#94a3b8;font-size:11px;">${escapeHtml(timeAgo(w.created_at))}</span></td>
+                  <td style="white-space:nowrap;font-size:12px;">${escapeHtml(fmtDateTime(w.created_at))}<br><span style="color:var(--text-muted);font-size:11px;">${escapeHtml(timeAgo(w.created_at))}</span></td>
                   <td><span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:600;">${escapeHtml((w.object_type||'') + '.' + (w.aspect_type||''))}</span></td>
                   <td style="font-family:monospace;font-size:12px;">${escapeHtml(w.object_id || '—')}</td>
                   <td><span class="sync-badge ${statusCls}">${w.status === 'ok' ? '<i data-lucide="check"></i> OK' : w.status === 'error' ? '<i data-lucide="x"></i> Error' : w.status}</span></td>
@@ -5626,7 +5706,7 @@
     async function fetchWebhookLogs() {
       syncLoaded = true;
       const tbody = document.getElementById('sync-table-body');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
 
       try {
         const sb = getSupabase();
@@ -5667,7 +5747,7 @@
         const msg = syncFilter === 'all'
           ? 'No webhook events yet. Events will appear here after the next Strava activity.'
           : `No ${syncFilter} events in the last 50.`;
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:40px;">${escapeHtml(msg)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px;">${escapeHtml(msg)}</td></tr>`;
         return;
       }
 
@@ -5694,12 +5774,12 @@
         return `
           <tr data-id="${row.id}">
             <td>
-              <div style="font-size:12px;color:#1e293b;">${escapeHtml(ts)}</div>
-              <div style="font-size:11px;color:#94a3b8;">${escapeHtml(ago)}</div>
+              <div style="font-size:12px;color:var(--text-primary);">${escapeHtml(ts)}</div>
+              <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(ago)}</div>
             </td>
             <td><span class="sync-event-pill ${eventClass}">${escapeHtml(eventLabel)}</span></td>
-            <td style="font-family:monospace;font-size:12px;color:#64748b;">${escapeHtml(row.owner_id || '—')}</td>
-            <td style="font-family:monospace;font-size:12px;color:#64748b;">${escapeHtml(row.object_id || '—')}</td>
+            <td style="font-family:monospace;font-size:12px;color:var(--text-secondary);">${escapeHtml(row.owner_id || '—')}</td>
+            <td style="font-family:monospace;font-size:12px;color:var(--text-secondary);">${escapeHtml(row.object_id || '—')}</td>
             <td>
               <span class="sync-badge ${statusClass}">${statusIcon} ${statusLabel}</span>
               ${errTip}
@@ -5798,7 +5878,7 @@
         if (el) { el.textContent = '…'; el.classList.add('loading-val'); }
       });
       const cronTbody = document.getElementById('h-cron-table');
-      if (cronTbody) cronTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;">Loading…</td></tr>';
+      if (cronTbody) cronTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">Loading…</td></tr>';
 
       try {
         const sb = getSupabase();
@@ -5862,7 +5942,7 @@
           /* pg_cron.job_run_details needs service role — show graceful fallback */
           cronTbody.innerHTML = `
             <tr>
-              <td colspan="4" style="text-align:center;color:#94a3b8;padding:24px;font-size:12px;">
+              <td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;font-size:12px;">
                 <div style="margin-bottom:6px"><i data-lucide="lock"></i> Cron details require service-role access</div>
                 <a href="https://supabase.com/dashboard/project/vpeszlbrrqwsmnhqdtpf/database/query-runner"
                    target="_blank"
@@ -5880,8 +5960,8 @@
               : row.status === 'failed' ? 'error' : 'warn';
             return `
               <tr>
-                <td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${escapeHtml(row.jobname || String(row.jobid))}</code></td>
-                <td>${fmtDateTime(row.start_time)}<br><span style="color:#94a3b8;font-size:11px">${timeAgo(row.start_time)}</span></td>
+                <td><code style="font-size:12px;background:var(--border-subtle);padding:2px 6px;border-radius:4px">${escapeHtml(row.jobname || String(row.jobid))}</code></td>
+                <td>${fmtDateTime(row.start_time)}<br><span style="color:var(--text-muted);font-size:11px">${timeAgo(row.start_time)}</span></td>
                 <td><span class="status-pill ${statusClass}">${escapeHtml(row.status || 'unknown')}</span></td>
                 <td>${duration}</td>
               </tr>`;
@@ -5932,7 +6012,7 @@
       if (ignored.size === 0) {
         el.innerHTML = '';
       } else {
-        el.innerHTML = `<span style="color:#64748b;font-size:13px;">${ignored.size} ignored</span>
+        el.innerHTML = `<span style="color:var(--text-secondary);font-size:13px;">${ignored.size} ignored</span>
           <button class="dup-refresh-btn" style="padding:4px 10px;font-size:12px;" onclick="resetIgnoredClusters()">Reset</button>`;
       }
     }
@@ -5968,7 +6048,7 @@
         document.getElementById('dup-list').innerHTML = `
           <div class="dup-empty">
             <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
-            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
+            <p style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px;">All duplicates resolved</p>
             <p>Great work — the catalog is clean.</p>
           </div>`;
       }
@@ -6274,7 +6354,7 @@
         container.innerHTML = `
           <div class="dup-empty">
             <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
-            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">No duplicates found</p>
+            <p style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px;">No duplicates found</p>
             <p>All ${escapeHtml(String(document.title))} shoe records appear to be unique.</p>
           </div>`;
         return;
@@ -6411,8 +6491,8 @@
           return `
             <tr class="${isMaster ? 'merge-preview-master' : ''}">
               <td>
-                <div style="font-weight:600;color:#1e293b;">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
-                <div style="font-size:11px;color:#64748b;margin-top:2px;">${isMaster ? 'Master (kept)' : 'Will be deleted'}</div>
+                <div style="font-weight:600;color:var(--text-primary);">${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">${isMaster ? 'Master (kept)' : 'Will be deleted'}</div>
               </td>
               <td class="merge-preview-count ${i.deals === 0 ? 'zero' : ''}">${i.deals}</td>
               <td class="merge-preview-count ${i.gear === 0 ? 'zero' : ''}">${i.gear}</td>
@@ -6425,7 +6505,7 @@
             <p><strong>Master:</strong> ${escapeHtml(master ? `${master.brand_name} ${master.model_name}` : 'Selected master')}</p>
             <p><strong>Duplicates to remove:</strong> ${duplicates.length}</p>
             <p><strong>Linked records to migrate:</strong> ${totalMigrated}</p>
-            <p style="font-size:12px;color:#64748b;margin-top:8px;">Deals, user gear and price alerts pointing at the duplicate products will be repointed to the master.</p>
+            <p style="font-size:12px;color:var(--text-secondary);margin-top:8px;">Deals, user gear and price alerts pointing at the duplicate products will be repointed to the master.</p>
           </div>
           <table class="merge-preview-table">
             <thead>
@@ -6575,7 +6655,7 @@
         document.getElementById('dup-list').innerHTML = `
           <div class="dup-empty">
             <div class="dup-empty-icon"><i data-lucide="check-circle"></i></div>
-            <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:6px;">All duplicates resolved</p>
+            <p style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px;">All duplicates resolved</p>
             <p>Great work — the catalog is clean.</p>
           </div>`;
       }
@@ -6679,11 +6759,18 @@
     let autoRefreshTimer = null;
     function toggleAutoRefresh(on) {
       if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+      sessionStorage.setItem('admin_auto_refresh', on ? '1' : '0');
       if (on) {
         autoRefreshTimer = setInterval(() => {
           const pulseView = document.getElementById('view-platform-pulse');
           if (pulseView && pulseView.classList.contains('active')) loadTelemetry();
         }, 60000);
+      }
+    }
+    function restoreAutoRefresh() {
+      if (sessionStorage.getItem('admin_auto_refresh') === '1') {
+        const cb = document.getElementById('auto-refresh-cb');
+        if (cb) { cb.checked = true; toggleAutoRefresh(true); }
       }
     }
 
@@ -7019,6 +7106,63 @@
     }
 
     /* ═══════════════════════════════════════════════════
+       MOBILE SIDEBAR TOGGLE
+    ═══════════════════════════════════════════════════ */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar-nav');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    }
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar-nav');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar) sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CHART.JS DARK MODE ADAPTATION
+    ═══════════════════════════════════════════════════ */
+    function applyChartDarkMode() {
+      if (typeof Chart === 'undefined') return;
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.06)';
+      const tickColor = isDark ? '#8b949e' : '#64748b';
+      Chart.defaults.color = tickColor;
+      Chart.defaults.borderColor = gridColor;
+      Chart.defaults.scale.grid = { color: gridColor };
+      // Re-render charts if they exist
+      if (chartUserGrowth)  { chartUserGrowth.options.scales.x.grid = { color: gridColor }; chartUserGrowth.options.scales.y.grid = { color: gridColor }; chartUserGrowth.update('none'); }
+      if (chartRetention)   { chartRetention.options.scales.x.grid = { color: gridColor }; chartRetention.options.scales.y.grid = { color: gridColor }; chartRetention.update('none'); }
+      if (chartSyncHealth)  { chartSyncHealth.options.scales.x.grid = { color: gridColor }; chartSyncHealth.options.scales.y.grid = { color: gridColor }; chartSyncHealth.update('none'); }
+    }
+
+    // Hook into theme toggle
+    const _origToggleTheme = toggleTheme;
+    toggleTheme = function() {
+      _origToggleTheme();
+      applyChartDarkMode();
+    };
+
+    /* ═══════════════════════════════════════════════════
+       LOADING SKELETON HELPERS
+    ═══════════════════════════════════════════════════ */
+    function showPulseSkeleton() {
+      document.querySelectorAll('#view-platform-pulse .pulse-value').forEach(el => {
+        el.dataset.orig = el.textContent;
+        el.innerHTML = '<div class="skeleton skeleton-value"></div>';
+      });
+    }
+    function hidePulseSkeleton() {
+      document.querySelectorAll('#view-platform-pulse .pulse-value').forEach(el => {
+        if (el.querySelector('.skeleton')) {
+          el.textContent = el.dataset.orig || '—';
+        }
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
        INIT ENHANCEMENTS — hook into showApp
     ═══════════════════════════════════════════════════ */
     const _origShowApp = showApp;
@@ -7026,6 +7170,8 @@
       _origShowApp();
       loadChartData();
       loadDeployBadge();
+      restoreAutoRefresh();
+      applyChartDarkMode();
     };
   </script>
 
