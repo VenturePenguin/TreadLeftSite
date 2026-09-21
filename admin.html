@@ -256,7 +256,7 @@
       font-weight: 600;
     }
 
-    /* Platform Pulse */
+    /* Dashboard */
     .pulse-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -568,7 +568,7 @@
       .deploy-badge { padding-left: 20px; }
     }
 
-    /* ── Batch toolbar for Discovery Queue ────────────────── */
+    /* ── Batch toolbar for Discoveries ────────────────── */
     .batch-selection-bar {
       display: none; align-items: center; gap: 12px;
       padding: 10px 16px; margin-bottom: 16px;
@@ -1115,7 +1115,7 @@
     .status-pill.error   { background: #fee2e2; color: #991b1b; }
     .status-pill.unknown { background: #f1f5f9; color: #64748b; }
 
-    /* ── Strava Sync Monitor ── */
+    /* ── Sync Monitor ── */
     .sync-toolbar {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
@@ -1268,7 +1268,7 @@
       font-weight: 500;
     }
 
-    /* ── Brand Normalization ── */
+    /* ── Brand Aliases ── */
     .brand-layout {
       display: grid;
       grid-template-columns: 1fr 320px;
@@ -1415,7 +1415,7 @@
     .brand-result-box.ok    { background: #d1fae5; color: #065f46; display: block; }
     .brand-result-box.error { background: #fee2e2; color: #991b1b; display: block; }
 
-    /* ── Deal Engine Monitor ── */
+    /* ── Deals Monitor ── */
     .deal-metric-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1597,7 +1597,7 @@
     .deal-action-btn.deactivate { background: #fee2e2; color: #991b1b; }
     .deal-action-btn:hover { opacity: .8; }
 
-    /* ── User Support Console ── */
+    /* ── User Lookup ── */
     .support-search-bar {
       display: flex; gap: 10px; align-items: center;
       margin-bottom: 24px;
@@ -1708,7 +1708,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── System Ledger ── */
+    /* ── Audit Log ── */
     .ledger-table-wrap {
       background: var(--bg-surface);
       border: 1px solid var(--border);
@@ -1915,7 +1915,7 @@
     .toast.error   { border-left: 4px solid #ef4444; }
     .toast.show    { display: flex; }
 
-    /* ── Revenue Analytics ── */
+    /* ── Revenue ── */
     .rev-kpi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -2009,7 +2009,7 @@
     }
     .rev-verify-btn:hover { border-color: #10b981; color: #10b981; }
 
-    /* ── Lifespan Insights (Graveyard) ── */
+    /* ── Shoe Lifespan (Graveyard) ── */
     .grave-kpi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -2103,7 +2103,7 @@
       color: #64748b;
     }
 
-    /* ── User Cohorts CRM ── */
+    /* ── Cohorts CRM ── */
     .cohort-control-bar {
       display: flex;
       align-items: center;
@@ -2710,11 +2710,11 @@
         <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Analytics</div>
         <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
           <span class="nav-icon"><i data-lucide="activity"></i></span>
-          Platform Pulse
+          Dashboard
         </button>
         <button class="nav-item" data-view="revenue-analytics" onclick="navigate('revenue-analytics')">
           <span class="nav-icon"><i data-lucide="dollar-sign"></i></span>
-          Revenue Analytics
+          Revenue
         </button>
       </div>
 
@@ -2722,16 +2722,16 @@
         <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Catalog</div>
         <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
           <span class="nav-icon"><i data-lucide="search"></i></span>
-          Discovery Queue
+          Discoveries
           <span class="nav-badge" id="sidebar-pending-count" style="display:none;background:#f59e0b;"></span>
         </button>
         <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
           <span class="nav-icon"><i data-lucide="percent"></i></span>
-          Deal Engine
+          Deals
         </button>
         <button class="nav-item" data-view="lifespan-insights" onclick="navigate('lifespan-insights')">
           <span class="nav-icon"><i data-lucide="skull"></i></span>
-          Lifespan Insights
+          Shoe Lifespan
         </button>
       </div>
 
@@ -2739,15 +2739,15 @@
         <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Data Governance</div>
         <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
           <span class="nav-icon"><i data-lucide="copy"></i></span>
-          Duplicate Detection
+          Duplicates
         </button>
         <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
           <span class="nav-icon"><i data-lucide="tag"></i></span>
-          Brand Normalization
+          Brand Aliases
         </button>
         <button class="nav-item" data-view="system-ledger" onclick="navigate('system-ledger')">
           <span class="nav-icon"><i data-lucide="file-text"></i></span>
-          System Ledger
+          Audit Log
         </button>
       </div>
 
@@ -2768,7 +2768,7 @@
         </button>
         <button class="nav-item" data-view="strava-monitor" onclick="navigate('strava-monitor')">
           <span class="nav-icon"><i data-lucide="bike"></i></span>
-          Strava Sync Monitor
+          Sync Monitor
           <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
         </button>
       </div>
@@ -2777,11 +2777,11 @@
         <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Support</div>
         <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
           <span class="nav-icon"><i data-lucide="user"></i></span>
-          User Support
+          User Lookup
         </button>
         <button class="nav-item" data-view="user-cohorts" onclick="navigate('user-cohorts')">
           <span class="nav-icon"><i data-lucide="target"></i></span>
-          User Cohorts
+          Cohorts
         </button>
       </div>
     </nav>
@@ -2789,10 +2789,10 @@
     <!-- Main Content -->
     <main class="main-content" role="main">
 
-      <!-- VIEW: Platform Pulse -->
+      <!-- VIEW: Dashboard -->
       <div id="view-platform-pulse" class="view active">
         <div class="view-header">
-          <h2><i data-lucide="activity"></i> Platform Pulse</h2>
+          <h2><i data-lucide="activity"></i> Dashboard</h2>
           <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
             <div id="pulse-health-pill" class="health-pill" onclick="navigate('system-health')" style="display:none">
               <span class="health-dot"></span>
@@ -2825,7 +2825,7 @@
               <div class="triage-card-icon"><i data-lucide="copy"></i></div>
               <div class="triage-card-body">
                 <div class="triage-card-value" id="triage-dup-count">—</div>
-                <div class="triage-card-label">Duplicate Detection</div>
+                <div class="triage-card-label">Duplicates</div>
                 <div class="triage-card-sub">Suspected duplicate shoe models</div>
                 <div class="triage-card-preview" id="triage-dup-preview"></div>
               </div>
@@ -2936,7 +2936,7 @@
           </div>
           <div class="pulse-card clickable" style="--accent:#7c3aed" onclick="navigate('duplicate-resolver')">
             <div class="pulse-value" id="pulse-duplicates">—</div>
-            <div class="pulse-label">Duplicate Detection</div>
+            <div class="pulse-label">Duplicates</div>
             <div class="pulse-sub">Suspected duplicate shoe models</div>
           </div>
           <div class="pulse-card clickable" style="--accent:#3b82f6" onclick="navigate('lifespan-insights')">
@@ -3057,7 +3057,7 @@
       <!-- VIEW: DiscoveryQueue -->
       <div id="view-discovery-queue" class="view">
         <div class="view-header">
-          <h2><i data-lucide="search"></i> Discovery Queue <span class="badge" id="pending-count">0 pending</span></h2>
+          <h2><i data-lucide="search"></i> Discoveries <span class="badge" id="pending-count">0 pending</span></h2>
         </div>
 
         <!-- Queue source tabs -->
@@ -3110,7 +3110,7 @@
       <!-- VIEW: DuplicateResolver -->
       <div id="view-duplicate-resolver" class="view">
         <div class="view-header">
-          <h2><i data-lucide="copy"></i> Duplicate Detection <span class="badge" id="dup-group-count" style="background:#64748b;">—</span></h2>
+          <h2><i data-lucide="copy"></i> Duplicates <span class="badge" id="dup-group-count" style="background:#64748b;">—</span></h2>
         </div>
 
         <div class="dup-toolbar">
@@ -3144,10 +3144,10 @@
         </div>
       </div>
 
-      <!-- VIEW: User Cohorts CRM -->
+      <!-- VIEW: Cohorts CRM -->
       <div id="view-user-cohorts" class="view">
         <div class="view-header">
-          <h2><i data-lucide="target"></i> User Cohorts</h2>
+          <h2><i data-lucide="target"></i> Cohorts</h2>
         </div>
 
         <p style="font-size:13px;color:var(--text-secondary);margin:0 0 20px;">
@@ -3170,7 +3170,7 @@
 
         <!-- Data Table -->
         <div class="cohort-table-wrap">
-          <table class="cohort-table" aria-label="User Cohorts">
+          <table class="cohort-table" aria-label="Cohorts">
             <thead>
               <tr>
                 <th>#</th>
@@ -3190,10 +3190,10 @@
         <div class="pagination" id="cohort-pagination"></div>
       </div>
 
-      <!-- VIEW: Lifespan Insights -->
+      <!-- VIEW: Shoe Lifespan -->
       <div id="view-lifespan-insights" class="view">
         <div class="view-header">
-          <h2><i data-lucide="skull"></i> Lifespan Insights <span class="badge" id="grave-model-count" style="background:#64748b;">—</span></h2>
+          <h2><i data-lucide="skull"></i> Shoe Lifespan <span class="badge" id="grave-model-count" style="background:#64748b;">—</span></h2>
           <div style="display:flex;gap:8px">
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadLifespanInsights()"><i data-lucide="refresh-cw"></i> Refresh</button>
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px;font-size:11px" onclick="exportTableToCSV('grave-table','lifespan-insights.csv')" title="Export to CSV"><i data-lucide="download"></i> CSV</button>
@@ -3246,10 +3246,10 @@
         </div>
       </div>
 
-      <!-- VIEW: Revenue Analytics -->
+      <!-- VIEW: Revenue -->
       <div id="view-revenue-analytics" class="view">
         <div class="view-header">
-          <h2><i data-lucide="dollar-sign"></i> Revenue Analytics</h2>
+          <h2><i data-lucide="dollar-sign"></i> Revenue</h2>
           <div style="display:flex;gap:8px">
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadRevenueAnalytics()"><i data-lucide="refresh-cw"></i> Refresh</button>
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px;font-size:11px" onclick="exportTableToCSV('rev-perf-table','revenue-performance.csv')" title="Export to CSV"><i data-lucide="download"></i> CSV</button>
@@ -3300,10 +3300,10 @@
         </div>
       </div>
 
-      <!-- VIEW: System Ledger -->
+      <!-- VIEW: Audit Log -->
       <div id="view-system-ledger" class="view">
         <div class="view-header">
-          <h2><i data-lucide="file-text"></i> System Ledger <span class="badge" id="ledger-count-badge" style="background:#7c3aed;">—</span></h2>
+          <h2><i data-lucide="file-text"></i> Audit Log <span class="badge" id="ledger-count-badge" style="background:#7c3aed;">—</span></h2>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
@@ -3328,7 +3328,7 @@
         </div>
 
         <div class="ledger-table-wrap">
-          <table class="ledger-table" aria-label="System Ledger">
+          <table class="ledger-table" aria-label="Audit Log">
             <thead>
               <tr>
                 <th class="sortable-th" onclick="sortLedger('created_at')">Timestamp <span class="sort-arrow" id="sort-ledger-created_at">▼</span></th>
@@ -3368,7 +3368,7 @@
         <div class="health-grid">
           <div class="health-card accent-orange">
             <div class="health-card-icon"><i data-lucide="search"></i></div>
-            <div class="health-card-label">Pending Discovery Queue</div>
+            <div class="health-card-label">Pending Discoveries</div>
             <div class="health-card-value loading-val" id="h-queue-val">—</div>
             <div class="health-card-sub" id="h-queue-sub">shoes awaiting review</div>
           </div>
@@ -3414,10 +3414,10 @@
         </div>
       </div>
 
-      <!-- VIEW: Strava Sync Monitor -->
+      <!-- VIEW: Sync Monitor -->
       <div id="view-strava-monitor" class="view">
         <div class="view-header">
-          <h2><i data-lucide="bike"></i> Strava Sync Monitor <span class="badge" id="sync-error-badge" style="background:#ef4444;display:none;">0 errors</span></h2>
+          <h2><i data-lucide="bike"></i> Sync Monitor <span class="badge" id="sync-error-badge" style="background:#ef4444;display:none;">0 errors</span></h2>
         </div>
 
         <div class="sync-toolbar">
@@ -3452,10 +3452,10 @@
         </div>
       </div>
 
-      <!-- VIEW: Brand Normalization -->
+      <!-- VIEW: Brand Aliases -->
       <div id="view-brand-normalization" class="view">
         <div class="view-header">
-          <h2><i data-lucide="tag"></i> Brand Normalization</h2>
+          <h2><i data-lucide="tag"></i> Brand Aliases</h2>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
@@ -3507,10 +3507,10 @@
         </div>
       </div>
 
-      <!-- VIEW: User Support Console -->
+      <!-- VIEW: User Lookup -->
       <div id="view-user-support" class="view">
         <div class="view-header">
-          <h2><i data-lucide="user"></i> User Support Console</h2>
+          <h2><i data-lucide="user"></i> User Lookup</h2>
         </div>
 
         <!-- Search -->
@@ -3590,10 +3590,10 @@
         </div>
       </div>
 
-      <!-- VIEW: Deal Engine Monitor -->
+      <!-- VIEW: Deals Monitor -->
       <div id="view-deal-engine" class="view">
         <div class="view-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <h2><i data-lucide="percent"></i> Deal Engine</h2>
+          <h2><i data-lucide="percent"></i> Deals</h2>
           <div style="display:flex;gap:10px;">
             <button class="deal-btn-primary" onclick="openDealModal()">+ Create New Deal</button>
             <button class="health-refresh-btn" onclick="fetchDealMetrics()">
@@ -3881,12 +3881,12 @@
     /* ── NAVIGATION ── */
     let dupLoaded = false;
     const VIEW_LABELS = {
-      'platform-pulse': 'Platform Pulse', 'revenue-analytics': 'Revenue Analytics',
-      'discovery-queue': 'Discovery Queue', 'deal-engine': 'Deal Engine',
-      'lifespan-insights': 'Lifespan Insights', 'duplicate-resolver': 'Duplicate Detection',
-      'brand-normalization': 'Brand Normalization', 'system-ledger': 'System Ledger',
-      'system-health': 'System Health', 'strava-monitor': 'Strava Monitor',
-      'user-support': 'User Support', 'user-cohorts': 'User Cohorts',
+      'platform-pulse': 'Dashboard', 'revenue-analytics': 'Revenue',
+      'discovery-queue': 'Discoveries', 'deal-engine': 'Deals',
+      'lifespan-insights': 'Shoe Lifespan', 'duplicate-resolver': 'Duplicates',
+      'brand-normalization': 'Brand Aliases', 'system-ledger': 'Audit Log',
+      'system-health': 'System Health', 'strava-monitor': 'Sync Monitor',
+      'user-support': 'User Lookup', 'user-cohorts': 'Cohorts',
     };
     function navigate(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -4632,7 +4632,7 @@
 
     const AI_OPS_URL = `${SUPABASE_URL}/functions/v1/admin-ai-ops`;
 
-    // ── Phase 2: AI Normalize Discovery Queue ─────────────────────────────
+    // ── Phase 2: AI Normalize Discoveries ─────────────────────────────
     async function aiNormalizeQueue() {
       const btn = document.getElementById('dq-ai-normalize-btn');
       const source = dqActiveTab === 'catalog' ? pendingData : aliasData;
@@ -5253,7 +5253,7 @@
         ['dm-deals-tbody','dm-alerts-tbody'].forEach(id => {
           document.getElementById(id).innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:28px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         });
-        showToast('Deal Engine error: ' + err.message, 'error');
+        showToast('Deals error: ' + err.message, 'error');
       }
     }
 
@@ -7255,18 +7255,18 @@
        COMMAND PALETTE
     ═══════════════════════════════════════════════════ */
     const CMD_ITEMS = [
-      { label: 'Platform Pulse', view: 'platform-pulse', icon: 'activity', key: '1' },
-      { label: 'Revenue Analytics', view: 'revenue-analytics', icon: 'dollar-sign', key: '2' },
-      { label: 'Discovery Queue', view: 'discovery-queue', icon: 'search', key: '3' },
-      { label: 'Deal Engine', view: 'deal-engine', icon: 'percent', key: '4' },
-      { label: 'Lifespan Insights', view: 'lifespan-insights', icon: 'skull', key: '5' },
-      { label: 'Duplicate Detection', view: 'duplicate-resolver', icon: 'copy', key: '6' },
-      { label: 'Brand Normalization', view: 'brand-normalization', icon: 'tag', key: '7' },
-      { label: 'System Ledger', view: 'system-ledger', icon: 'file-text', key: '8' },
+      { label: 'Dashboard', view: 'platform-pulse', icon: 'activity', key: '1' },
+      { label: 'Revenue', view: 'revenue-analytics', icon: 'dollar-sign', key: '2' },
+      { label: 'Discoveries', view: 'discovery-queue', icon: 'search', key: '3' },
+      { label: 'Deals', view: 'deal-engine', icon: 'percent', key: '4' },
+      { label: 'Shoe Lifespan', view: 'lifespan-insights', icon: 'skull', key: '5' },
+      { label: 'Duplicates', view: 'duplicate-resolver', icon: 'copy', key: '6' },
+      { label: 'Brand Aliases', view: 'brand-normalization', icon: 'tag', key: '7' },
+      { label: 'Audit Log', view: 'system-ledger', icon: 'file-text', key: '8' },
       { label: 'System Health', view: 'system-health', icon: 'heart', key: '9' },
-      { label: 'Strava Sync Monitor', view: 'strava-monitor', icon: 'bike' },
-      { label: 'User Support', view: 'user-support', icon: 'user' },
-      { label: 'User Cohorts', view: 'user-cohorts', icon: 'target' },
+      { label: 'Sync Monitor', view: 'strava-monitor', icon: 'bike' },
+      { label: 'User Lookup', view: 'user-support', icon: 'user' },
+      { label: 'Cohorts', view: 'user-cohorts', icon: 'target' },
     ];
     let cmdSelectedIdx = 0;
     let cmdFiltered = [...CMD_ITEMS];
@@ -7535,7 +7535,7 @@
     }
 
     /* ═══════════════════════════════════════════════════
-       BATCH TOOLBAR — Discovery Queue multi-select
+       BATCH TOOLBAR — Discoveries multi-select
     ═══════════════════════════════════════════════════ */
     let batchSelectedShoes = new Set();
     function toggleBatchShoe(id, checkbox) {
@@ -7723,7 +7723,7 @@
       });
     })();
 
-    /* ── Keyboard navigation: arrow keys for Discovery Queue cards ── */
+    /* ── Keyboard navigation: arrow keys for Discoveries cards ── */
     document.addEventListener('keydown', function(e) {
       // Only active in discovery-queue view
       const dqView = document.getElementById('view-discovery-queue');
