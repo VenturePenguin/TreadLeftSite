@@ -440,23 +440,8 @@
     }
 
     /* ── Toast History Tray ───────────────────────────────── */
-    .toast-tray-btn {
-      position: fixed; bottom: 20px; right: 20px; z-index: 90;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--bg-surface); border: 1px solid var(--border);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,.12); font-size: 16px; color: var(--text-secondary);
-      transition: all .15s;
-    }
-    .toast-tray-btn:hover { border-color: #f97316; color: #f97316; }
-    .toast-tray-btn .toast-badge {
-      position: absolute; top: -4px; right: -4px;
-      background: #ef4444; color: #fff; font-size: 9px; font-weight: 700;
-      width: 16px; height: 16px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-    }
     .toast-tray {
-      position: fixed; bottom: 64px; right: 20px; z-index: 91;
+      position: fixed; top: 52px; right: 20px; z-index: 91;
       width: 340px; max-height: 320px; overflow-y: auto;
       background: var(--bg-surface); border: 1px solid var(--border);
       border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
@@ -7341,14 +7326,7 @@
       updateToastTray();
     }
     function updateToastTray() {
-      const btn = document.getElementById('toast-tray-btn');
-      const badge = document.getElementById('toast-tray-badge');
       const list = document.getElementById('toast-tray-list');
-      if (btn) btn.style.display = 'flex';
-      if (badge) {
-        badge.style.display = toastHistory.length > 0 ? 'flex' : 'none';
-        badge.textContent = toastHistory.length;
-      }
       if (!list) return;
       if (toastHistory.length === 0) {
         list.innerHTML = '<div class="toast-tray-empty">No notifications yet</div>';
@@ -7787,10 +7765,6 @@
   </div>
 
   <!-- Toast History Tray -->
-  <button class="toast-tray-btn" id="toast-tray-btn" onclick="toggleToastTray()" title="Notification history" style="display:none">
-    <i data-lucide="bell"></i>
-    <span class="toast-badge" id="toast-tray-badge" style="display:none">0</span>
-  </button>
   <div class="toast-tray" id="toast-tray">
     <div class="toast-tray-header">
       Notifications
