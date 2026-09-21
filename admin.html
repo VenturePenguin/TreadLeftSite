@@ -2405,18 +2405,122 @@
       accent-color: #1e293b;
       cursor: pointer;
     }
+
+    /* ── Dark mode badge overrides ── */
+    html.dark .sync-event-pill,
+    html.dark .ledger-action-pill.approve,
+    html.dark .ledger-action-pill.reject,
+    html.dark .ledger-action-pill.merge,
+    html.dark .ledger-action-pill.ai,
+    html.dark .ledger-action-pill.edit,
+    html.dark .ledger-action-pill.brand {
+      filter: brightness(0.85) saturate(1.2);
+    }
+    html.dark span[style*="background:#eff6ff"],
+    html.dark span[style*="background:#d1fae5"],
+    html.dark span[style*="background:#fef2f2"],
+    html.dark span[style*="background:#fef9c3"] {
+      filter: brightness(0.65) saturate(1.1);
+    }
+
+    /* ── Sortable table headers ── */
+    .sortable-th {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .sortable-th:hover { color: var(--text-primary); }
+    .sort-arrow { font-size: 10px; margin-left: 3px; opacity: 0.4; }
+    .sort-arrow.active { opacity: 1; color: #f97316; }
+
+    /* ── Pagination controls ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px 0 4px;
+    }
+    .pagination button {
+      min-width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .pagination button:hover { background: var(--bg-subtle); }
+    .pagination button.active { background: #f97316; color: #fff; border-color: #f97316; }
+    .pagination button:disabled { opacity: 0.35; cursor: not-allowed; }
+    .pagination .page-info { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Chart fallback ── */
+    .chart-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      height: 180px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* ── Session timeout banner ── */
+    .session-timeout-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fbbf24;
+      color: #78350f;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 10000;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      display: none;
+    }
+    .session-timeout-banner.visible { display: flex; align-items: center; gap: 10px; }
+
+    /* ── Keyboard focus highlight ── */
+    .shoe-card.kb-focus {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+    }
+
+    /* ── Sidebar badge ── */
+    .nav-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: auto;
+    }
     </style>
 </head>
 <body>
 
   <!-- LOGIN GATE -->
-  <div id="login-gate">
-    <div class="login-box">
+  <div id="login-gate" role="dialog" aria-label="Admin Login">
+    <div class="login-box" role="form" aria-label="Login form">
       <h1><i data-lucide="shield-check"></i> TreadLeft Admin</h1>
       <p>Admin Control Panel</p>
-      <input type="password" id="password" class="password-input" placeholder="Enter admin password" autocomplete="off">
-      <button class="login-btn" onclick="doLogin()">Access Panel</button>
-      <div class="error-msg" id="login-error">Invalid password</div>
+      <input type="password" id="password" class="password-input" placeholder="Enter admin password" autocomplete="off" aria-label="Admin password">
+      <button class="login-btn" onclick="doLogin()" aria-label="Log in">Access Panel</button>
+      <div class="error-msg" id="login-error" role="alert">Invalid password</div>
     </div>
   </div>
 
@@ -2424,9 +2528,9 @@
   <div id="admin-shell">
 
     <!-- Top Bar -->
-    <div class="topbar">
+    <header class="topbar" role="banner">
       <div style="display:flex;align-items:center;gap:8px;">
-        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i data-lucide="menu"></i></button>
+        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" title="Menu" aria-label="Toggle navigation menu"><i data-lucide="menu"></i></button>
         <div class="topbar-brand">
           <img src="/favicon.png" alt="TreadLeft" style="width:22px;height:22px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.18);flex-shrink:0;">
           TreadLeft <span>/ Admin</span>
@@ -2435,16 +2539,16 @@
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="cmdk-hint" onclick="openCmdPalette()" title="Search"><kbd>⌘</kbd><kbd>K</kbd></span>
-        <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark mode"><i data-lucide="moon"></i></button>
-        <button class="logout-btn" onclick="doLogout()">Logout</button>
+        <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i data-lucide="moon"></i></button>
+        <button class="logout-btn" onclick="doLogout()" aria-label="Log out">Logout</button>
       </div>
-    </div>
+    </header>
 
     <!-- Sidebar Overlay (mobile) -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()" aria-hidden="true"></div>
 
     <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar-nav">
+    <nav class="sidebar" id="sidebar-nav" role="navigation" aria-label="Main navigation">
       <div class="sidebar-section-label">Analytics</div>
 
       <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
@@ -2462,6 +2566,7 @@
       <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
         <span class="nav-icon"><i data-lucide="search"></i></span>
         Discovery Queue
+        <span class="nav-badge" id="sidebar-pending-count" style="display:none;background:#f59e0b;"></span>
       </button>
 
       <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
@@ -2526,7 +2631,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <main class="main-content" role="main">
 
       <!-- VIEW: Platform Pulse -->
       <div id="view-platform-pulse" class="view active">
@@ -2909,16 +3014,16 @@
 
         <!-- Data Table -->
         <div class="cohort-table-wrap">
-          <table class="cohort-table">
+          <table class="cohort-table" aria-label="User Cohorts">
             <thead>
               <tr>
                 <th>#</th>
-                <th>Email</th>
-                <th>Name</th>
-                <th>Active Shoes</th>
+                <th class="sortable-th" onclick="sortCohort('email')">Email <span class="sort-arrow" id="sort-cohort-email">▼</span></th>
+                <th class="sortable-th" onclick="sortCohort('name')">Name <span class="sort-arrow" id="sort-cohort-name">▼</span></th>
+                <th class="sortable-th" onclick="sortCohort('shoes')">Active Shoes <span class="sort-arrow" id="sort-cohort-shoes">▼</span></th>
                 <th>Strava</th>
-                <th>Last Sync</th>
-                <th>Joined</th>
+                <th class="sortable-th" onclick="sortCohort('last_sync')">Last Sync <span class="sort-arrow" id="sort-cohort-last_sync">▼</span></th>
+                <th class="sortable-th" onclick="sortCohort('joined')">Joined <span class="sort-arrow" id="sort-cohort-joined">▼</span></th>
               </tr>
             </thead>
             <tbody id="cohort-tbody">
@@ -2926,6 +3031,7 @@
             </tbody>
           </table>
         </div>
+        <div class="pagination" id="cohort-pagination"></div>
       </div>
 
       <!-- VIEW: Lifespan Insights -->
@@ -3066,14 +3172,14 @@
         </div>
 
         <div class="ledger-table-wrap">
-          <table class="ledger-table">
+          <table class="ledger-table" aria-label="System Ledger">
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>Action</th>
-                <th>Entity</th>
+                <th class="sortable-th" onclick="sortLedger('created_at')">Timestamp <span class="sort-arrow" id="sort-ledger-created_at">▼</span></th>
+                <th class="sortable-th" onclick="sortLedger('action_type')">Action <span class="sort-arrow" id="sort-ledger-action_type">▼</span></th>
+                <th class="sortable-th" onclick="sortLedger('entity_type')">Entity <span class="sort-arrow" id="sort-ledger-entity_type">▼</span></th>
                 <th>Entity ID</th>
-                <th>Admin</th>
+                <th class="sortable-th" onclick="sortLedger('admin_identifier')">Admin <span class="sort-arrow" id="sort-ledger-admin_identifier">▼</span></th>
                 <th>Payload</th>
               </tr>
             </thead>
@@ -3082,6 +3188,7 @@
             </tbody>
           </table>
         </div>
+        <div class="pagination" id="ledger-pagination"></div>
       </div>
 
       <!-- VIEW: SystemHealth -->
@@ -3371,15 +3478,15 @@
           <span id="dm-deals-count" style="font-weight:400;color:var(--text-muted);"></span>
         </div>
         <div class="deal-table-wrap">
-          <table class="deal-table">
+          <table class="deal-table" aria-label="Active Deals">
             <thead>
               <tr>
-                <th>Shoe</th>
-                <th>Retailer</th>
-                <th>MSRP</th>
-                <th>Current Price</th>
-                <th>Discount</th>
-                <th>Last Updated</th>
+                <th class="sortable-th" onclick="sortDeals('shoe')">Shoe <span class="sort-arrow" id="sort-deal-shoe">▼</span></th>
+                <th class="sortable-th" onclick="sortDeals('retailer')">Retailer <span class="sort-arrow" id="sort-deal-retailer">▼</span></th>
+                <th class="sortable-th" onclick="sortDeals('msrp')">MSRP <span class="sort-arrow" id="sort-deal-msrp">▼</span></th>
+                <th class="sortable-th" onclick="sortDeals('price')">Current Price <span class="sort-arrow" id="sort-deal-price">▼</span></th>
+                <th class="sortable-th" onclick="sortDeals('discount')">Discount <span class="sort-arrow" id="sort-deal-discount">▼</span></th>
+                <th class="sortable-th" onclick="sortDeals('updated')">Last Updated <span class="sort-arrow" id="sort-deal-updated">▼</span></th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -3413,11 +3520,11 @@
         </div>
       </div>
 
-    </div>
+    </main>
   </div>
 
   <!-- Deal CRUD Modal -->
-  <div class="deal-modal-overlay" id="deal-modal-overlay" onclick="closeDealModalOnOverlay(event)">
+  <div class="deal-modal-overlay" id="deal-modal-overlay" onclick="closeDealModalOnOverlay(event)" role="dialog" aria-label="Create new deal">
     <div class="deal-modal">
       <h3><i data-lucide="plus"></i> Create New Deal</h3>
       <div class="deal-form-grid">
@@ -3634,6 +3741,7 @@
       // Update breadcrumb
       const bc = document.getElementById('topbar-breadcrumb');
       if (bc) { bc.textContent = '/ ' + (VIEW_LABELS[viewId] || viewId); bc.classList.add('visible'); }
+      document.title = (VIEW_LABELS[viewId] || 'Admin') + ' — TreadLeft Admin';
       // Close mobile sidebar
       closeSidebar();
       if (viewId === 'duplicate-resolver' && !dupLoaded) {
@@ -3884,6 +3992,12 @@
         pendingCard.classList.toggle('triage-card--warning', total > 0);
         pendingCard.setAttribute('onclick', total > 0 ? "navigate('discovery-queue')" : '');
       }
+      // Update sidebar badge
+      const sidebarBadge = document.getElementById('sidebar-pending-count');
+      if (sidebarBadge) {
+        if (total > 0) { sidebarBadge.textContent = total; sidebarBadge.style.display = ''; }
+        else { sidebarBadge.style.display = 'none'; }
+      }
       document.getElementById('stat-total').textContent   = total;
       document.getElementById('stat-high').textContent    = high;
       document.getElementById('stat-medium').textContent  = medium;
@@ -3989,6 +4103,7 @@
     }
 
     async function rejectShoe(id) {
+      if (!confirm('Reject this shoe discovery? This cannot be undone.')) return;
       setLoading(id, true);
       const shoe = pendingData.find(s => s.id === id);
       try {
@@ -4271,6 +4386,33 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    /* ── Shared pagination renderer ── */
+    function renderPagination(containerId, currentPage, totalPages, onPageChange) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      if (totalPages <= 1) { el.innerHTML = ''; return; }
+      const maxBtns = 5;
+      let startP = Math.max(1, currentPage - Math.floor(maxBtns / 2));
+      let endP = Math.min(totalPages, startP + maxBtns - 1);
+      if (endP - startP + 1 < maxBtns) startP = Math.max(1, endP - maxBtns + 1);
+      let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="void(0)" aria-label="Previous page">‹</button>`;
+      for (let p = startP; p <= endP; p++) {
+        html += `<button class="${p === currentPage ? 'active' : ''}" onclick="void(0)">${p}</button>`;
+      }
+      html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="void(0)" aria-label="Next page">›</button>`;
+      html += `<span class="page-info">${currentPage} / ${totalPages}</span>`;
+      el.innerHTML = html;
+      // Bind clicks
+      const btns = el.querySelectorAll('button');
+      btns[0].onclick = () => { if (currentPage > 1) onPageChange(currentPage - 1); };
+      let idx = 1;
+      for (let p = startP; p <= endP; p++, idx++) {
+        const pg = p;
+        btns[idx].onclick = () => onPageChange(pg);
+      }
+      btns[btns.length - 1].onclick = () => { if (currentPage < totalPages) onPageChange(currentPage + 1); };
     }
 
     /* ═══════════════════════════════════════════════════
@@ -4736,6 +4878,58 @@
     ═══════════════════════════════════════════════════ */
 
     let dealEngineLoaded = false;
+    let dealTableData = [];
+    let dealSortCol = 'discount', dealSortAsc = false;
+
+    function sortDeals(col) {
+      if (dealSortCol === col) { dealSortAsc = !dealSortAsc; }
+      else { dealSortCol = col; dealSortAsc = true; }
+      document.querySelectorAll('[id^="sort-deal-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('active'); });
+      const arrow = document.getElementById('sort-deal-' + col);
+      if (arrow) { arrow.textContent = dealSortAsc ? '▲' : '▼'; arrow.classList.add('active'); }
+      renderDealRows();
+    }
+
+    function renderDealRows() {
+      const SORT_MAP = { shoe: '_name', retailer: 'retailer_name', msrp: 'msrp_cents', price: 'price_cents', discount: 'pct', updated: 'updated_at' };
+      const field = SORT_MAP[dealSortCol] || 'pct';
+      let rows = [...dealTableData];
+      rows.sort((a, b) => {
+        let va, vb;
+        if (field === '_name') {
+          const prodA = a.master_shoe_products, prodB = b.master_shoe_products;
+          va = prodA ? `${prodA.brand_name} ${prodA.model_name}` : '';
+          vb = prodB ? `${prodB.brand_name} ${prodB.model_name}` : '';
+        } else { va = a[field] ?? ''; vb = b[field] ?? ''; }
+        const cmp = typeof va === 'string' ? va.localeCompare(vb) : (va||0) - (vb||0);
+        return dealSortAsc ? cmp : -cmp;
+      });
+      const tbody = document.getElementById('dm-deals-tbody');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">No active discounted deals.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(d => {
+        const prod  = d.master_shoe_products;
+        const name  = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
+        const thumb = prod?.image_url
+          ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
+          : `<div class="deal-shoe-thumb-placeholder"><i data-lucide="image"></i></div>`;
+        const pillCls = discountPillClass(d.pct);
+        return `<tr>
+          <td style="display:flex;align-items:center;gap:10px;">${thumb}<span style="font-weight:500;">${escapeHtml(name)}</span></td>
+          <td>${escapeHtml(d.retailer_name)}</td>
+          <td style="color:var(--text-muted);text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
+          <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
+          <td><span class="deal-discount-pill ${pillCls}"><i data-lucide="arrow-down"></i>${d.pct}%</span></td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
+          <td style="white-space:nowrap;">
+            <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)"><i data-lucide="check"></i> Verify</button>
+            <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)"><i data-lucide="x"></i> Deactivate</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
 
     function fmtCents(cents, currency) {
       if (cents == null) return '—';
@@ -4811,34 +5005,8 @@
 
         /* ─ Render deals table ─ */
         document.getElementById('dm-deals-count').textContent = `· ${topDeals.length} of ${allDeals.length} shown`;
-        if (topDeals.length === 0) {
-          document.getElementById('dm-deals-tbody').innerHTML =
-            '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">No active discounted deals found. Make sure <code>msrp_cents</code> is populated.</td></tr>';
-        } else {
-          document.getElementById('dm-deals-tbody').innerHTML = topDeals.map(d => {
-            const prod  = d.master_shoe_products;
-            const name  = prod ? `${prod.brand_name} ${prod.model_name}` : '(unknown)';
-            const thumb = prod?.image_url
-              ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
-              : `<div class="deal-shoe-thumb-placeholder"><i data-lucide="image"></i></div>`;
-            const pillCls = discountPillClass(d.pct);
-            return `<tr>
-              <td style="display:flex;align-items:center;gap:10px;">
-                ${thumb}
-                <span style="font-weight:500;">${escapeHtml(name)}</span>
-              </td>
-              <td>${escapeHtml(d.retailer_name)}</td>
-              <td style="color:var(--text-muted);text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
-              <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
-              <td><span class="deal-discount-pill ${pillCls}"><i data-lucide="arrow-down"></i>${d.pct}%</span></td>
-              <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
-              <td style="white-space:nowrap;">
-                <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)"><i data-lucide="check"></i> Verify</button>
-                <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)"><i data-lucide="x"></i> Deactivate</button>
-              </td>
-            </tr>`;
-          }).join('');
-        }
+        dealTableData = topDeals;
+        renderDealRows();
 
         /* ─ Render alerts table ─ */
         document.getElementById('dm-alerts-count').textContent = `· ${allAlerts.length} shown`;
@@ -4972,6 +5140,19 @@
     let cohortData = [];
     let cohortLoaded = false;
     let currentCohortFilter = 'ALL';
+    let cohortSortCol = 'joined', cohortSortAsc = false;
+    let cohortPage = 1;
+    const COHORT_PAGE_SIZE = 30;
+
+    function sortCohort(col) {
+      if (cohortSortCol === col) { cohortSortAsc = !cohortSortAsc; }
+      else { cohortSortCol = col; cohortSortAsc = true; }
+      cohortPage = 1;
+      document.querySelectorAll('[id^="sort-cohort-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('active'); });
+      const arrow = document.getElementById('sort-cohort-' + col);
+      if (arrow) { arrow.textContent = cohortSortAsc ? '▲' : '▼'; arrow.classList.add('active'); }
+      renderCohortTable();
+    }
 
     async function loadUserCohorts(filter) {
       filter = filter || document.getElementById('cohort-filter-select').value;
@@ -4994,38 +5175,61 @@
         cohortData = data || [];
         label.textContent = `${cohortData.length.toLocaleString()} user${cohortData.length !== 1 ? 's' : ''}`;
         expBtn.disabled   = cohortData.length === 0;
+        cohortPage = 1;
 
         if (!cohortData.length) {
           tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="target"></i> No users match this segment.</td></tr>`;
+          document.getElementById('cohort-pagination').innerHTML = '';
           return;
         }
-
-        tbody.innerHTML = cohortData.map((row, i) => {
-          const shoes    = Number(row.active_shoe_count) || 0;
-          const shoeClass = shoes === 0 ? 'zero' : shoes < 3 ? 'low' : shoes < 6 ? 'good' : 'power';
-          const syncText = row.last_sync_date ? timeAgo(row.last_sync_date) : 'Never';
-          const joinedText = row.account_created_at
-            ? new Date(row.account_created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
-            : '—';
-          const stravaOn = row.strava_connected;
-          return `<tr>
-            <td style="color:var(--text-secondary);font-size:11px;">${i + 1}</td>
-            <td style="font-family:monospace;font-size:12px;">${escapeHtml(row.email || '—')}</td>
-            <td style="font-size:12px;">${escapeHtml(row.first_name || '—')}</td>
-            <td><span class="cohort-shoe-pill ${shoeClass}">${shoes}</span></td>
-            <td style="white-space:nowrap;">
-              <span class="strava-dot ${stravaOn ? 'on' : 'off'}"></span>
-              <span style="font-size:11px;color:${stravaOn ? '#fc4c02' : '#64748b'}">${stravaOn ? 'Connected' : 'None'}</span>
-            </td>
-            <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(syncText)}</td>
-            <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(joinedText)}</td>
-          </tr>`;
-        }).join('');
+        renderCohortTable();
 
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:36px;"><i data-lucide="alert-triangle"></i> ${escapeHtml(err.message)}</td></tr>`;
         showToast('Cohort load error: ' + err.message, 'error');
       }
+    }
+
+    function renderCohortTable() {
+      const tbody = document.getElementById('cohort-tbody');
+      const SORT_MAP = { email: 'email', name: 'first_name', shoes: 'active_shoe_count', last_sync: 'last_sync_date', joined: 'account_created_at' };
+      const field = SORT_MAP[cohortSortCol] || 'account_created_at';
+      let rows = [...cohortData];
+      rows.sort((a, b) => {
+        let va = a[field] ?? '', vb = b[field] ?? '';
+        if (field === 'active_shoe_count') { va = Number(va) || 0; vb = Number(vb) || 0; }
+        const cmp = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb));
+        return cohortSortAsc ? cmp : -cmp;
+      });
+
+      const totalPages = Math.ceil(rows.length / COHORT_PAGE_SIZE);
+      if (cohortPage > totalPages) cohortPage = totalPages;
+      const start = (cohortPage - 1) * COHORT_PAGE_SIZE;
+      const pageRows = rows.slice(start, start + COHORT_PAGE_SIZE);
+
+      tbody.innerHTML = pageRows.map((row, i) => {
+        const shoes    = Number(row.active_shoe_count) || 0;
+        const shoeClass = shoes === 0 ? 'zero' : shoes < 3 ? 'low' : shoes < 6 ? 'good' : 'power';
+        const syncText = row.last_sync_date ? timeAgo(row.last_sync_date) : 'Never';
+        const joinedText = row.account_created_at
+          ? new Date(row.account_created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+          : '—';
+        const stravaOn = row.strava_connected;
+        return `<tr>
+          <td style="color:var(--text-secondary);font-size:11px;">${start + i + 1}</td>
+          <td style="font-family:monospace;font-size:12px;">${escapeHtml(row.email || '—')}</td>
+          <td style="font-size:12px;">${escapeHtml(row.first_name || '—')}</td>
+          <td><span class="cohort-shoe-pill ${shoeClass}">${shoes}</span></td>
+          <td style="white-space:nowrap;">
+            <span class="strava-dot ${stravaOn ? 'on' : 'off'}"></span>
+            <span style="font-size:11px;color:${stravaOn ? '#fc4c02' : '#64748b'}">${stravaOn ? 'Connected' : 'None'}</span>
+          </td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(syncText)}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${escapeHtml(joinedText)}</td>
+        </tr>`;
+      }).join('');
+
+      renderPagination('cohort-pagination', cohortPage, totalPages, p => { cohortPage = p; renderCohortTable(); });
     }
 
     function exportCohortCSV() {
@@ -5268,17 +5472,46 @@
       }
     }
 
+    let ledgerSortCol = 'created_at', ledgerSortAsc = false;
+    let ledgerPage = 1;
+    const LEDGER_PAGE_SIZE = 30;
+
+    function sortLedger(col) {
+      if (ledgerSortCol === col) { ledgerSortAsc = !ledgerSortAsc; }
+      else { ledgerSortCol = col; ledgerSortAsc = true; }
+      ledgerPage = 1;
+      // Update arrows
+      document.querySelectorAll('[id^="sort-ledger-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('active'); });
+      const arrow = document.getElementById('sort-ledger-' + col);
+      if (arrow) { arrow.textContent = ledgerSortAsc ? '▲' : '▼'; arrow.classList.add('active'); }
+      renderLedger();
+    }
+
     function renderLedger() {
       const tbody = document.getElementById('ledger-tbody');
       const filter = document.getElementById('ledger-filter-action')?.value || '';
-      const rows = filter ? ledgerAllRows.filter(r => r.action_type === filter) : ledgerAllRows;
+      let rows = filter ? ledgerAllRows.filter(r => r.action_type === filter) : [...ledgerAllRows];
+
+      // Sort
+      rows.sort((a, b) => {
+        const va = a[ledgerSortCol] || '', vb = b[ledgerSortCol] || '';
+        const cmp = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
+        return ledgerSortAsc ? cmp : -cmp;
+      });
 
       if (rows.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">No audit entries found.</td></tr>';
+        document.getElementById('ledger-pagination').innerHTML = '';
         return;
       }
 
-      tbody.innerHTML = rows.map(row => {
+      // Paginate
+      const totalPages = Math.ceil(rows.length / LEDGER_PAGE_SIZE);
+      if (ledgerPage > totalPages) ledgerPage = totalPages;
+      const start = (ledgerPage - 1) * LEDGER_PAGE_SIZE;
+      const pageRows = rows.slice(start, start + LEDGER_PAGE_SIZE);
+
+      tbody.innerHTML = pageRows.map(row => {
         const pillClass = /MERGE|NUCLEAR/.test(row.action_type) ? 'merge'
           : /APPROVE/.test(row.action_type) ? 'approve'
           : /REJECT/.test(row.action_type) ? 'reject'
@@ -5300,6 +5533,8 @@
           </td>
         </tr>`;
       }).join('');
+
+      renderPagination('ledger-pagination', ledgerPage, totalPages, p => { ledgerPage = p; renderLedger(); });
     }
 
     function openDiffModal(rowJson) {
@@ -7205,11 +7440,59 @@
       loadDeployBadge();
       restoreAutoRefresh();
       applyChartDarkMode();
+      startSessionTimer();
     };
+
+    /* ── Chart.js CDN Fallback ── */
+    (function checkChartJs() {
+      if (typeof Chart !== 'undefined') return;
+      // Replace all chart canvases with fallback message
+      document.querySelectorAll('canvas[id$="-chart"], canvas[id$="Chart"]').forEach(c => {
+        const wrap = c.parentElement;
+        if (wrap) {
+          wrap.innerHTML = `<div class="chart-fallback">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>Chart.js failed to load. Check your connection.</span>
+          </div>`;
+        }
+      });
+    })();
+
+    /* ── Keyboard navigation: arrow keys for Discovery Queue cards ── */
+    document.addEventListener('keydown', function(e) {
+      // Only active in discovery-queue view
+      const dqView = document.getElementById('view-discovery-queue');
+      if (!dqView || !dqView.classList.contains('active')) return;
+      const cards = Array.from(document.querySelectorAll('.shoe-card.view-mode'));
+      if (!cards.length) return;
+      const focused = document.querySelector('.shoe-card.view-mode.kb-focus');
+      let idx = focused ? cards.indexOf(focused) : -1;
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        idx = Math.min(idx + 1, cards.length - 1);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        idx = Math.max(idx - 1, 0);
+      } else { return; }
+      cards.forEach(c => c.classList.remove('kb-focus'));
+      cards[idx].classList.add('kb-focus');
+      cards[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+
+    /* ── Session timeout warning ── */
+    let sessionTimerId = null;
+    function startSessionTimer() {
+      if (sessionTimerId) clearTimeout(sessionTimerId);
+      // Show warning 5 minutes before a 60-min session expires
+      sessionTimerId = setTimeout(() => {
+        const banner = document.getElementById('session-timeout-banner');
+        if (banner) banner.classList.add('visible');
+      }, 55 * 60 * 1000);
+    }
   </script>
 
   <!-- Command Palette -->
-  <div class="cmd-overlay" id="cmd-overlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-overlay" id="cmd-overlay" onclick="if(event.target===this)closeCmdPalette()" role="dialog" aria-label="Command palette">
     <div class="cmd-box">
       <input class="cmd-input" id="cmd-input" placeholder="Search views, users, shoes…" autocomplete="off" oninput="filterCmdResults(this.value)" onkeydown="handleCmdKey(event)">
       <div class="cmd-results" id="cmd-results"></div>
@@ -7259,6 +7542,12 @@
         </button>
       </div>
     </div>
+  </div>
+  <!-- Session Timeout Warning -->
+  <div class="session-timeout-banner" id="session-timeout-banner">
+    <i data-lucide="clock" style="width:16px;height:16px"></i>
+    <span>Your session expires soon.</span>
+    <button onclick="location.reload()" style="background:#78350f;color:#fbbf24;border:none;padding:4px 12px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">Refresh</button>
   </div>
 </body>
 </html>
