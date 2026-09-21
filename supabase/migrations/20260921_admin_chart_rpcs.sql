@@ -22,7 +22,7 @@ AS $$
   ),
   daily_users AS (
     SELECT d,
-      (SELECT COUNT(*) FROM auth.users WHERE created_at::date <= d) AS total_users,
+      (SELECT COUNT(*) FROM public.users WHERE created_at::date <= d) AS total_users,
       (SELECT COUNT(DISTINCT user_id) FROM user_gear_items WHERE status = 'active' AND created_at::date <= d) AS total_lockers,
       (SELECT COUNT(DISTINCT user_id) FROM user_activities WHERE created_at::date = d) AS dau
     FROM date_series
@@ -50,15 +50,15 @@ AS $$
   daily_retention AS (
     SELECT d,
       CASE
-        WHEN (SELECT COUNT(*) FROM auth.users WHERE created_at::date = d - 7) = 0 THEN 0
+        WHEN (SELECT COUNT(*) FROM public.users WHERE created_at::date = d - 7) = 0 THEN 0
         ELSE ROUND(
           (SELECT COUNT(DISTINCT ua.user_id)
            FROM user_activities ua
-           JOIN auth.users u ON u.id = ua.user_id
+           JOIN public.users u ON u.id = ua.user_id
            WHERE u.created_at::date = d - 7
              AND ua.created_at::date BETWEEN d - 6 AND d
           )::numeric /
-          NULLIF((SELECT COUNT(*) FROM auth.users WHERE created_at::date = d - 7), 0) * 100,
+          NULLIF((SELECT COUNT(*) FROM public.users WHERE created_at::date = d - 7), 0) * 100,
           1
         )
       END AS retention_7d
@@ -84,9 +84,9 @@ AS $$
   today_logs AS (
     SELECT
       EXTRACT(HOUR FROM created_at)::integer AS h,
-      CASE WHEN status = 'success' THEN 1 ELSE 0 END AS is_success,
-      CASE WHEN status != 'success' THEN 1 ELSE 0 END AS is_failed
-    FROM webhook_logs
+      CASE WHEN status = 'ok' THEN 1 ELSE 0 END AS is_success,
+      CASE WHEN status != 'ok' THEN 1 ELSE 0 END AS is_failed
+    FROM strava_webhook_logs
     WHERE created_at >= CURRENT_DATE
   )
   SELECT

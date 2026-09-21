@@ -6987,18 +6987,51 @@
     }
 
     // Fetch chart data alongside telemetry
+    function showChartEmpty(canvasId, msg) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const parent = canvas.parentElement;
+      canvas.style.display = 'none';
+      let overlay = parent.querySelector('.chart-empty-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'chart-empty-overlay';
+        overlay.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;height:160px;color:var(--text-muted);font-size:12px;text-align:center;';
+        parent.appendChild(overlay);
+      }
+      overlay.innerHTML = `<i data-lucide="bar-chart-3" style="width:24px;height:24px;opacity:.4"></i><div>${msg}</div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
     async function loadChartData() {
       try {
         const [growthRes, retentionRes, syncRes] = await Promise.all([
-          getSupabase().rpc('get_daily_growth', { days: 30 }).then(r => r.data).catch(() => null),
-          getSupabase().rpc('get_daily_retention', { days: 30 }).then(r => r.data).catch(() => null),
-          getSupabase().rpc('get_hourly_sync_health').then(r => r.data).catch(() => null),
+          getSupabase().rpc('get_daily_growth', { days: 30 }).then(r => { if (r.error) throw r.error; return r.data; }).catch(() => null),
+          getSupabase().rpc('get_daily_retention', { days: 30 }).then(r => { if (r.error) throw r.error; return r.data; }).catch(() => null),
+          getSupabase().rpc('get_hourly_sync_health').then(r => { if (r.error) throw r.error; return r.data; }).catch(() => null),
         ]);
-        if (growthRes) renderGrowthChart(growthRes);
-        if (retentionRes) renderRetentionChart(retentionRes);
-        if (syncRes) renderSyncHealthChart(syncRes);
-        // DAU sparkline from growth data
-        if (growthRes) renderSparkline('sparkline-dau', growthRes.map(d => d.dau || 0), '#10b981');
+        // Growth
+        if (growthRes && growthRes.length) {
+          document.getElementById('chart-user-growth').style.display = '';
+          renderGrowthChart(growthRes);
+          renderSparkline('sparkline-dau', growthRes.map(d => d.dau || 0), '#10b981');
+        } else {
+          showChartEmpty('chart-user-growth', 'Run the SQL migration to enable this chart');
+        }
+        // Retention
+        if (retentionRes && retentionRes.length) {
+          document.getElementById('chart-retention-trend').style.display = '';
+          renderRetentionChart(retentionRes);
+        } else {
+          showChartEmpty('chart-retention-trend', 'Run the SQL migration to enable this chart');
+        }
+        // Sync Health
+        if (syncRes && syncRes.length) {
+          document.getElementById('chart-sync-health').style.display = '';
+          renderSyncHealthChart(syncRes);
+        } else {
+          showChartEmpty('chart-sync-health', 'Run the SQL migration to enable this chart');
+        }
       } catch (err) {
         console.warn('Chart data load error:', err);
       }
