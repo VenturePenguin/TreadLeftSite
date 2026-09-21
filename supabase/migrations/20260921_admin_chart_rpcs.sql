@@ -23,7 +23,7 @@ AS $$
   daily_users AS (
     SELECT d,
       (SELECT COUNT(*) FROM public.users WHERE created_at::date <= d) AS total_users,
-      (SELECT COUNT(DISTINCT user_id) FROM user_gear_items WHERE status = 'active' AND created_at::date <= d) AS total_lockers,
+      (SELECT COUNT(DISTINCT user_id) FROM user_gear_items WHERE is_active = true AND created_at::date <= d) AS total_lockers,
       (SELECT COUNT(DISTINCT user_id) FROM user_activities WHERE created_at::date = d) AS dau
     FROM date_series
   )
