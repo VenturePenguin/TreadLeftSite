@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@1.31.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -372,6 +373,184 @@
     /* Clickable metric cards */
     .pulse-card.clickable { cursor: pointer; }
     .pulse-card.clickable:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+
+    /* ── Sparkline (inline SVG in pulse cards) ────────────── */
+    .pulse-sparkline {
+      display: block;
+      width: 100%;
+      height: 28px;
+      margin-top: 8px;
+      opacity: .7;
+    }
+
+    /* ── Sidebar active indicator ─────────────────────────── */
+    .nav-item { position: relative; }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: #f97316;
+    }
+
+    /* ── Command Palette ──────────────────────────────────── */
+    .cmd-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,.45);
+      display: none; align-items: flex-start; justify-content: center;
+      padding-top: min(20vh, 160px);
+      backdrop-filter: blur(2px);
+    }
+    .cmd-overlay.open { display: flex; }
+    .cmd-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 90%; max-width: 520px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.18);
+      overflow: hidden;
+    }
+    .cmd-input {
+      width: 100%; padding: 16px 20px;
+      border: none; outline: none;
+      font-size: 16px; font-family: inherit;
+      color: var(--text-primary); background: transparent;
+    }
+    .cmd-input::placeholder { color: var(--text-muted); }
+    .cmd-results {
+      max-height: 300px; overflow-y: auto;
+      border-top: 1px solid var(--border);
+    }
+    .cmd-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px; cursor: pointer;
+      font-size: 14px; color: var(--text-secondary);
+      transition: background .1s;
+    }
+    .cmd-item:hover, .cmd-item.selected { background: var(--bg-subtle); color: var(--text-primary); }
+    .cmd-item .cmd-icon { font-size: 16px; width: 20px; text-align: center; opacity: .6; }
+    .cmd-shortcut {
+      margin-left: auto; font-size: 11px; font-weight: 600;
+      color: var(--text-muted); background: var(--bg-subtle);
+      padding: 2px 6px; border-radius: 4px;
+    }
+
+    /* ── Toast History Tray ───────────────────────────────── */
+    .toast-tray-btn {
+      position: fixed; bottom: 20px; right: 20px; z-index: 90;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12); font-size: 16px; color: var(--text-secondary);
+      transition: all .15s;
+    }
+    .toast-tray-btn:hover { border-color: #f97316; color: #f97316; }
+    .toast-tray-btn .toast-badge {
+      position: absolute; top: -4px; right: -4px;
+      background: #ef4444; color: #fff; font-size: 9px; font-weight: 700;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .toast-tray {
+      position: fixed; bottom: 64px; right: 20px; z-index: 91;
+      width: 340px; max-height: 320px; overflow-y: auto;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+      display: none; flex-direction: column;
+    }
+    .toast-tray.open { display: flex; }
+    .toast-tray-header {
+      padding: 12px 16px; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--text-muted); border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .toast-tray-clear { cursor: pointer; font-size: 11px; color: var(--text-muted); }
+    .toast-tray-clear:hover { color: #ef4444; }
+    .toast-tray-item {
+      padding: 10px 16px; border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .toast-tray-item:last-child { border-bottom: none; }
+    .toast-tray-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .toast-tray-empty { padding: 20px 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+    /* ── Auto-Refresh Toggle ──────────────────────────────── */
+    .auto-refresh-toggle {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--text-muted); cursor: pointer;
+      user-select: none;
+    }
+    .auto-refresh-toggle input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none;
+      width: 28px; height: 16px; border-radius: 8px;
+      background: var(--border); position: relative;
+      cursor: pointer; transition: background .2s;
+    }
+    .auto-refresh-toggle input[type="checkbox"]::after {
+      content: ''; position: absolute;
+      top: 2px; left: 2px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
+    }
+    .auto-refresh-toggle input[type="checkbox"]:checked { background: #10b981; }
+    .auto-refresh-toggle input[type="checkbox"]:checked::after { transform: translateX(12px); }
+
+    /* ── Growth Chart ─────────────────────────────────────── */
+    .growth-chart-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .growth-chart-card canvas { width: 100% !important; max-height: 200px; }
+
+    /* ── Deploy Badge ─────────────────────────────────────── */
+    .deploy-badge {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      padding: 6px 20px 6px 240px;
+      font-size: 10px; color: var(--text-muted);
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; z-index: 50;
+    }
+    .deploy-badge a { color: var(--text-muted); text-decoration: underline; }
+
+    /* ── Responsive grid for smaller screens ──────────────── */
+    @media (max-width: 900px) {
+      .sidebar { width: 180px; }
+      .main-content { left: 180px; padding: 20px; }
+      .deploy-badge { padding-left: 200px; }
+    }
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .main-content { left: 0; padding: 16px; }
+      .deploy-badge { padding-left: 20px; }
+    }
+
+    /* ── Batch toolbar for Discovery Queue ────────────────── */
+    .batch-selection-bar {
+      display: none; align-items: center; gap: 12px;
+      padding: 10px 16px; margin-bottom: 16px;
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
+      font-size: 13px; color: #1e40af;
+    }
+    html.dark .batch-selection-bar { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: #93c5fd; }
+    .batch-selection-bar.visible { display: flex; }
+    .batch-selection-bar button {
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      border: 1px solid transparent; cursor: pointer; font-family: inherit;
+    }
+    .batch-approve-btn { background: #10b981; color: #fff; }
+    .batch-approve-btn:hover { background: #059669; }
+    .batch-reject-btn { background: #fff; color: #ef4444; border-color: #ef4444; }
+    .batch-reject-btn:hover { background: #fef2f2; }
+    .shoe-card .shoe-checkbox {
+      width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6;
+    }
 
     /* ── Funnel ──────────────────────────────────────────────── */
     .funnel {
@@ -2299,7 +2478,12 @@
               <span id="pulse-health-text">Operational</span>
             </div>
             <span id="pulse-last-updated" style="font-size:12px;color:var(--text-muted)"></span>
+            <label class="auto-refresh-toggle" title="Auto-refresh every 60 seconds">
+              <input type="checkbox" id="auto-refresh-cb" onchange="toggleAutoRefresh(this.checked)">
+              Auto
+            </label>
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px;font-size:11px" onclick="exportPulseToCSV()" title="Export metrics to CSV"><i data-lucide="download"></i> CSV</button>
           </div>
         </div>
 
@@ -2337,17 +2521,20 @@
             <div class="pulse-label">Total Users</div>
             <div class="pulse-sub">All-time accounts</div>
             <div class="pulse-delta" id="pulse-users-delta"></div>
+            <svg class="pulse-sparkline" id="sparkline-users" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
           </div>
           <div class="pulse-card clickable" style="--accent:#6366f1" onclick="navigate('user-cohorts')">
             <div class="pulse-value" id="pulse-active-lockers">—</div>
             <div class="pulse-label">Active Lockers</div>
             <div class="pulse-sub">Users with ≥1 active shoe</div>
             <div class="pulse-delta" id="pulse-lockers-delta"></div>
+            <svg class="pulse-sparkline" id="sparkline-lockers" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
           </div>
           <div class="pulse-card clickable" style="--accent:#10b981" onclick="navigate('user-cohorts')">
             <div class="pulse-value" id="pulse-dau">—</div>
             <div class="pulse-label">Daily Active Users</div>
             <div class="pulse-sub">Users who synced today</div>
+            <svg class="pulse-sparkline" id="sparkline-dau" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
           </div>
         </div>
 
@@ -2443,6 +2630,24 @@
           </div>
         </div>
 
+        <!-- ── USER GROWTH CHART ─────────────────────────────────── -->
+        <div class="pulse-section-label">User Growth (30 days)</div>
+        <div class="growth-chart-card">
+          <canvas id="chart-user-growth" height="180"></canvas>
+        </div>
+
+        <!-- ── RETENTION TREND CHART ──────────────────────────────── -->
+        <div class="pulse-section-label">Retention Trend (30 days)</div>
+        <div class="growth-chart-card">
+          <canvas id="chart-retention-trend" height="180"></canvas>
+        </div>
+
+        <!-- ── SYNC HEALTH TIMELINE ───────────────────────────────── -->
+        <div class="pulse-section-label">Sync Health (last 24h)</div>
+        <div class="growth-chart-card">
+          <canvas id="chart-sync-health" height="160"></canvas>
+        </div>
+
         <div class="funnel">
           <div class="funnel-title">Activation Funnel</div>
           <div class="funnel-steps">
@@ -2487,7 +2692,7 @@
         </div>
 
         <!-- Revenue Pipeline & Engagement -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;">Revenue Pipeline &amp; Engagement</div>
+        <div class="pulse-section-label">Revenue Pipeline &amp; Engagement</div>
         <div class="pulse-grid" style="margin-bottom:0">
           <div class="pulse-card" style="--accent:#ef4444">
             <div class="pulse-value" id="pulse-high-intent">—</div>
@@ -2507,23 +2712,23 @@
         </div>
 
         <!-- Product Intelligence -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px;margin-top:24px;">Product Intelligence</div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px">
-          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="pulse-section-label" style="margin-top:24px">Product Intelligence</div>
+        <div class="pulse-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
+          <div class="growth-chart-card" style="margin-bottom:0">
             <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px"><i data-lucide="trophy"></i> Top Shoe Models</div>
             <div id="top-shoes-list" style="display:flex;flex-direction:column;gap:8px">
-              <div style="color:#94a3b8;font-size:13px">Loading…</div>
+              <div style="color:var(--text-muted);font-size:13px">Loading…</div>
             </div>
           </div>
-          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+          <div class="growth-chart-card" style="margin-bottom:0">
             <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px"><i data-lucide="tag"></i> Brand Distribution</div>
             <div id="brand-distribution-list" style="display:flex;flex-direction:column;gap:8px">
-              <div style="color:#94a3b8;font-size:13px">Loading…</div>
+              <div style="color:var(--text-muted);font-size:13px">Loading…</div>
             </div>
           </div>
         </div>
 
-        <div id="pulse-loading" style="display:none;text-align:center;padding:40px;color:#94a3b8">
+        <div id="pulse-loading" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
           Loading telemetry…
         </div>
       </div>
@@ -2563,6 +2768,14 @@
           <button class="batch-btn" id="dq-approve-all-btn" onclick="approveAllHigh()"><i data-lucide="check"></i> Approve All</button>
           <button class="batch-btn" onclick="refreshData()"><i data-lucide="refresh-cw"></i> Refresh</button>
           <button class="batch-btn ai-btn" id="dq-ai-normalize-btn" onclick="aiNormalizeQueue()" title="Use AI to parse messy brand/model strings"><i data-lucide="bot"></i> AI Normalize Queue</button>
+          <button class="batch-btn" onclick="selectAllShoes()" title="Select all for batch action"><i data-lucide="check-square"></i> Select All</button>
+        </div>
+
+        <div class="batch-selection-bar" id="batch-selection-bar">
+          <span id="batch-sel-count">0 selected</span>
+          <button class="batch-approve-btn" onclick="batchApproveSelected()"><i data-lucide="check"></i> Approve Selected</button>
+          <button class="batch-reject-btn" onclick="batchRejectSelected()"><i data-lucide="x"></i> Reject Selected</button>
+          <button class="batch-btn" style="flex:none;width:auto;padding:4px 10px;font-size:11px" onclick="deselectAllShoes()">Deselect All</button>
         </div>
 
         <div id="shoe-list" class="shoe-list">
@@ -3624,6 +3837,7 @@
         return `
         <div class="shoe-card view-mode ${shoe.confidence}" id="card-${shoe.id}">
           <div class="shoe-header">
+            <input type="checkbox" class="shoe-checkbox" data-id="${shoe.id}" onchange="toggleBatchShoe('${shoe.id}', this)" title="Select for batch action">
             <div class="shoe-info">
               <h3>${escapeHtml(shoe.brand_name)} ${escapeHtml(shoe.model_name)}</h3>
               <div class="raw">Raw: ${escapeHtml(shoe.raw_name)}</div>
@@ -3970,6 +4184,7 @@
       document.getElementById('toast-icon').innerHTML    = type === 'success' ? '<i data-lucide="check"></i>' : '<i data-lucide="x"></i>';
       document.getElementById('toast-message').textContent = message;
       setTimeout(() => toast.classList.remove('show'), 3000);
+      addToastToHistory(message, type);
     }
 
     function escapeHtml(text) {
@@ -6437,7 +6652,411 @@
         showToast(`Merged ${done} cluster${done === 1 ? '' : 's'} successfully`, 'success');
       }
     }
+
+    /* ═══════════════════════════════════════════════════
+       SPARKLINES — inline SVG in pulse cards
+    ═══════════════════════════════════════════════════ */
+    function renderSparkline(svgId, values, color) {
+      const svg = document.getElementById(svgId);
+      if (!svg || !values || values.length < 2) { if (svg) svg.style.display = 'none'; return; }
+      svg.style.display = 'block';
+      const min = Math.min(...values), max = Math.max(...values);
+      const range = max - min || 1;
+      const w = 100, h = 28, pad = 2;
+      const pts = values.map((v, i) => {
+        const x = (i / (values.length - 1)) * w;
+        const y = h - pad - ((v - min) / range) * (h - pad * 2);
+        return `${x},${y}`;
+      });
+      svg.innerHTML =
+        `<polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>` +
+        `<polyline points="0,${h} ${pts.join(' ')} ${w},${h}" fill="${color}" fill-opacity="0.08" stroke="none"/>`;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       AUTO-REFRESH
+    ═══════════════════════════════════════════════════ */
+    let autoRefreshTimer = null;
+    function toggleAutoRefresh(on) {
+      if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+      if (on) {
+        autoRefreshTimer = setInterval(() => {
+          const pulseView = document.getElementById('view-platform-pulse');
+          if (pulseView && pulseView.classList.contains('active')) loadTelemetry();
+        }, 60000);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       KEYBOARD SHORTCUTS
+    ═══════════════════════════════════════════════════ */
+    const NAV_SHORTCUTS = [
+      'platform-pulse', 'revenue-analytics', 'discovery-queue', 'deal-engine',
+      'lifespan-insights', 'duplicate-resolver', 'brand-normalization',
+      'system-ledger', 'system-health'
+    ];
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      // Cmd+K or Ctrl+K → command palette
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openCmdPalette();
+        return;
+      }
+      // / → focus search (command palette)
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        openCmdPalette();
+        return;
+      }
+      // 1–9 → navigate
+      const idx = parseInt(e.key) - 1;
+      if (idx >= 0 && idx < NAV_SHORTCUTS.length && !e.metaKey && !e.ctrlKey) {
+        navigate(NAV_SHORTCUTS[idx]);
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════
+       COMMAND PALETTE
+    ═══════════════════════════════════════════════════ */
+    const CMD_ITEMS = [
+      { label: 'Platform Pulse', view: 'platform-pulse', icon: 'activity', key: '1' },
+      { label: 'Revenue Analytics', view: 'revenue-analytics', icon: 'dollar-sign', key: '2' },
+      { label: 'Discovery Queue', view: 'discovery-queue', icon: 'search', key: '3' },
+      { label: 'Deal Engine', view: 'deal-engine', icon: 'percent', key: '4' },
+      { label: 'Lifespan Insights', view: 'lifespan-insights', icon: 'skull', key: '5' },
+      { label: 'Duplicate Detection', view: 'duplicate-resolver', icon: 'copy', key: '6' },
+      { label: 'Brand Normalization', view: 'brand-normalization', icon: 'tag', key: '7' },
+      { label: 'System Ledger', view: 'system-ledger', icon: 'file-text', key: '8' },
+      { label: 'System Health', view: 'system-health', icon: 'heart', key: '9' },
+      { label: 'Strava Sync Monitor', view: 'strava-monitor', icon: 'bike' },
+      { label: 'User Support', view: 'user-support', icon: 'user' },
+      { label: 'User Cohorts', view: 'user-cohorts', icon: 'target' },
+    ];
+    let cmdSelectedIdx = 0;
+    let cmdFiltered = [...CMD_ITEMS];
+
+    function openCmdPalette() {
+      const overlay = document.getElementById('cmd-overlay');
+      overlay.classList.add('open');
+      const input = document.getElementById('cmd-input');
+      input.value = '';
+      cmdFiltered = [...CMD_ITEMS];
+      cmdSelectedIdx = 0;
+      renderCmdResults();
+      setTimeout(() => input.focus(), 50);
+    }
+    function closeCmdPalette() {
+      document.getElementById('cmd-overlay').classList.remove('open');
+    }
+    function filterCmdResults(query) {
+      const q = query.toLowerCase();
+      cmdFiltered = CMD_ITEMS.filter(item => item.label.toLowerCase().includes(q));
+      cmdSelectedIdx = 0;
+      renderCmdResults();
+    }
+    function renderCmdResults() {
+      const container = document.getElementById('cmd-results');
+      if (cmdFiltered.length === 0) {
+        container.innerHTML = '<div style="padding:16px 20px;color:var(--text-muted);font-size:13px">No results</div>';
+        return;
+      }
+      container.innerHTML = cmdFiltered.map((item, i) =>
+        `<div class="cmd-item${i === cmdSelectedIdx ? ' selected' : ''}" onclick="executeCmdItem(${i})">
+          <span class="cmd-icon"><i data-lucide="${item.icon}"></i></span>
+          ${item.label}
+          ${item.key ? `<span class="cmd-shortcut">${item.key}</span>` : ''}
+        </div>`
+      ).join('');
+      if (window.lucide) lucide.createIcons();
+    }
+    function handleCmdKey(e) {
+      if (e.key === 'Escape') { closeCmdPalette(); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); cmdSelectedIdx = Math.min(cmdSelectedIdx + 1, cmdFiltered.length - 1); renderCmdResults(); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); cmdSelectedIdx = Math.max(cmdSelectedIdx - 1, 0); renderCmdResults(); return; }
+      if (e.key === 'Enter' && cmdFiltered.length > 0) { executeCmdItem(cmdSelectedIdx); return; }
+    }
+    function executeCmdItem(idx) {
+      const item = cmdFiltered[idx];
+      if (item) { closeCmdPalette(); navigate(item.view); }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       TOAST HISTORY TRAY
+    ═══════════════════════════════════════════════════ */
+    let toastHistory = [];
+    function addToastToHistory(message, type) {
+      toastHistory.unshift({ message, type, time: new Date() });
+      if (toastHistory.length > 50) toastHistory.pop();
+      updateToastTray();
+    }
+    function updateToastTray() {
+      const btn = document.getElementById('toast-tray-btn');
+      const badge = document.getElementById('toast-tray-badge');
+      const list = document.getElementById('toast-tray-list');
+      if (btn) btn.style.display = 'flex';
+      if (badge) {
+        badge.style.display = toastHistory.length > 0 ? 'flex' : 'none';
+        badge.textContent = toastHistory.length;
+      }
+      if (!list) return;
+      if (toastHistory.length === 0) {
+        list.innerHTML = '<div class="toast-tray-empty">No notifications yet</div>';
+        return;
+      }
+      list.innerHTML = toastHistory.map(t =>
+        `<div class="toast-tray-item">
+          <div>${t.type === 'error' ? '❌' : '✅'} ${escapeHtml(t.message)}</div>
+          <div class="toast-tray-time">${t.time.toLocaleTimeString()}</div>
+        </div>`
+      ).join('');
+    }
+    function toggleToastTray() {
+      document.getElementById('toast-tray').classList.toggle('open');
+    }
+    function clearToastHistory() {
+      toastHistory = [];
+      updateToastTray();
+      document.getElementById('toast-tray').classList.remove('open');
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CHARTS — User Growth, Retention Trend, Sync Health
+    ═══════════════════════════════════════════════════ */
+    let chartUserGrowth = null, chartRetention = null, chartSyncHealth = null;
+
+    function renderGrowthChart(daily) {
+      if (!daily || daily.length === 0) return;
+      const labels = daily.map(d => d.date ? new Date(d.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '');
+      const users = daily.map(d => d.total_users || 0);
+      const lockers = daily.map(d => d.total_lockers || 0);
+      const ctx = document.getElementById('chart-user-growth');
+      if (!ctx) return;
+      if (chartUserGrowth) chartUserGrowth.destroy();
+      chartUserGrowth = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Total Users', data: users, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.08)', fill: true, tension: .3, pointRadius: 0 },
+            { label: 'Active Lockers', data: lockers, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,.08)', fill: true, tension: .3, pointRadius: 0 },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+          scales: { x: { ticks: { maxTicksToSkip: 6, font: { size: 10 } } }, y: { beginAtZero: false, ticks: { font: { size: 10 } } } }
+        }
+      });
+      // Also render sparklines from this data
+      renderSparkline('sparkline-users', users, '#10b981');
+      renderSparkline('sparkline-lockers', lockers, '#6366f1');
+    }
+
+    function renderRetentionChart(daily) {
+      if (!daily || daily.length === 0) return;
+      const labels = daily.map(d => d.date ? new Date(d.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '');
+      const retention = daily.map(d => d.retention_7d || 0);
+      const ctx = document.getElementById('chart-retention-trend');
+      if (!ctx) return;
+      if (chartRetention) chartRetention.destroy();
+      chartRetention = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ label: '7-Day Retention %', data: retention, backgroundColor: '#14b8a6', borderRadius: 3 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { maxTicksToSkip: 6, font: { size: 10 } } }, y: { beginAtZero: true, max: 100, ticks: { font: { size: 10 }, callback: v => v + '%' } } }
+        }
+      });
+    }
+
+    function renderSyncHealthChart(hourly) {
+      if (!hourly || hourly.length === 0) return;
+      const labels = hourly.map(h => h.hour != null ? h.hour + ':00' : '');
+      const success = hourly.map(h => h.success || 0);
+      const failed = hourly.map(h => h.failed || 0);
+      const ctx = document.getElementById('chart-sync-health');
+      if (!ctx) return;
+      if (chartSyncHealth) chartSyncHealth.destroy();
+      chartSyncHealth = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Success', data: success, backgroundColor: '#22c55e', borderRadius: 2 },
+            { label: 'Failed', data: failed, backgroundColor: '#ef4444', borderRadius: 2 },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+          scales: { x: { stacked: true, ticks: { font: { size: 9 } } }, y: { stacked: true, beginAtZero: true, ticks: { font: { size: 10 } } } }
+        }
+      });
+    }
+
+    // Fetch chart data alongside telemetry
+    async function loadChartData() {
+      try {
+        const [growthRes, retentionRes, syncRes] = await Promise.all([
+          getSupabase().rpc('get_daily_growth', { days: 30 }).then(r => r.data).catch(() => null),
+          getSupabase().rpc('get_daily_retention', { days: 30 }).then(r => r.data).catch(() => null),
+          getSupabase().rpc('get_hourly_sync_health').then(r => r.data).catch(() => null),
+        ]);
+        if (growthRes) renderGrowthChart(growthRes);
+        if (retentionRes) renderRetentionChart(retentionRes);
+        if (syncRes) renderSyncHealthChart(syncRes);
+        // DAU sparkline from growth data
+        if (growthRes) renderSparkline('sparkline-dau', growthRes.map(d => d.dau || 0), '#10b981');
+      } catch (err) {
+        console.warn('Chart data load error:', err);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DEPLOY BADGE — fetch last deploy from Netlify API
+    ═══════════════════════════════════════════════════ */
+    async function loadDeployBadge() {
+      try {
+        const res = await fetch('https://api.netlify.com/api/v1/sites/treadleft.netlify.app/deploys?per_page=1');
+        if (!res.ok) return;
+        const [deploy] = await res.json();
+        if (!deploy) return;
+        const badge = document.getElementById('deploy-badge');
+        const text = document.getElementById('deploy-badge-text');
+        if (!badge || !text) return;
+        const time = new Date(deploy.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const sha = deploy.commit_ref ? deploy.commit_ref.slice(0, 7) : '—';
+        text.textContent = `Last deploy: ${time} · ${sha} · ${deploy.state}`;
+        badge.style.display = 'flex';
+      } catch (e) { /* silent */ }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CSV EXPORT
+    ═══════════════════════════════════════════════════ */
+    function exportTableToCSV(tableId, filename) {
+      const rows = [];
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      table.querySelectorAll('tr').forEach(tr => {
+        const cells = [];
+        tr.querySelectorAll('th, td').forEach(td => cells.push('"' + td.textContent.replace(/"/g, '""').trim() + '"'));
+        rows.push(cells.join(','));
+      });
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename || 'export.csv';
+      a.click();
+    }
+
+    function exportPulseToCSV() {
+      const cards = document.querySelectorAll('#view-platform-pulse .pulse-card');
+      const rows = [['Metric', 'Value', 'Subtitle']];
+      cards.forEach(card => {
+        const val = card.querySelector('.pulse-value')?.textContent || '';
+        const label = card.querySelector('.pulse-label')?.textContent || '';
+        const sub = card.querySelector('.pulse-sub')?.textContent || '';
+        rows.push(['"' + label + '"', '"' + val + '"', '"' + sub + '"']);
+      });
+      const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'platform-pulse.csv';
+      a.click();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       BATCH TOOLBAR — Discovery Queue multi-select
+    ═══════════════════════════════════════════════════ */
+    let batchSelectedShoes = new Set();
+    function toggleBatchShoe(id, checkbox) {
+      if (checkbox.checked) batchSelectedShoes.add(id);
+      else batchSelectedShoes.delete(id);
+      updateBatchBar();
+    }
+    function updateBatchBar() {
+      const bar = document.getElementById('batch-selection-bar');
+      const count = document.getElementById('batch-sel-count');
+      if (!bar) return;
+      bar.classList.toggle('visible', batchSelectedShoes.size > 0);
+      if (count) count.textContent = `${batchSelectedShoes.size} selected`;
+    }
+    function selectAllShoes() {
+      document.querySelectorAll('.shoe-checkbox').forEach(cb => { cb.checked = true; batchSelectedShoes.add(cb.dataset.id); });
+      updateBatchBar();
+    }
+    function deselectAllShoes() {
+      document.querySelectorAll('.shoe-checkbox').forEach(cb => { cb.checked = false; });
+      batchSelectedShoes.clear();
+      updateBatchBar();
+    }
+    async function batchApproveSelected() {
+      if (batchSelectedShoes.size === 0) return;
+      const ids = [...batchSelectedShoes];
+      for (const id of ids) {
+        const shoe = pendingData.find(s => s.id === id);
+        if (shoe) await approveShoe(shoe);
+      }
+      batchSelectedShoes.clear();
+      updateBatchBar();
+    }
+    async function batchRejectSelected() {
+      if (batchSelectedShoes.size === 0) return;
+      if (!confirm(`Reject ${batchSelectedShoes.size} shoe(s)?`)) return;
+      const ids = [...batchSelectedShoes];
+      for (const id of ids) {
+        const shoe = pendingData.find(s => s.id === id);
+        if (shoe) await rejectShoe(shoe);
+      }
+      batchSelectedShoes.clear();
+      updateBatchBar();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       INIT ENHANCEMENTS — hook into showApp
+    ═══════════════════════════════════════════════════ */
+    const _origShowApp = showApp;
+    showApp = function() {
+      _origShowApp();
+      loadChartData();
+      loadDeployBadge();
+    };
   </script>
+
+  <!-- Command Palette -->
+  <div class="cmd-overlay" id="cmd-overlay" onclick="if(event.target===this)closeCmdPalette()">
+    <div class="cmd-box">
+      <input class="cmd-input" id="cmd-input" placeholder="Search views, users, shoes…" autocomplete="off" oninput="filterCmdResults(this.value)" onkeydown="handleCmdKey(event)">
+      <div class="cmd-results" id="cmd-results"></div>
+    </div>
+  </div>
+
+  <!-- Toast History Tray -->
+  <button class="toast-tray-btn" id="toast-tray-btn" onclick="toggleToastTray()" title="Notification history" style="display:none">
+    <i data-lucide="bell"></i>
+    <span class="toast-badge" id="toast-tray-badge" style="display:none">0</span>
+  </button>
+  <div class="toast-tray" id="toast-tray">
+    <div class="toast-tray-header">
+      Notifications
+      <span class="toast-tray-clear" onclick="clearToastHistory()">Clear all</span>
+    </div>
+    <div id="toast-tray-list">
+      <div class="toast-tray-empty">No notifications yet</div>
+    </div>
+  </div>
+
+  <!-- Deploy Badge -->
+  <div class="deploy-badge" id="deploy-badge" style="display:none">
+    <span id="deploy-badge-text"></span>
+    <a href="https://github.com/VenturePenguin/TreadLeftSite" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
 
   <!-- Merge Preview Modal -->
   <div class="merge-preview-overlay" id="merge-preview-overlay" onclick="closeMergePreviewOnOverlay(event)">
