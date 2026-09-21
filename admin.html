@@ -2509,6 +2509,174 @@
       font-weight: 700;
       margin-left: auto;
     }
+
+    /* ── Loading skeleton shimmer ── */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton-row td { padding: 14px 12px !important; }
+    .skeleton-bar {
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--border) 50%, var(--bg-subtle) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+    .skeleton-bar.w60 { width: 60%; }
+    .skeleton-bar.w40 { width: 40%; }
+    .skeleton-bar.w80 { width: 80%; }
+    .skeleton-bar.w30 { width: 30%; }
+
+    /* ── Collapsible sidebar sections ── */
+    .sidebar-section-label {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-section-label::after {
+      content: '‹';
+      font-size: 11px;
+      opacity: 0.4;
+      transition: transform .2s;
+      transform: rotate(-90deg);
+    }
+    .sidebar-section-label.collapsed::after {
+      transform: rotate(0deg);
+    }
+    .sidebar-section-label.collapsed ~ .nav-item,
+    .sidebar-section-label.collapsed ~ a.nav-item {
+      display: none;
+    }
+    .sidebar-group { overflow: hidden; }
+    .sidebar-group.collapsed .nav-item,
+    .sidebar-group.collapsed a.nav-item { display: none; max-height: 0; }
+
+    /* ── Kebab dropdown menu ── */
+    .kebab-wrap { position: relative; display: inline-block; }
+    .kebab-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1;
+    }
+    .kebab-btn:hover { background: var(--bg-subtle); }
+    .kebab-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      min-width: 140px;
+      z-index: 100;
+      padding: 4px;
+    }
+    .kebab-menu.open { display: block; }
+    .kebab-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .kebab-menu-item:hover { background: var(--bg-subtle); }
+    .kebab-menu-item.danger { color: #ef4444; }
+    .kebab-menu-item.danger:hover { background: #fef2f2; }
+    html.dark .kebab-menu-item.danger:hover { background: #451a1a; }
+
+    /* ── Empty state illustrations ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .empty-state svg.empty-illustration { width: 56px; height: 56px; opacity: 0.3; margin-bottom: 16px; }
+    .empty-state .empty-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+    .empty-state .empty-sub { font-size: 12px; }
+
+    /* ── Topbar bell ── */
+    .topbar-bell {
+      position: relative;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+    }
+    .topbar-bell:hover { background: var(--bg-subtle); }
+    .topbar-bell .bell-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      display: none;
+    }
+    .topbar-bell .bell-dot.active { display: block; }
+
+    /* ── Offline detection banner ── */
+    .offline-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      z-index: 10001;
+    }
+    .offline-banner.visible { display: flex; }
+    .offline-banner .offline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── Button busy state ── */
+    button.btn-busy {
+      opacity: 0.55;
+      pointer-events: none;
+      position: relative;
+    }
     </style>
 </head>
 <body>
@@ -2539,6 +2707,10 @@
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="cmdk-hint" onclick="openCmdPalette()" title="Search"><kbd>⌘</kbd><kbd>K</kbd></span>
+        <button class="topbar-bell" id="topbar-bell" onclick="toggleToastTray()" title="Notifications" aria-label="Notifications">
+          <i data-lucide="bell" style="width:16px;height:16px"></i>
+          <span class="bell-dot" id="topbar-bell-dot"></span>
+        </button>
         <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i data-lucide="moon"></i></button>
         <button class="logout-btn" onclick="doLogout()" aria-label="Log out">Logout</button>
       </div>
@@ -2549,85 +2721,84 @@
 
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar-nav" role="navigation" aria-label="Main navigation">
-      <div class="sidebar-section-label">Analytics</div>
+      <div class="sidebar-group" data-section="analytics">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Analytics</div>
+        <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
+          <span class="nav-icon"><i data-lucide="activity"></i></span>
+          Platform Pulse
+        </button>
+        <button class="nav-item" data-view="revenue-analytics" onclick="navigate('revenue-analytics')">
+          <span class="nav-icon"><i data-lucide="dollar-sign"></i></span>
+          Revenue Analytics
+        </button>
+      </div>
 
-      <button class="nav-item active" data-view="platform-pulse" onclick="navigate('platform-pulse')">
-        <span class="nav-icon"><i data-lucide="activity"></i></span>
-        Platform Pulse
-      </button>
+      <div class="sidebar-group" data-section="catalog" style="margin-top:12px;">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Catalog</div>
+        <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
+          <span class="nav-icon"><i data-lucide="search"></i></span>
+          Discovery Queue
+          <span class="nav-badge" id="sidebar-pending-count" style="display:none;background:#f59e0b;"></span>
+        </button>
+        <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
+          <span class="nav-icon"><i data-lucide="percent"></i></span>
+          Deal Engine
+        </button>
+        <button class="nav-item" data-view="lifespan-insights" onclick="navigate('lifespan-insights')">
+          <span class="nav-icon"><i data-lucide="skull"></i></span>
+          Lifespan Insights
+        </button>
+      </div>
 
-      <button class="nav-item" data-view="revenue-analytics" onclick="navigate('revenue-analytics')">
-        <span class="nav-icon"><i data-lucide="dollar-sign"></i></span>
-        Revenue Analytics
-      </button>
+      <div class="sidebar-group" data-section="governance" style="margin-top:12px;">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Data Governance</div>
+        <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
+          <span class="nav-icon"><i data-lucide="copy"></i></span>
+          Duplicate Detection
+        </button>
+        <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
+          <span class="nav-icon"><i data-lucide="tag"></i></span>
+          Brand Normalization
+        </button>
+        <button class="nav-item" data-view="system-ledger" onclick="navigate('system-ledger')">
+          <span class="nav-icon"><i data-lucide="file-text"></i></span>
+          System Ledger
+        </button>
+      </div>
 
-      <div class="sidebar-section-label" style="margin-top:12px;">Catalog</div>
+      <div class="sidebar-group" data-section="content" style="margin-top:12px;">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Content</div>
+        <a class="nav-item" href="https://treadleft-cms.netlify.app/admin/posts" target="_blank" rel="noopener" id="cms-link" title="Manage blog posts in the CMS">
+          <span class="nav-icon"><i data-lucide="edit-3"></i></span>
+          Blog CMS
+          <span class="nav-icon" style="margin-left:auto;font-size:12px;opacity:.5"><i data-lucide="external-link"></i></span>
+        </a>
+      </div>
 
-      <button class="nav-item" data-view="discovery-queue" onclick="navigate('discovery-queue')">
-        <span class="nav-icon"><i data-lucide="search"></i></span>
-        Discovery Queue
-        <span class="nav-badge" id="sidebar-pending-count" style="display:none;background:#f59e0b;"></span>
-      </button>
+      <div class="sidebar-group" data-section="system" style="margin-top:12px;">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">System</div>
+        <button class="nav-item" data-view="system-health" onclick="navigate('system-health')">
+          <span class="nav-icon"><i data-lucide="heart"></i></span>
+          System Health
+        </button>
+        <button class="nav-item" data-view="strava-monitor" onclick="navigate('strava-monitor')">
+          <span class="nav-icon"><i data-lucide="bike"></i></span>
+          Strava Sync Monitor
+          <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
+        </button>
+      </div>
 
-      <button class="nav-item" data-view="deal-engine" onclick="navigate('deal-engine')">
-        <span class="nav-icon"><i data-lucide="percent"></i></span>
-        Deal Engine
-      </button>
-
-      <button class="nav-item" data-view="lifespan-insights" onclick="navigate('lifespan-insights')">
-        <span class="nav-icon"><i data-lucide="skull"></i></span>
-        Lifespan Insights
-      </button>
-
-      <div class="sidebar-section-label" style="margin-top:12px;">Data Governance</div>
-
-      <button class="nav-item" data-view="duplicate-resolver" onclick="navigate('duplicate-resolver')">
-        <span class="nav-icon"><i data-lucide="copy"></i></span>
-        Duplicate Detection
-      </button>
-
-      <button class="nav-item" data-view="brand-normalization" onclick="navigate('brand-normalization')">
-        <span class="nav-icon"><i data-lucide="tag"></i></span>
-        Brand Normalization
-      </button>
-
-      <button class="nav-item" data-view="system-ledger" onclick="navigate('system-ledger')">
-        <span class="nav-icon"><i data-lucide="file-text"></i></span>
-        System Ledger
-      </button>
-
-      <div class="sidebar-section-label" style="margin-top:12px;">Content</div>
-
-      <a class="nav-item" href="https://treadleft-cms.netlify.app/admin/posts" target="_blank" rel="noopener" id="cms-link" title="Manage blog posts in the CMS">
-        <span class="nav-icon"><i data-lucide="edit-3"></i></span>
-        Blog CMS
-        <span class="nav-icon" style="margin-left:auto;font-size:12px;opacity:.5"><i data-lucide="external-link"></i></span>
-      </a>
-
-      <div class="sidebar-section-label" style="margin-top:12px;">System</div>
-
-      <button class="nav-item" data-view="system-health" onclick="navigate('system-health')">
-        <span class="nav-icon"><i data-lucide="heart"></i></span>
-        System Health
-      </button>
-
-      <button class="nav-item" data-view="strava-monitor" onclick="navigate('strava-monitor')">
-        <span class="nav-icon"><i data-lucide="bike"></i></span>
-        Strava Sync Monitor
-        <span class="nav-badge" id="sidebar-error-count" style="display:none;background:#ef4444;">!</span>
-      </button>
-
-      <div class="sidebar-section-label" style="margin-top:12px;">Support</div>
-
-      <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
-        <span class="nav-icon"><i data-lucide="user"></i></span>
-        User Support
-      </button>
-
-      <button class="nav-item" data-view="user-cohorts" onclick="navigate('user-cohorts')">
-        <span class="nav-icon"><i data-lucide="target"></i></span>
-        User Cohorts
-      </button>
+      <div class="sidebar-group" data-section="support" style="margin-top:12px;">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Support</div>
+        <button class="nav-item" data-view="user-support" onclick="navigate('user-support')">
+          <span class="nav-icon"><i data-lucide="user"></i></span>
+          User Support
+        </button>
+        <button class="nav-item" data-view="user-cohorts" onclick="navigate('user-cohorts')">
+          <span class="nav-icon"><i data-lucide="target"></i></span>
+          User Cohorts
+        </button>
+      </div>
     </nav>
 
     <!-- Main Content -->
@@ -4388,6 +4559,57 @@
       return div.innerHTML;
     }
 
+    /* ── Skeleton loading rows ── */
+    function skeletonRows(cols, rows = 5) {
+      const widths = ['w60','w40','w80','w30','w60','w40','w80'];
+      return Array.from({ length: rows }, () =>
+        `<tr class="skeleton-row">${Array.from({ length: cols }, (_, i) =>
+          `<td><div class="skeleton-bar ${widths[i % widths.length]}"></div></td>`
+        ).join('')}</tr>`
+      ).join('');
+    }
+
+    /* ── API retry wrapper ── */
+    async function withRetry(fn, retries = 2, delayMs = 800) {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          return await fn();
+        } catch (err) {
+          if (attempt === retries) throw err;
+          await new Promise(r => setTimeout(r, delayMs * Math.pow(2, attempt)));
+        }
+      }
+    }
+
+    /* ── Debounce destructive buttons ── */
+    function busyBtn(btn, busy) {
+      if (!btn) return;
+      if (busy) { btn.classList.add('btn-busy'); btn.disabled = true; }
+      else { btn.classList.remove('btn-busy'); btn.disabled = false; }
+    }
+
+    /* ── Kebab menu helpers ── */
+    let activeKebab = null;
+    function toggleKebab(el, e) {
+      e.stopPropagation();
+      const menu = el.nextElementSibling;
+      if (activeKebab && activeKebab !== menu) activeKebab.classList.remove('open');
+      menu.classList.toggle('open');
+      activeKebab = menu.classList.contains('open') ? menu : null;
+    }
+    document.addEventListener('click', () => {
+      if (activeKebab) { activeKebab.classList.remove('open'); activeKebab = null; }
+    });
+
+    /* ── Empty state builder ── */
+    function emptyStateHtml(icon, title, sub) {
+      return `<div class="empty-state">
+        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icon}</svg>
+        <div class="empty-title">${title}</div>
+        <div class="empty-sub">${sub}</div>
+      </div>`;
+    }
+
     /* ── Shared pagination renderer ── */
     function renderPagination(containerId, currentPage, totalPages, onPageChange) {
       const el = document.getElementById(containerId);
@@ -4906,7 +5128,7 @@
       });
       const tbody = document.getElementById('dm-deals-tbody');
       if (!rows.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">No active discounted deals.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="7">${emptyStateHtml('<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>', 'No active discounted deals', 'Make sure msrp_cents is populated for deals')}</td></tr>`;
         return;
       }
       tbody.innerHTML = rows.map(d => {
@@ -4924,8 +5146,13 @@
           <td><span class="deal-discount-pill ${pillCls}"><i data-lucide="arrow-down"></i>${d.pct}%</span></td>
           <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${escapeHtml(timeAgo(d.updated_at))}</td>
           <td style="white-space:nowrap;">
-            <button class="deal-action-btn verify" onclick="verifyDeal('${d.id}', this)"><i data-lucide="check"></i> Verify</button>
-            <button class="deal-action-btn deactivate" onclick="deactivateDeal('${d.id}', this)"><i data-lucide="x"></i> Deactivate</button>
+            <div class="kebab-wrap">
+              <button class="kebab-btn" onclick="toggleKebab(this, event)" aria-label="Actions">⋯</button>
+              <div class="kebab-menu">
+                <button class="kebab-menu-item" onclick="verifyDeal('${d.id}', this)"><i data-lucide="check" style="width:14px;height:14px"></i> Verify</button>
+                <button class="kebab-menu-item danger" onclick="deactivateDeal('${d.id}', this)"><i data-lucide="x" style="width:14px;height:14px"></i> Deactivate</button>
+              </div>
+            </div>
           </td>
         </tr>`;
       }).join('');
@@ -4951,9 +5178,8 @@
     async function fetchDealMetrics() {
       dealEngineLoaded = true;
       /* Loading state */
-      const loadingRow = (cols) => `<tr><td colspan="${cols}" style="text-align:center;color:var(--text-muted);padding:28px;"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</td></tr>`;
-      document.getElementById('dm-deals-tbody').innerHTML  = loadingRow(7);
-      document.getElementById('dm-alerts-tbody').innerHTML = loadingRow(6);
+      document.getElementById('dm-deals-tbody').innerHTML  = skeletonRows(7, 4);
+      document.getElementById('dm-alerts-tbody').innerHTML = skeletonRows(6, 3);
       ['dm-active-deals','dm-alerts-today','dm-deepest'].forEach(id => {
         document.getElementById(id).innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;display:inline-block;"></div>';
       });
@@ -4962,24 +5188,24 @@
         const sb = getSupabase();
         const yesterday = new Date(Date.now() - 864e5).toISOString();
 
-        /* Parallel queries */
+        /* Parallel queries with retry */
         const [dealsRes, alertsRes] = await Promise.all([
 
-          /* All active discounted deals, sorted by largest % drop */
-          sb.from('shoe_deals')
+          withRetry(() => sb.from('shoe_deals')
             .select('id, price_cents, msrp_cents, currency, retailer_name, updated_at, master_shoe_products(brand_name, model_name, image_url)')
             .eq('is_active', true)
             .not('msrp_cents', 'is', null)
             .gt('msrp_cents', 0)
             .order('price_cents', { ascending: true })
-            .limit(100),  /* fetch 100, sort by discount % client-side */
+            .limit(100)
+            .then(r => { if (r.error) throw r.error; return r; })),
 
-          /* Triggered alerts: is_active=false + last_alerted_at set, most recent 20 */
-          sb.from('user_price_alerts')
+          withRetry(() => sb.from('user_price_alerts')
             .select('id, target_price_cents, currency, created_at, last_alerted_at, master_shoe_products(brand_name, model_name), users(email, first_name, last_name)')
             .not('last_alerted_at', 'is', null)
             .order('last_alerted_at', { ascending: false })
-            .limit(20),
+            .limit(20)
+            .then(r => { if (r.error) throw r.error; return r; })),
         ]);
 
         if (dealsRes.error)  throw dealsRes.error;
@@ -5107,13 +5333,12 @@
     }
 
     async function verifyDeal(dealId, btn) {
-      btn.disabled = true;
-      btn.textContent = '…';
+      busyBtn(btn, true);
       const { error } = await getSupabase()
         .from('shoe_deals')
         .update({ last_verified_at: new Date().toISOString(), updated_at: new Date().toISOString() })
         .eq('id', dealId);
-      if (error) { showToast('Verify failed: ' + error.message, 'error'); btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Verify'; return; }
+      if (error) { showToast('Verify failed: ' + error.message, 'error'); busyBtn(btn, false); return; }
       showToast('Deal verified — staleness cleared.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
@@ -5121,13 +5346,12 @@
 
     async function deactivateDeal(dealId, btn) {
       if (!confirm('Deactivate this deal? It will no longer appear in the app.')) return;
-      btn.disabled = true;
-      btn.textContent = '…';
+      busyBtn(btn, true);
       const { error } = await getSupabase()
         .from('shoe_deals')
         .update({ is_active: false })
         .eq('id', dealId);
-      if (error) { showToast('Deactivate failed: ' + error.message, 'error'); btn.disabled = false; btn.innerHTML = '<i data-lucide="x"></i> Deactivate'; return; }
+      if (error) { showToast('Deactivate failed: ' + error.message, 'error'); busyBtn(btn, false); return; }
       showToast('Deal deactivated.', 'success');
       dealEngineLoaded = false;
       fetchDealMetrics();
@@ -5163,13 +5387,16 @@
       const label  = document.getElementById('cohort-count-label');
       const expBtn = document.getElementById('cohort-export-btn');
 
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      tbody.innerHTML = skeletonRows(7, 5);
       label.textContent  = '— users';
       expBtn.disabled    = true;
       cohortData         = [];
 
       try {
-        const { data, error } = await getSupabase().rpc('get_user_cohorts', { segment_filter: filter });
+        const { data, error } = await withRetry(() =>
+          getSupabase().rpc('get_user_cohorts', { segment_filter: filter })
+            .then(r => { if (r.error) throw r.error; return r; })
+        );
         if (error) throw error;
 
         cohortData = data || [];
@@ -5178,7 +5405,7 @@
         cohortPage = 1;
 
         if (!cohortData.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="target"></i> No users match this segment.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7">${emptyStateHtml('<circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/>', 'No users match this segment', 'Try adjusting the filter above')}</td></tr>`;
           document.getElementById('cohort-pagination').innerHTML = '';
           return;
         }
@@ -5272,7 +5499,7 @@
     async function loadLifespanInsights() {
       lifespanLoaded = true;
       const tbody = document.getElementById('grave-tbody');
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      tbody.innerHTML = skeletonRows(5, 4);
       ['grave-kpi-total','grave-kpi-longest','grave-kpi-fastest'].forEach(id => {
         document.getElementById(id).textContent = '—';
       });
@@ -5280,8 +5507,8 @@
       try {
         const sb = getSupabase();
         const [insightRes, kpiRes] = await Promise.all([
-          sb.rpc('get_lifespan_insights'),
-          sb.rpc('get_lifespan_kpis'),
+          withRetry(() => sb.rpc('get_lifespan_insights').then(r => { if (r.error) throw r.error; return r; })),
+          withRetry(() => sb.rpc('get_lifespan_kpis').then(r => { if (r.error) throw r.error; return r; })),
         ]);
 
         if (insightRes.error) throw insightRes.error;
@@ -5311,7 +5538,7 @@
 
         // ─ Table ─
         if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="skull"></i> No retired shoes with ≥3 samples yet.<br><span style="font-size:11px;">Retire some shoes in the app or add mock data to see insights.</span></td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5">${emptyStateHtml('<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M3 3h2l.4 2M7 13h10l4-8H5.4"/>', 'No retired shoes with ≥3 samples', 'Retire some shoes in the app to see insights')}</td></tr>`;
           return;
         }
 
@@ -5366,7 +5593,7 @@
     async function loadRevenueAnalytics() {
       revenueAnalyticsLoaded = true;
       const tbody = document.getElementById('rev-perf-tbody');
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>`;
+      tbody.innerHTML = skeletonRows(7, 4);
       document.getElementById('rev-kpi-clicks').textContent     = '—';
       document.getElementById('rev-kpi-top-deal').textContent   = '—';
       document.getElementById('rev-kpi-epc').textContent        = '—';
@@ -5375,8 +5602,8 @@
         const sb = getSupabase();
 
         const [perfRes, kpiRes] = await Promise.all([
-          sb.rpc('get_affiliate_performance'),
-          sb.rpc('get_affiliate_kpis', { days: 30 }),
+          withRetry(() => sb.rpc('get_affiliate_performance').then(r => { if (r.error) throw r.error; return r; })),
+          withRetry(() => sb.rpc('get_affiliate_kpis', { days: 30 }).then(r => { if (r.error) throw r.error; return r; })),
         ]);
 
         if (perfRes.error) throw perfRes.error;
@@ -5399,7 +5626,7 @@
 
         // ─ Performance Table ─
         if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;"><i data-lucide="package"></i> No active deals found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7">${emptyStateHtml('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', 'No active deals found', 'Affiliate performance data will appear once deals are tracked')}</td></tr>`;
           return;
         }
 
@@ -5450,14 +5677,15 @@
     async function loadLedger() {
       ledgerLoaded = true;
       const tbody = document.getElementById('ledger-tbody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+      tbody.innerHTML = skeletonRows(6, 5);
 
       try {
-        const { data, error } = await getSupabase()
+        const { data, error } = await withRetry(() => getSupabase()
           .from('admin_audit_logs')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(200);
+          .limit(200)
+          .then(r => { if (r.error) throw r.error; return r; }));
 
         if (error) throw error;
         ledgerAllRows = data || [];
@@ -5500,7 +5728,7 @@
       });
 
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">No audit entries found.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="6">${emptyStateHtml('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>', 'No audit entries found', 'Actions performed in the admin panel will be logged here')}</td></tr>`;
         document.getElementById('ledger-pagination').innerHTML = '';
         return;
       }
@@ -5941,15 +6169,15 @@
     async function fetchWebhookLogs() {
       syncLoaded = true;
       const tbody = document.getElementById('sync-table-body');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;"><div class="spinner" style="margin:0 auto 12px"></div>Loading…</td></tr>';
+      tbody.innerHTML = skeletonRows(6, 4);
 
       try {
-        const sb = getSupabase();
-        const { data, error } = await sb
+        const { data, error } = await withRetry(() => getSupabase()
           .from('strava_webhook_logs')
           .select('id, created_at, object_type, aspect_type, object_id, owner_id, status, error_message, payload')
           .order('created_at', { ascending: false })
-          .limit(50);
+          .limit(50)
+          .then(r => { if (r.error) throw r.error; return r; }));
 
         if (error) throw error;
         syncAllLogs = data || [];
@@ -5979,10 +6207,10 @@
       const filtered = syncFilter === 'all' ? logs : logs.filter(r => r.status === syncFilter);
 
       if (filtered.length === 0) {
-        const msg = syncFilter === 'all'
-          ? 'No webhook events yet. Events will appear here after the next Strava activity.'
-          : `No ${syncFilter} events in the last 50.`;
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px;">${escapeHtml(msg)}</td></tr>`;
+        const sub = syncFilter === 'all'
+          ? 'Events will appear here after the next Strava activity'
+          : `No ${syncFilter} events in the last 50`;
+        tbody.innerHTML = `<tr><td colspan="6">${emptyStateHtml('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 'No webhook events', sub)}</td></tr>`;
         return;
       }
 
@@ -5996,11 +6224,6 @@
         const statusClass = row.status === 'ok' ? 'ok' : row.status === 'error' ? 'error' : 'skipped';
         const statusIcon  = row.status === 'ok' ? '<i data-lucide="check"></i>' : row.status === 'error' ? '<i data-lucide="x"></i>' : '⏭';
         const statusLabel = row.status === 'ok' ? '200 OK' : row.status === 'error' ? 'Error' : 'Skipped';
-
-        const retryBtn = row.status === 'error'
-          ? `<button class="sync-retry-btn" id="retry-${row.id}" onclick="retryStravaSync('${row.id}', ${escapeHtml(JSON.stringify(JSON.stringify(row.payload)))})"><i data-lucide="rotate-ccw"></i> Retry</button>`
-          : '';
-        const payloadBtn = `<button class="sync-payload-btn" onclick="showPayload('${row.id}')">{ }</button>`;
 
         const errTip = row.error_message
           ? `<div style="font-size:11px;color:#ef4444;margin-top:3px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(row.error_message)}">${escapeHtml(row.error_message)}</div>`
@@ -6019,9 +6242,14 @@
               <span class="sync-badge ${statusClass}">${statusIcon} ${statusLabel}</span>
               ${errTip}
             </td>
-            <td style="display:flex;gap:6px;align-items:center;">
-              ${retryBtn}
-              ${payloadBtn}
+            <td>
+              <div class="kebab-wrap">
+                <button class="kebab-btn" onclick="toggleKebab(this, event)" aria-label="Actions">⋯</button>
+                <div class="kebab-menu">
+                  ${row.status === 'error' ? `<button class="kebab-menu-item" id="retry-${row.id}" onclick="retryStravaSync('${row.id}', ${escapeHtml(JSON.stringify(JSON.stringify(row.payload)))})"><i data-lucide="rotate-ccw" style="width:14px;height:14px"></i> Retry</button>` : ''}
+                  <button class="kebab-menu-item" onclick="showPayload('${row.id}')"><i data-lucide="code" style="width:14px;height:14px"></i> View Payload</button>
+                </div>
+              </div>
             </td>
           </tr>`;
       }).join('');
@@ -6033,7 +6261,7 @@
 
     async function retryStravaSync(logId, payloadJson) {
       const btn = document.getElementById(`retry-${logId}`);
-      if (btn) { btn.disabled = true; btn.textContent = '⏳ Retrying…'; }
+      busyBtn(btn, true);
 
       let payload;
       try { payload = JSON.parse(payloadJson); } catch { payload = {}; }
@@ -6049,7 +6277,7 @@
         setTimeout(fetchWebhookLogs, 2000);
       } catch (err) {
         showToast('Retry failed: ' + err.message, 'error');
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="rotate-ccw"></i> Retry'; }
+        busyBtn(btn, false);
       }
     }
 
@@ -7135,6 +7363,8 @@
     }
     function toggleToastTray() {
       document.getElementById('toast-tray').classList.toggle('open');
+      const dot = document.getElementById('topbar-bell-dot');
+      if (dot) dot.classList.remove('active');
     }
     function clearToastHistory() {
       toastHistory = [];
@@ -7441,7 +7671,64 @@
       restoreAutoRefresh();
       applyChartDarkMode();
       startSessionTimer();
+      restoreSidebarState();
+      initOfflineDetection();
     };
+
+    /* ── Collapsible sidebar sections ── */
+    function toggleSidebarSection(label) {
+      const group = label.closest('.sidebar-group');
+      if (!group) return;
+      group.classList.toggle('collapsed');
+      label.classList.toggle('collapsed');
+      saveSidebarState();
+    }
+    function saveSidebarState() {
+      const collapsed = [];
+      document.querySelectorAll('.sidebar-group.collapsed').forEach(g => {
+        if (g.dataset.section) collapsed.push(g.dataset.section);
+      });
+      localStorage.setItem('admin_sidebar_collapsed', JSON.stringify(collapsed));
+    }
+    function restoreSidebarState() {
+      try {
+        const collapsed = JSON.parse(localStorage.getItem('admin_sidebar_collapsed') || '[]');
+        collapsed.forEach(section => {
+          const group = document.querySelector(`.sidebar-group[data-section="${section}"]`);
+          if (group) {
+            group.classList.add('collapsed');
+            const label = group.querySelector('.sidebar-section-label');
+            if (label) label.classList.add('collapsed');
+          }
+        });
+      } catch (e) { /* ignore */ }
+    }
+
+    /* ── Offline detection ── */
+    function initOfflineDetection() {
+      const banner = document.getElementById('offline-banner');
+      if (!banner) return;
+      const update = () => {
+        if (navigator.onLine) {
+          banner.classList.remove('visible');
+        } else {
+          banner.classList.add('visible');
+        }
+      };
+      window.addEventListener('online', update);
+      window.addEventListener('offline', update);
+      update();
+    }
+
+    /* ── Bell dot: activate on new toast ── */
+    const _origAddToast = typeof addToastToHistory === 'function' ? addToastToHistory : null;
+    if (_origAddToast) {
+      addToastToHistory = function(msg, type) {
+        _origAddToast(msg, type);
+        const dot = document.getElementById('topbar-bell-dot');
+        if (dot) dot.classList.add('active');
+      };
+    }
 
     /* ── Chart.js CDN Fallback ── */
     (function checkChartJs() {
@@ -7548,6 +7835,11 @@
     <i data-lucide="clock" style="width:16px;height:16px"></i>
     <span>Your session expires soon.</span>
     <button onclick="location.reload()" style="background:#78350f;color:#fbbf24;border:none;padding:4px 12px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">Refresh</button>
+  </div>
+  <!-- Offline Detection Banner -->
+  <div class="offline-banner" id="offline-banner">
+    <span class="offline-dot"></span>
+    <span>You are offline — changes may not save</span>
   </div>
 </body>
 </html>
