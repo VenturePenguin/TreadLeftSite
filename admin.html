@@ -7134,11 +7134,9 @@
     }
 
     function confirmMergeFromPreview() {
-      console.log('[MERGE] confirmMergeFromPreview called, currentPreviewKey =', currentPreviewKey);
-      if (!currentPreviewKey) { console.warn('[MERGE] currentPreviewKey is null, aborting'); return; }
+      if (!currentPreviewKey) return;
       const key = currentPreviewKey;
       closeMergePreviewModal();
-      console.log('[MERGE] calling mergeDuplicates with key =', key);
       mergeDuplicates(key);
     }
 
@@ -7205,12 +7203,10 @@
             .maybeSingle();
           if (!dupCheck) { successCount++; continue; }
 
-          console.log('[MERGE] Calling RPC merge_duplicate_shoes:', { master_id: state.masterId, duplicate_id: dup.id });
           const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
             master_id:    state.masterId,
             duplicate_id: dup.id
           });
-          console.log('[MERGE] RPC result:', { data, error });
           if (error) throw error;
           if (!data) throw new Error('RPC returned false');
           successCount++;
@@ -7264,13 +7260,10 @@
     }
 
     async function mergeDuplicates(groupKey) {
-      console.log('[MERGE] mergeDuplicates called with key =', groupKey);
       const state = dupState[groupKey];
-      console.log('[MERGE] dupState[key] =', state);
-      if (!state) { console.warn('[MERGE] No state found for key, aborting'); return; }
+      if (!state) return;
 
       const duplicates = state.shoes.filter(s => s.id !== state.masterId);
-      console.log('[MERGE] masterId =', state.masterId, ', duplicates to merge =', duplicates.length);
       if (!duplicates.length) { showToast('No duplicates to merge', 'error'); return; }
 
       const btn = document.getElementById(`merge-btn-${groupKey}`);

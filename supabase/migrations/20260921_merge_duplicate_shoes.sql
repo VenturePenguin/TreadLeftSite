@@ -43,8 +43,7 @@ BEGIN
 
   -- 3. Repoint user_price_alerts
   UPDATE user_price_alerts
-    SET master_product_id = master_id,
-        updated_at = NOW()
+    SET master_product_id = master_id
   WHERE master_product_id = duplicate_id;
 
   -- 4. Delete the duplicate product
