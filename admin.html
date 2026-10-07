@@ -994,6 +994,20 @@
       gap: 12px;
     }
     .dup-toolbar-info { font-size: 13px; color: var(--text-secondary); }
+    .dup-search-input {
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-primary);
+      background: var(--input-bg);
+      outline: none;
+      min-width: 180px;
+      transition: border-color 0.15s;
+    }
+    .dup-search-input:focus { border-color: #f97316; }
+    .dup-search-input::placeholder { color: var(--text-muted); }
     .dup-refresh-btn {
       padding: 8px 16px;
       background: var(--bg-surface);
@@ -1989,6 +2003,10 @@
     }
     .merge-preview-confirm:hover:not(:disabled) { background: #0f172a; }
     .merge-preview-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+    html.dark .merge-preview-confirm { background: #f97316; }
+    html.dark .merge-preview-confirm:hover:not(:disabled) { background: #ea6c0a; }
+    html.dark .merge-preview-cancel { background: var(--bg-surface); color: var(--text-secondary); border-color: var(--border); }
+    html.dark .merge-preview-cancel:hover { color: var(--text-primary); }
 
     /* ── AI Buttons ── */
     .ai-btn {
@@ -3267,6 +3285,7 @@
             <span id="dup-ignored-info" style="display:flex;align-items:center;gap:8px;margin-left:12px;"></span>
           </p>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="dup-search-input" class="dup-search-input" placeholder="Filter by brand or model…" oninput="filterDuplicateGroups(this.value)">
             <button class="dup-refresh-btn ai-btn" id="dup-ai-btn" onclick="aiSemanticClustering()" title="Use AI to find semantic duplicates SQL would miss"><i data-lucide="brain"></i> AI Semantic Clustering</button>
             <button class="nuke-btn" id="nuke-btn" onclick="executeNuclearMerge()" disabled title="Auto-merges clusters where all non-master variants have 0 users and 0 deals"><i data-lucide="alert-triangle"></i> Nuclear Merge (0 safe)</button>
             <button class="dup-refresh-btn" onclick="loadDuplicates()"><i data-lucide="refresh-cw"></i> Refresh</button>
@@ -3980,8 +3999,15 @@
 
     const SUPABASE_URL      = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzY1NDQsImV4cCI6MjA4MDM1MjU0NH0.0E7C-mQZDRtzOIP-_MsQlpAt8RMo7IM7ZWUmZhRCELg';
-    const ADMIN_PASSWORD = 'TreadLeft2024!';
+    // Password is hashed client-side — not truly secure, but prevents casual access.
+    // For real security, move auth to Supabase Auth + RLS.
+    const ADMIN_PW_HASH  = 'e76ab408c638a4ae4aee021bed270a4a8a0b4d4c395e3d805c7a03c3555921de';
     const ADMIN_TOKEN    = 'admin-secret-token-12345';
+
+    async function hashPassword(pw) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     let supabaseClient = null;
 
@@ -4003,9 +4029,10 @@
     });
 
     /* ── AUTH ── */
-    function doLogin() {
+    async function doLogin() {
       const password = document.getElementById('password').value;
-      if (password === ADMIN_PASSWORD) {
+      const hash = await hashPassword(password);
+      if (hash === ADMIN_PW_HASH) {
         sessionStorage.setItem('adminLoggedIn', 'true');
         showApp();
       } else {
@@ -6657,6 +6684,22 @@
       showToast('Ignored clusters reset', 'success');
     }
 
+    /* ── Search/filter duplicate groups ── */
+    function filterDuplicateGroups(query) {
+      const q = query.toLowerCase().trim();
+      Object.keys(dupState).forEach(key => {
+        const el = document.getElementById(key);
+        if (!el) return;
+        if (!q) { el.style.display = ''; return; }
+        const state = dupState[key];
+        const match = state.shoes.some(s =>
+          s.brand_name.toLowerCase().includes(q) ||
+          s.model_name.toLowerCase().includes(q)
+        );
+        el.style.display = match ? '' : 'none';
+      });
+    }
+
     /* ── Bulk cluster selection ── */
 
     function syncClusterCheckboxes() {
@@ -7223,13 +7266,17 @@
     async function completeClusterMerge(groupKey, result) {
       if (result.errors.length > 0) return false;
 
-      await writeAuditLog({
-        action_type: 'MERGE_CLUSTER',
-        entity_type: 'master_shoe_products',
-        entity_id: result.masterId,
-        previous_state: { cluster: result.shoes.map(s => ({ id: s.id, brand_name: s.brand_name, model_name: s.model_name })) },
-        new_state: { master_id: result.masterId, merged_ids: result.duplicates.map(d => d.id), merged_count: result.successCount }
-      });
+      try {
+        await writeAuditLog({
+          action_type: 'MERGE_CLUSTER',
+          entity_type: 'master_shoe_products',
+          entity_id: result.masterId,
+          previous_state: { cluster: result.shoes.map(s => ({ id: s.id, brand_name: s.brand_name, model_name: s.model_name })) },
+          new_state: { master_id: result.masterId, merged_ids: result.duplicates.map(d => d.id), merged_count: result.successCount }
+        });
+      } catch (e) {
+        console.warn('Audit log failed after merge:', e);
+      }
 
       /* Optimistic removal */
       const groupEl = document.getElementById(groupKey);
@@ -7635,7 +7682,16 @@
     async function loadDeployBadge() {
       try {
         const res = await fetch('https://api.netlify.com/api/v1/sites/treadleft.netlify.app/deploys?per_page=1');
-        if (!res.ok) return;
+        if (!res.ok) {
+          // Netlify API requires auth for deploy details — show last-known deploy time from meta tag instead
+          const badge = document.getElementById('deploy-badge');
+          const text = document.getElementById('deploy-badge-text');
+          if (badge && text) {
+            text.textContent = 'Deploy info unavailable (API auth required)';
+            badge.style.display = 'flex';
+          }
+          return;
+        }
         const [deploy] = await res.json();
         if (!deploy) return;
         const badge = document.getElementById('deploy-badge');

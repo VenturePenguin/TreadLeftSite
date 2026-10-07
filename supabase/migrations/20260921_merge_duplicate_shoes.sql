@@ -29,7 +29,18 @@ BEGIN
     RAISE EXCEPTION 'Cannot merge a product into itself';
   END IF;
 
-  -- 1. Repoint shoe_deals
+  -- 1a. Delete duplicate's deals that would conflict (same retailer+market) with master
+  DELETE FROM shoe_deals
+  WHERE id IN (
+    SELECT d.id FROM shoe_deals d
+    INNER JOIN shoe_deals m
+      ON  m.master_product_id = master_id
+      AND m.retailer_name = d.retailer_name
+      AND COALESCE(m.market, '') = COALESCE(d.market, '')
+    WHERE d.master_product_id = duplicate_id
+  );
+
+  -- 1b. Repoint remaining non-conflicting deals
   UPDATE shoe_deals
     SET master_product_id = master_id,
         updated_at = NOW()
