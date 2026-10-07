@@ -1842,6 +1842,154 @@
     }
     .diff-close-btn:hover { border-color: #7c3aed; color: #7c3aed; }
 
+    /* ── Merge Preview Modal ── */
+    .merge-preview-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .merge-preview-overlay.open { display: flex; }
+    .merge-preview-modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 640px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      overflow: hidden;
+    }
+    .merge-preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+    .merge-preview-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+    .merge-preview-close {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .merge-preview-close:hover { border-color: #ef4444; color: #ef4444; }
+    .merge-preview-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .merge-preview-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .merge-preview-error {
+      color: #ef4444;
+      font-size: 13px;
+      padding: 20px;
+      text-align: center;
+    }
+    .merge-preview-summary {
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    .merge-preview-summary p { margin: 0 0 4px; }
+    .merge-preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .merge-preview-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+    .merge-preview-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .merge-preview-table tr:last-child td { border-bottom: none; }
+    .merge-preview-master td { background: rgba(249,115,22,0.04); }
+    .merge-preview-count { text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .merge-preview-count.zero { color: var(--text-muted); }
+    .merge-preview-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+    .merge-preview-cancel {
+      padding: 9px 20px;
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .merge-preview-cancel:hover { border-color: #94a3b8; color: var(--text-primary); }
+    .merge-preview-confirm {
+      padding: 9px 20px;
+      background: #1e293b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .merge-preview-confirm:hover:not(:disabled) { background: #0f172a; }
+    .merge-preview-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
     /* ── AI Buttons ── */
     .ai-btn {
       background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%) !important;
@@ -6986,9 +7134,12 @@
     }
 
     function confirmMergeFromPreview() {
-      if (!currentPreviewKey) return;
+      console.log('[MERGE] confirmMergeFromPreview called, currentPreviewKey =', currentPreviewKey);
+      if (!currentPreviewKey) { console.warn('[MERGE] currentPreviewKey is null, aborting'); return; }
+      const key = currentPreviewKey;
       closeMergePreviewModal();
-      mergeDuplicates(currentPreviewKey);
+      console.log('[MERGE] calling mergeDuplicates with key =', key);
+      mergeDuplicates(key);
     }
 
     /* ── Interaction ── */
@@ -7054,10 +7205,12 @@
             .maybeSingle();
           if (!dupCheck) { successCount++; continue; }
 
+          console.log('[MERGE] Calling RPC merge_duplicate_shoes:', { master_id: state.masterId, duplicate_id: dup.id });
           const { data, error } = await getSupabase().rpc('merge_duplicate_shoes', {
             master_id:    state.masterId,
             duplicate_id: dup.id
           });
+          console.log('[MERGE] RPC result:', { data, error });
           if (error) throw error;
           if (!data) throw new Error('RPC returned false');
           successCount++;
@@ -7111,10 +7264,13 @@
     }
 
     async function mergeDuplicates(groupKey) {
+      console.log('[MERGE] mergeDuplicates called with key =', groupKey);
       const state = dupState[groupKey];
-      if (!state) return;
+      console.log('[MERGE] dupState[key] =', state);
+      if (!state) { console.warn('[MERGE] No state found for key, aborting'); return; }
 
       const duplicates = state.shoes.filter(s => s.id !== state.masterId);
+      console.log('[MERGE] masterId =', state.masterId, ', duplicates to merge =', duplicates.length);
       if (!duplicates.length) { showToast('No duplicates to merge', 'error'); return; }
 
       const btn = document.getElementById(`merge-btn-${groupKey}`);
