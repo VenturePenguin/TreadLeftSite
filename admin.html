@@ -2927,7 +2927,7 @@
               <input type="checkbox" id="auto-refresh-cb" onchange="toggleAutoRefresh(this.checked)">
               Auto
             </label>
-            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry()">&#x1F504; Refresh</button>
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadTelemetry(true)">&#x1F504; Refresh</button>
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px;font-size:11px" onclick="exportPulseToCSV()" title="Export metrics to CSV"><i data-lucide="download"></i> CSV</button>
           </div>
         </div>
@@ -3136,13 +3136,17 @@
           <div class="growth-chart-card" style="margin-bottom:0">
             <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px"><i data-lucide="trophy"></i> Top Shoe Models</div>
             <div id="top-shoes-list" style="display:flex;flex-direction:column;gap:8px">
-              <div style="color:var(--text-muted);font-size:13px">Loading…</div>
+              <div class="skeleton-bar w80" style="height:16px"></div>
+              <div class="skeleton-bar w60" style="height:16px"></div>
+              <div class="skeleton-bar w80" style="height:16px"></div>
             </div>
           </div>
           <div class="growth-chart-card" style="margin-bottom:0">
             <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px"><i data-lucide="tag"></i> Brand Distribution</div>
             <div id="brand-distribution-list" style="display:flex;flex-direction:column;gap:8px">
-              <div style="color:var(--text-muted);font-size:13px">Loading…</div>
+              <div class="skeleton-bar w60" style="height:16px"></div>
+              <div class="skeleton-bar w80" style="height:16px"></div>
+              <div class="skeleton-bar w40" style="height:16px"></div>
             </div>
           </div>
         </div>
@@ -3163,7 +3167,8 @@
               </tr>
             </thead>
             <tbody id="pulse-lifespan-tbody">
-              <tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:16px;">Loading…</td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -3366,7 +3371,9 @@
               </tr>
             </thead>
             <tbody id="grave-tbody">
-              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:36px;">Click Refresh to load…</td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w40"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w40"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -3387,12 +3394,12 @@
           <div class="rev-kpi-card">
             <div class="rev-kpi-label"><i data-lucide="link"></i> Total Outbound Clicks (Last 30 Days)</div>
             <div class="rev-kpi-value" id="rev-kpi-clicks">—</div>
-            <div class="rev-kpi-sub" id="rev-kpi-clicks-sub">Loading…</div>
+            <div class="rev-kpi-sub" id="rev-kpi-clicks-sub"><div class="skeleton-bar w60" style="height:10px"></div></div>
           </div>
           <div class="rev-kpi-card">
             <div class="rev-kpi-label"><i data-lucide="flame"></i> Most Active Deal</div>
             <div class="rev-kpi-value" id="rev-kpi-top-deal" style="font-size:16px;line-height:1.3;padding-top:4px;">—</div>
-            <div class="rev-kpi-sub" id="rev-kpi-top-deal-sub">Loading…</div>
+            <div class="rev-kpi-sub" id="rev-kpi-top-deal-sub"><div class="skeleton-bar w80" style="height:10px"></div></div>
           </div>
           <div class="rev-kpi-card highlight">
             <div class="rev-kpi-label"><i data-lucide="percent"></i> Estimated Conversion Value</div>
@@ -3420,7 +3427,9 @@
               </tr>
             </thead>
             <tbody id="rev-perf-tbody">
-              <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:36px;">Click Refresh to load…</td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -3466,7 +3475,9 @@
               </tr>
             </thead>
             <tbody id="ledger-tbody">
-              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">Click Refresh to load…</td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -3764,7 +3775,9 @@
               </tr>
             </thead>
             <tbody id="dm-deals-tbody">
-              <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px;">Click Refresh to load…</td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -3787,7 +3800,8 @@
               </tr>
             </thead>
             <tbody id="dm-alerts-tbody">
-              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">Click Refresh to load…</td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w60"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-bar w80"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td><td><div class="skeleton-bar w40"></div></td><td><div class="skeleton-bar w30"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -4031,6 +4045,17 @@
       document.title = (VIEW_LABELS[viewId] || 'Admin') + ' — TreadLeft Admin';
       // Close mobile sidebar
       closeSidebar();
+      // Auto-expand collapsed sidebar section for the target view
+      const activeNavItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+      if (activeNavItem) {
+        const parentGroup = activeNavItem.closest('.sidebar-group');
+        if (parentGroup && parentGroup.classList.contains('collapsed')) {
+          parentGroup.classList.remove('collapsed');
+          const lbl = parentGroup.querySelector('.sidebar-section-label');
+          if (lbl) lbl.classList.remove('collapsed');
+          saveSidebarState();
+        }
+      }
       if (viewId === 'duplicate-resolver' && !dupLoaded) {
         dupLoaded = true;
         loadDuplicates();
@@ -4068,7 +4093,10 @@
     }
 
     /* ── PLATFORM PULSE — TELEMETRY ── */
-    async function loadTelemetry() {
+    let _telemetryLastFetch = 0;
+    const TELEMETRY_CACHE_MS = 60000;
+    async function loadTelemetry(force) {
+      if (!force && Date.now() - _telemetryLastFetch < TELEMETRY_CACHE_MS) return;
       document.getElementById('pulse-loading').style.display = 'block';
       if (typeof showPulseSkeleton === 'function') showPulseSkeleton();
       try {
@@ -4198,6 +4226,7 @@
             console.warn('Lifespan snapshot error:', e);
           }
         })();
+        _telemetryLastFetch = Date.now();
       } catch (err) {
         showToast('Telemetry error: ' + err.message, 'error');
       } finally {
@@ -7362,7 +7391,7 @@
       if (on) {
         autoRefreshTimer = setInterval(() => {
           const pulseView = document.getElementById('view-platform-pulse');
-          if (pulseView && pulseView.classList.contains('active')) loadTelemetry();
+          if (pulseView && pulseView.classList.contains('active')) loadTelemetry(true);
         }, 60000);
       }
     }
@@ -7800,7 +7829,10 @@
     }
     function restoreSidebarState() {
       try {
-        const collapsed = JSON.parse(localStorage.getItem('admin_sidebar_collapsed') || '[]');
+        const stored = localStorage.getItem('admin_sidebar_collapsed');
+        const collapsed = stored
+          ? JSON.parse(stored)
+          : ['governance', 'content', 'support'];
         collapsed.forEach(section => {
           const group = document.querySelector(`.sidebar-group[data-section="${section}"]`);
           if (group) {
@@ -7809,6 +7841,7 @@
             if (label) label.classList.add('collapsed');
           }
         });
+        if (!stored) saveSidebarState();
       } catch (e) { /* ignore */ }
     }
 
