@@ -2832,27 +2832,28 @@
     .cs-panel { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px 20px; }
     .cs-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 
-    .cs-fleet-card { border-radius: 14px; padding: 20px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f1f5f9; }
+    .cs-fleet-card { border-radius: 14px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-top: 3px solid #f97316; color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,.06); }
     .cs-fleet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .cs-fleet-creator { font-size: 16px; font-weight: 700; }
+    .cs-fleet-creator { font-size: 16px; font-weight: 700; color: var(--text-primary); }
     .cs-fleet-stats { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
     .cs-ring-wrap { position: relative; width: 76px; height: 76px; flex-shrink: 0; }
     .cs-ring-wrap svg { transform: rotate(-90deg); }
     .cs-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .cs-ring-pct { font-size: 17px; font-weight: 800; line-height: 1; }
-    .cs-ring-sub { font-size: 8px; font-weight: 700; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; }
+    .cs-ring-sub { font-size: 8px; font-weight: 700; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; }
     .cs-fleet-stat { text-align: left; }
-    .cs-fleet-stat-v { font-size: 18px; font-weight: 800; line-height: 1.1; }
-    .cs-fleet-stat-l { font-size: 9px; font-weight: 700; letter-spacing: .8px; color: #94a3b8; text-transform: uppercase; }
-    .cs-roi-callout { background: rgba(245,158,11,.14); border: 1px solid rgba(245,158,11,.35); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #fbbf24; margin-bottom: 14px; }
-    .cs-shoe-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-top: 1px solid rgba(148,163,184,.15); font-size: 12px; flex-wrap: wrap; }
+    .cs-fleet-stat-v { font-size: 18px; font-weight: 800; line-height: 1.1; color: var(--text-primary); }
+    .cs-fleet-stat-l { font-size: 9px; font-weight: 700; letter-spacing: .8px; color: var(--text-muted); text-transform: uppercase; }
+    .cs-roi-callout { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.30); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #b45309; margin-bottom: 14px; }
+    html.dark .cs-roi-callout { color: #fbbf24; }
+    .cs-shoe-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border-subtle); font-size: 12px; flex-wrap: wrap; }
     .cs-shoe-row:first-of-type { border-top: none; }
     .cs-tier-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; align-self: center; }
     .cs-tier-fresh { background: #22c55e; } .cs-tier-worn { background: #f59e0b; } .cs-tier-critical { background: #ef4444; }
-    .cs-shoe-name { font-weight: 600; flex: 1; min-width: 0; }
-    .cs-shoe-meta { color: #94a3b8; white-space: nowrap; }
-    .cs-shoe-cost { font-weight: 700; color: #fbbf24; white-space: nowrap; }
-    .cs-shoe-notes { font-size: 11px; color: #94a3b8; font-style: italic; padding-left: 18px; padding-bottom: 6px; }
+    .cs-shoe-name { font-weight: 600; flex: 1; min-width: 0; color: var(--text-primary); }
+    .cs-shoe-meta { color: var(--text-muted); white-space: nowrap; }
+    .cs-shoe-cost { font-weight: 700; color: #d97706; white-space: nowrap; }
+    .cs-shoe-notes { font-size: 11px; color: var(--text-muted); font-style: italic; padding-left: 18px; padding-bottom: 6px; }
 
     .cs-kv { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .cs-kv-label { font-weight: 600; color: var(--text-secondary); min-width: 92px; }
@@ -8215,9 +8216,9 @@
           <div class="cs-fleet-head">
             <div>
               <div class="cs-fleet-creator">${escapeHtml(lead.creator_name)}</div>
-              <div style="font-size:11px;color:#94a3b8;margin-top:2px">${escapeHtml(lead.creator_handle || '')} · ${csFmtSubs(lead.subscriber_count)}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${escapeHtml(lead.creator_handle || '')} · ${csFmtSubs(lead.subscriber_count)}</div>
             </div>
-            ${snapshotUrl ? `<a href="${snapshotUrl}" target="_blank" rel="noopener" style="color:#94a3b8" title="Open public snapshot"><i data-lucide="external-link" style="width:16px;height:16px"></i></a>` : ''}
+            ${snapshotUrl ? `<a href="${snapshotUrl}" target="_blank" rel="noopener" style="color:var(--text-muted)" title="Open public snapshot"><i data-lucide="external-link" style="width:16px;height:16px"></i></a>` : ''}
           </div>
           <div class="cs-fleet-stats">
             ${csRing(fs.health_score || 0)}
