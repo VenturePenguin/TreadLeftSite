@@ -2790,6 +2790,91 @@
       pointer-events: none;
       position: relative;
     }
+
+    /* ── CREATOR SEEDING ── */
+    .cs-scout-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+    .cs-input { flex: 1; min-width: 240px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 13px; background: var(--input-bg, var(--bg-card)); color: var(--text-primary); }
+    .cs-input:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.12); }
+    .cs-scout-status { font-size: 12px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; }
+
+    .cs-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .cs-pill { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .cs-pill:hover { border-color: #f97316; color: #ea580c; }
+    .cs-pill.active { background: #fff7ed; border-color: #f97316; color: #ea580c; }
+    html.dark .cs-pill.active { background: rgba(249,115,22,0.12); }
+    .cs-pill-count { margin-left: 6px; opacity: .65; font-weight: 700; }
+
+    .cs-layout { display: grid; grid-template-columns: minmax(340px, 420px) 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 1100px) { .cs-layout { grid-template-columns: 1fr; } }
+
+    .cs-queue { display: flex; flex-direction: column; gap: 10px; max-height: 75vh; overflow-y: auto; }
+    .cs-lead-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-left: 4px solid var(--border); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: box-shadow .15s, border-color .15s; }
+    .cs-lead-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,.08); }
+    .cs-lead-card.selected { border-color: #f97316; border-left-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.10); }
+    .cs-lead-card.status-pending_review { border-left-color: #f59e0b; }
+    .cs-lead-card.status-contacted { border-left-color: #3b82f6; }
+    .cs-lead-card.status-claimed { border-left-color: #22c55e; }
+    .cs-lead-card.status-dismissed { border-left-color: #94a3b8; opacity: .7; }
+    .cs-lead-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .cs-lead-name { font-weight: 700; font-size: 14px; color: var(--text-primary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cs-platform-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 8px; border-radius: 999px; background: rgba(239,68,68,.10); color: #ef4444; flex-shrink: 0; }
+    .cs-platform-badge.instagram { background: rgba(168,85,247,.12); color: #a855f7; }
+    .cs-platform-badge.strava_club { background: rgba(252,82,0,.12); color: #fc5200; }
+    .cs-platform-badge.manual { background: var(--bg-subtle); color: var(--text-secondary); }
+    .cs-lead-subs { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+    .cs-lead-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cs-lead-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .cs-mini-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--bg-subtle); color: var(--text-secondary); }
+    .cs-status-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: auto; }
+    .cs-installs { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(34,197,94,.12); color: #16a34a; }
+
+    .cs-inspector { display: flex; flex-direction: column; gap: 16px; }
+    .cs-panel { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px 20px; }
+    .cs-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+    .cs-fleet-card { border-radius: 14px; padding: 20px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f1f5f9; }
+    .cs-fleet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cs-fleet-creator { font-size: 16px; font-weight: 700; }
+    .cs-fleet-stats { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+    .cs-ring-wrap { position: relative; width: 76px; height: 76px; flex-shrink: 0; }
+    .cs-ring-wrap svg { transform: rotate(-90deg); }
+    .cs-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .cs-ring-pct { font-size: 17px; font-weight: 800; line-height: 1; }
+    .cs-ring-sub { font-size: 8px; font-weight: 700; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; }
+    .cs-fleet-stat { text-align: left; }
+    .cs-fleet-stat-v { font-size: 18px; font-weight: 800; line-height: 1.1; }
+    .cs-fleet-stat-l { font-size: 9px; font-weight: 700; letter-spacing: .8px; color: #94a3b8; text-transform: uppercase; }
+    .cs-roi-callout { background: rgba(245,158,11,.14); border: 1px solid rgba(245,158,11,.35); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #fbbf24; margin-bottom: 14px; }
+    .cs-shoe-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-top: 1px solid rgba(148,163,184,.15); font-size: 12px; flex-wrap: wrap; }
+    .cs-shoe-row:first-of-type { border-top: none; }
+    .cs-tier-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; align-self: center; }
+    .cs-tier-fresh { background: #22c55e; } .cs-tier-worn { background: #f59e0b; } .cs-tier-critical { background: #ef4444; }
+    .cs-shoe-name { font-weight: 600; flex: 1; min-width: 0; }
+    .cs-shoe-meta { color: #94a3b8; white-space: nowrap; }
+    .cs-shoe-cost { font-weight: 700; color: #fbbf24; white-space: nowrap; }
+    .cs-shoe-notes { font-size: 11px; color: #94a3b8; font-style: italic; padding-left: 18px; padding-bottom: 6px; }
+
+    .cs-kv { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .cs-kv-label { font-weight: 600; color: var(--text-secondary); min-width: 92px; }
+    .cs-kv-value { font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .cs-copy-btn { flex-shrink: 0; padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text-secondary); cursor: pointer; }
+    .cs-copy-btn:hover { border-color: #f97316; color: #ea580c; }
+    .cs-pitch-text { width: 100%; min-height: 110px; resize: vertical; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 13px; line-height: 1.5; background: var(--input-bg, var(--bg-card)); color: var(--text-primary); box-sizing: border-box; }
+    .cs-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cs-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; font-weight: 700; cursor: pointer; background: var(--bg-card); color: var(--text-secondary); transition: all .15s; }
+    .cs-btn-primary { background: #f97316; border-color: #f97316; color: #fff; }
+    .cs-btn-primary:hover { background: #ea580c; }
+    .cs-btn-claim { border-color: #22c55e; color: #16a34a; }
+    .cs-btn-claim:hover { background: rgba(34,197,94,.08); }
+    .cs-btn-dismiss { border-color: #cbd5e1; color: #64748b; }
+    .cs-btn-dismiss:hover { background: var(--bg-subtle); }
+    .cs-btn-reset { border-color: #f59e0b; color: #d97706; }
+    .cs-btn-reset:hover { background: rgba(245,158,11,.08); }
+    .cs-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .cs-btn svg { width: 14px; height: 14px; }
+    .cs-scout-bar .deal-btn-primary, .cs-scout-bar .deal-btn-secondary { display: inline-flex; align-items: center; gap: 6px; }
+    .cs-scout-bar .deal-btn-primary svg, .cs-scout-bar .deal-btn-secondary svg { width: 14px; height: 14px; }
+    .cs-scout-bar .spinner { width: 14px; height: 14px; border-width: 2px; }
     </style>
 </head>
 <body>
@@ -2860,6 +2945,15 @@
         <button class="nav-item" data-view="lifespan-insights" onclick="navigate('lifespan-insights')">
           <span class="nav-icon"><i data-lucide="skull"></i></span>
           Shoe Lifespan
+        </button>
+      </div>
+
+      <div class="sidebar-group" data-section="growth" style="margin-top:12px;">
+        <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Growth</div>
+        <button class="nav-item" data-view="creator-seeding" onclick="navigate('creator-seeding')">
+          <span class="nav-icon"><i data-lucide="send"></i></span>
+          Creator Seeding
+          <span class="nav-badge" id="sidebar-cs-pending" style="display:none;background:#f97316;"></span>
         </button>
       </div>
 
@@ -3227,6 +3321,37 @@
           <div class="loading">
             <div class="spinner"></div>
             <p>Loading pending discoveries...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: CreatorSeeding -->
+      <div id="view-creator-seeding" class="view">
+        <div class="view-header">
+          <h2><i data-lucide="send"></i> Creator Seeding <span class="badge" id="cs-pending-badge">0 pending</span></h2>
+          <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+            <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadCreatorLeads(true)"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
+        </div>
+
+        <!-- On-demand scout trigger bar -->
+        <div class="cs-scout-bar">
+          <input type="url" id="cs-manual-url" class="cs-input" placeholder="Paste a YouTube video URL to analyze a single creator…" aria-label="YouTube video URL">
+          <button class="deal-btn-primary" id="cs-analyze-btn" onclick="csAnalyzeManual()"><i data-lucide="search"></i> Analyze Video</button>
+          <button class="deal-btn-secondary" id="cs-scout-btn" onclick="csRunAutoScout()"><i data-lucide="bot"></i> Run Auto-Scout</button>
+          <span class="cs-scout-status" id="cs-scout-status"></span>
+        </div>
+
+        <!-- Status filter pills -->
+        <div class="cs-pills" id="cs-pills"></div>
+
+        <!-- Queue + inspector: side-by-side on wide screens, stacked on compact -->
+        <div class="cs-layout">
+          <div class="cs-queue" id="cs-queue">
+            <div class="loading"><div class="spinner"></div><p>Loading creator leads…</p></div>
+          </div>
+          <div class="cs-inspector" id="cs-inspector">
+            <div class="cs-panel"><div class="empty"><div class="empty-icon"><i data-lucide="mouse-pointer-click"></i></div><p>Select a lead to inspect</p></div></div>
           </div>
         </div>
       </div>
@@ -4024,6 +4149,7 @@
       'discovery-queue': 'Discoveries', 'deal-engine': 'Deals',
       'lifespan-insights': 'Shoe Lifespan', 'duplicate-resolver': 'Duplicates',
       'brand-normalization': 'Brand Aliases', 'system-ledger': 'Audit Log',
+      'creator-seeding': 'Creator Seeding',
       'system-health': 'System',
       'user-support': 'User Lookup', 'user-cohorts': 'Cohorts',
     };
@@ -4088,6 +4214,10 @@
       if (viewId === 'deal-engine' && !dealEngineLoaded) {
         dealEngineLoaded = true;
         fetchDealMetrics();
+      }
+      if (viewId === 'creator-seeding' && !csLoaded) {
+        csLoaded = true;
+        loadCreatorLeads();
       }
       if (viewId === 'platform-pulse') loadTelemetry();
     }
@@ -7914,6 +8044,316 @@
         if (menu) menu.classList.remove('open');
       }
     });
+
+    /* ── CREATOR SEEDING COMMAND CENTER ── */
+    let csLoaded = false;
+    let csLeads = [];
+    let csFilter = 'all';
+    let csSelectedId = null;
+    let csScoutBusy = false;
+
+    const CS_FILTERS = [
+      { key: 'all', label: 'All' },
+      { key: 'pending_review', label: 'Pending Review' },
+      { key: 'contacted', label: 'Contacted' },
+      { key: 'claimed', label: 'Claimed 🔥' },
+      { key: 'dismissed', label: 'Dismissed' },
+    ];
+    const CS_STATUS_META = {
+      pending_review: { label: 'Pending', bg: 'rgba(245,158,11,.14)', fg: '#d97706' },
+      contacted:      { label: 'Contacted', bg: 'rgba(59,130,246,.12)', fg: '#2563eb' },
+      claimed:        { label: 'Claimed', bg: 'rgba(34,197,94,.12)', fg: '#16a34a' },
+      dismissed:      { label: 'Dismissed', bg: 'rgba(100,116,139,.14)', fg: '#64748b' },
+    };
+    const CS_SNAPSHOT_BASE = 'https://treadleft.app/snapshot';
+
+    function csFmtSubs(n) {
+      if (n == null) return '—';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M subs';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k subs';
+      return n + ' subs';
+    }
+    function csMoney(v) { return '£' + Number(v || 0).toFixed(2); }
+    function csStatusMeta(s) { return CS_STATUS_META[s] || CS_STATUS_META.pending_review; }
+
+    /* Load the lead queue (created_at DESC) */
+    async function loadCreatorLeads() {
+      const queueEl = document.getElementById('cs-queue');
+      try {
+        const { data, error } = await getSupabase()
+          .from('creator_seeding_leads')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        csLeads = data || [];
+        if (csSelectedId && !csLeads.some(l => l.id === csSelectedId)) csSelectedId = null;
+        renderCsPills();
+        renderCsQueue();
+        renderCsInspector();
+        csUpdateBadges();
+      } catch (err) {
+        console.error('Creator leads load error:', err);
+        showToast('Error loading leads: ' + err.message, 'error');
+        queueEl.innerHTML = '<div class="empty"><p>Error loading leads</p><p style="font-size:12px;margin-top:8px;">' + escapeHtml(err.message) + '</p></div>';
+      }
+    }
+
+    function csUpdateBadges() {
+      const pending = csLeads.filter(l => l.status === 'pending_review').length;
+      const badge = document.getElementById('cs-pending-badge');
+      if (badge) badge.textContent = pending + ' pending';
+      const side = document.getElementById('sidebar-cs-pending');
+      if (side) {
+        if (pending > 0) { side.textContent = pending; side.style.display = ''; }
+        else side.style.display = 'none';
+      }
+    }
+
+    function renderCsPills() {
+      const el = document.getElementById('cs-pills');
+      el.innerHTML = CS_FILTERS.map(f => {
+        const count = f.key === 'all' ? csLeads.length : csLeads.filter(l => l.status === f.key).length;
+        const badge = f.key === 'pending_review' && count > 0 ? `<span class="cs-pill-count">${count}</span>` : (count ? `<span class="cs-pill-count">${count}</span>` : '');
+        return `<button class="cs-pill ${csFilter === f.key ? 'active' : ''}" onclick="csSetFilter('${f.key}')">${f.label}${badge}</button>`;
+      }).join('');
+    }
+
+    function csSetFilter(key) {
+      csFilter = key;
+      renderCsPills();
+      renderCsQueue();
+    }
+
+    function csVisibleLeads() {
+      return csFilter === 'all' ? csLeads : csLeads.filter(l => l.status === csFilter);
+    }
+
+    function renderCsQueue() {
+      const el = document.getElementById('cs-queue');
+      const leads = csVisibleLeads();
+      if (!leads.length) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon"><i data-lucide="inbox"></i></div><p>No leads in this state</p><p style="font-size:12px;margin-top:8px;">Run a scout to discover creators.</p></div>';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+      el.innerHTML = leads.map(lead => {
+        const fs = lead.fleet_summary || {};
+        const meta = csStatusMeta(lead.status);
+        return `
+        <div class="cs-lead-card status-${lead.status} ${lead.id === csSelectedId ? 'selected' : ''}" onclick="csSelectLead('${lead.id}')">
+          <div class="cs-lead-head">
+            <span class="cs-lead-name" title="${escapeHtml(lead.creator_name)}">${escapeHtml(lead.creator_name)}</span>
+            <span class="cs-platform-badge ${lead.platform}">${lead.platform === 'youtube' ? 'YouTube' : lead.platform}</span>
+            <span class="cs-lead-subs">${csFmtSubs(lead.subscriber_count)}</span>
+          </div>
+          <div class="cs-lead-title" title="${escapeHtml(lead.video_title || '')}">${escapeHtml(lead.video_title || '—')}</div>
+          <div class="cs-lead-pills">
+            <span class="cs-mini-pill">👟 ${fs.total_shoes || 0} Shoes</span>
+            <span class="cs-mini-pill">Avg ${csMoney(fs.avg_cost_per_km)}/km</span>
+            <span class="cs-mini-pill">Health ${fs.health_score || 0}%</span>
+            ${lead.attributed_installs > 0 ? `<span class="cs-installs">⬇ ${lead.attributed_installs} installs</span>` : ''}
+            <span class="cs-status-badge" style="background:${meta.bg};color:${meta.fg}">${meta.label}</span>
+          </div>
+        </div>`;
+      }).join('');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function csSelectLead(id) {
+      csSelectedId = id;
+      renderCsQueue();
+      renderCsInspector();
+    }
+
+    /* Fleet Snapshot Card — health ring matches TreadLevelsWidget colors */
+    function csRing(score) {
+      const r = 30, circ = 2 * Math.PI * r;
+      const color = score >= 70 ? '#22c55e' : score >= 40 ? '#f59e0b' : '#ef4444';
+      const off = circ * (1 - Math.min(100, Math.max(0, score)) / 100);
+      return `<div class="cs-ring-wrap">
+        <svg width="76" height="76">
+          <circle cx="38" cy="38" r="${r}" stroke="rgba(148,163,184,.2)" stroke-width="8" fill="none"/>
+          <circle cx="38" cy="38" r="${r}" stroke="${color}" stroke-width="8" fill="none" stroke-linecap="round"
+                  stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+        </svg>
+        <div class="cs-ring-label"><div class="cs-ring-pct" style="color:${color}">${score}%</div><div class="cs-ring-sub">Healthy</div></div>
+      </div>`;
+    }
+
+    function csShoeRow(shoe) {
+      const tier = shoe.status === 'critical' ? 'critical' : shoe.status === 'worn' ? 'worn' : 'fresh';
+      const notes = shoe.creator_notes ? `<div class="cs-shoe-notes">${escapeHtml(shoe.creator_notes)}</div>` : '';
+      return `
+        <div>
+          <div class="cs-shoe-row">
+            <span class="cs-tier-dot cs-tier-${tier}" title="${tier}"></span>
+            <span class="cs-shoe-name">${escapeHtml(shoe.brand)} ${escapeHtml(shoe.model)}</span>
+            <span class="cs-shoe-meta">${Math.round(shoe.mileage_km || 0)} km</span>
+            <span class="cs-shoe-cost">${csMoney(shoe.cost_per_km)}/km</span>
+          </div>
+          ${notes}
+        </div>`;
+    }
+
+    function renderCsInspector() {
+      const el = document.getElementById('cs-inspector');
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      if (!lead) {
+        el.innerHTML = '<div class="cs-panel"><div class="empty"><div class="empty-icon"><i data-lucide="mouse-pointer-click"></i></div><p>Select a lead to inspect</p></div></div>';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      const fs = lead.fleet_summary || {};
+      const shoes = Array.isArray(lead.extracted_shoes) ? lead.extracted_shoes : [];
+      const snapshotUrl = lead.snapshot_slug ? `${CS_SNAPSHOT_BASE}/${lead.snapshot_slug}` : null;
+      const meta = csStatusMeta(lead.status);
+
+      el.innerHTML = `
+        <!-- 1. Creator Fleet Preview Card -->
+        <div class="cs-fleet-card">
+          <div class="cs-fleet-head">
+            <div>
+              <div class="cs-fleet-creator">${escapeHtml(lead.creator_name)}</div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:2px">${escapeHtml(lead.creator_handle || '')} · ${csFmtSubs(lead.subscriber_count)}</div>
+            </div>
+            ${snapshotUrl ? `<a href="${snapshotUrl}" target="_blank" rel="noopener" style="color:#94a3b8" title="Open public snapshot"><i data-lucide="external-link" style="width:16px;height:16px"></i></a>` : ''}
+          </div>
+          <div class="cs-fleet-stats">
+            ${csRing(fs.health_score || 0)}
+            <div class="cs-fleet-stat"><div class="cs-fleet-stat-v">${fs.total_shoes || 0}</div><div class="cs-fleet-stat-l">Shoes</div></div>
+            <div class="cs-fleet-stat"><div class="cs-fleet-stat-v">${(fs.total_km || 0).toLocaleString()}</div><div class="cs-fleet-stat-l">Total km</div></div>
+            <div class="cs-fleet-stat"><div class="cs-fleet-stat-v">${csMoney(fs.avg_cost_per_km)}</div><div class="cs-fleet-stat-l">Avg /km</div></div>
+          </div>
+          ${fs.best_roi_shoe ? `<div class="cs-roi-callout">🏆 Best ROI: ${escapeHtml(fs.best_roi_shoe)} at ${csMoney(fs.best_roi_value)}/km</div>` : ''}
+          <div>${shoes.map(csShoeRow).join('') || '<div style="font-size:12px;color:#94a3b8">No shoes extracted</div>'}</div>
+        </div>
+
+        <!-- 2. Editable Outreach Pitch & VIP Code -->
+        <div class="cs-panel">
+          <div class="cs-panel-title"><i data-lucide="mail"></i> Outreach Pitch &amp; VIP Access</div>
+          <div class="cs-kv">
+            <span class="cs-kv-label">VIP Code</span>
+            <span class="cs-kv-value">${escapeHtml(lead.vip_code)}</span>
+            <button class="cs-copy-btn" onclick="csCopy('${escapeHtml(lead.vip_code)}','VIP code')">Copy</button>
+          </div>
+          <div class="cs-kv">
+            <span class="cs-kv-label">Snapshot</span>
+            <span class="cs-kv-value">${snapshotUrl ? escapeHtml(snapshotUrl) : '—'}</span>
+            ${snapshotUrl ? `<button class="cs-copy-btn" onclick="csCopy('${snapshotUrl}','Snapshot URL')">Copy</button>` : ''}
+          </div>
+          ${lead.contact_info ? `<div class="cs-kv"><span class="cs-kv-label">Contact</span><span class="cs-kv-value" style="font-family:inherit">${escapeHtml(lead.contact_info)}</span></div>` : ''}
+          <textarea class="cs-pitch-text" id="cs-pitch-text">${escapeHtml(lead.draft_outreach_text || '')}</textarea>
+          <div class="cs-actions" style="margin-top:10px">
+            <button class="cs-btn" onclick="csSavePitch()"><i data-lucide="save"></i> Save Pitch</button>
+            <a class="cs-btn" href="${escapeHtml(lead.source_url)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Open Video</a>
+          </div>
+        </div>
+
+        <!-- 3. Triage Actions -->
+        <div class="cs-panel">
+          <div class="cs-panel-title"><i data-lucide="zap"></i> Triage <span class="cs-status-badge" style="background:${meta.bg};color:${meta.fg};margin-left:8px">${meta.label}</span></div>
+          <div class="cs-actions">
+            <button class="cs-btn cs-btn-primary" onclick="csCopyPitchAndContact()"><i data-lucide="clipboard-copy"></i> Copy Pitch &amp; Mark Contacted</button>
+            <button class="cs-btn cs-btn-claim" onclick="csSetStatus('claimed')" ${lead.status === 'claimed' ? 'disabled' : ''}><i data-lucide="flame"></i> Claimed</button>
+            <button class="cs-btn cs-btn-dismiss" onclick="csSetStatus('dismissed')" ${lead.status === 'dismissed' ? 'disabled' : ''}><i data-lucide="x"></i> Dismiss</button>
+            <button class="cs-btn cs-btn-reset" onclick="csSetStatus('pending_review')" ${lead.status === 'pending_review' ? 'disabled' : ''}><i data-lucide="rotate-ccw"></i> Reset to Pending</button>
+          </div>
+        </div>`;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    /* Scout triggers — on-demand single video + batch auto-scout */
+    async function csTriggerScout(body, busyBtnId) {
+      if (csScoutBusy) return;
+      csScoutBusy = true;
+      const statusEl = document.getElementById('cs-scout-status');
+      const btn = document.getElementById(busyBtnId);
+      if (btn) btn.disabled = true;
+      statusEl.innerHTML = '<div class="spinner"></div><span>Scout running — fetching transcripts &amp; analyzing rotations…</span>';
+      try {
+        const { data, error } = await getSupabase().functions.invoke('creator-scout-agent', { body });
+        if (error) throw error;
+        const s = data || {};
+        showToast(`Scout done: ${s.inserted || 0} lead(s) added, ${s.discovered || 0} discovered, ${s.skipped || 0} skipped`, 'success');
+        if (s.errors && s.errors.length) console.warn('[scout] errors:', s.errors);
+        await loadCreatorLeads();
+      } catch (err) {
+        console.error('Scout error:', err);
+        showToast('Scout failed: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        csScoutBusy = false;
+        if (btn) btn.disabled = false;
+        statusEl.innerHTML = '';
+      }
+    }
+
+    function csAnalyzeManual() {
+      const input = document.getElementById('cs-manual-url');
+      const url = (input.value || '').trim();
+      if (!url) { showToast('Paste a YouTube URL first', 'error'); return; }
+      csTriggerScout({ manualVideoUrl: url, token: ADMIN_TOKEN }, 'cs-analyze-btn');
+    }
+
+    function csRunAutoScout() {
+      csTriggerScout({ maxResults: 5, token: ADMIN_TOKEN }, 'cs-scout-btn');
+    }
+
+    /* Triage + persistence */
+    async function csSetStatus(status) {
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      if (!lead) return;
+      const { error } = await getSupabase()
+        .from('creator_seeding_leads')
+        .update({ status })
+        .eq('id', lead.id);
+      if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
+      lead.status = status;
+      renderCsPills(); renderCsQueue(); renderCsInspector(); csUpdateBadges();
+      showToast(`Marked ${csStatusMeta(status).label}`, 'success');
+    }
+
+    async function csSavePitch() {
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      const text = document.getElementById('cs-pitch-text').value;
+      if (!lead || !text.trim()) { showToast('Pitch is empty', 'error'); return; }
+      const { error } = await getSupabase()
+        .from('creator_seeding_leads')
+        .update({ draft_outreach_text: text })
+        .eq('id', lead.id);
+      if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+      lead.draft_outreach_text = text;
+      showToast('Pitch saved', 'success');
+    }
+
+    async function csCopy(text, label) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(label + ' copied', 'success');
+      } catch {
+        showToast('Copy failed — clipboard unavailable', 'error');
+      }
+    }
+
+    async function csCopyPitchAndContact() {
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      if (!lead) return;
+      const text = document.getElementById('cs-pitch-text')?.value || lead.draft_outreach_text;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        showToast('Clipboard unavailable', 'error');
+      }
+      const { error } = await getSupabase()
+        .from('creator_seeding_leads')
+        .update({ status: 'contacted', draft_outreach_text: text })
+        .eq('id', lead.id);
+      if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
+      lead.status = 'contacted';
+      lead.draft_outreach_text = text;
+      renderCsPills(); renderCsQueue(); renderCsInspector(); csUpdateBadges();
+      showToast('Pitch copied — lead marked Contacted', 'success');
+    }
 
   </script>
 
