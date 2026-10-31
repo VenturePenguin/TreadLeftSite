@@ -2814,6 +2814,7 @@
     .cs-lead-card.status-pending_review { border-left-color: #f59e0b; }
     .cs-lead-card.status-contacted { border-left-color: #3b82f6; }
     .cs-lead-card.status-claimed { border-left-color: #22c55e; }
+    .cs-lead-card.status-replied { border-left-color: #a855f7; }
     .cs-lead-card.status-dismissed { border-left-color: #94a3b8; opacity: .7; }
     .cs-lead-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .cs-lead-name { font-weight: 700; font-size: 14px; color: var(--text-primary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -8057,12 +8058,15 @@
       { key: 'all', label: 'All' },
       { key: 'pending_review', label: 'Pending Review' },
       { key: 'contacted', label: 'Contacted' },
+      { key: 'followup', label: '⏰ Follow Up' },
+      { key: 'replied', label: 'Replied' },
       { key: 'claimed', label: 'Claimed 🔥' },
       { key: 'dismissed', label: 'Dismissed' },
     ];
     const CS_STATUS_META = {
       pending_review: { label: 'Pending', bg: 'rgba(245,158,11,.14)', fg: '#d97706' },
       contacted:      { label: 'Contacted', bg: 'rgba(59,130,246,.12)', fg: '#2563eb' },
+      replied:        { label: 'Replied 💬', bg: 'rgba(168,85,247,.14)', fg: '#9333ea' },
       claimed:        { label: 'Claimed', bg: 'rgba(34,197,94,.12)', fg: '#16a34a' },
       dismissed:      { label: 'Dismissed', bg: 'rgba(100,116,139,.14)', fg: '#64748b' },
     };
@@ -8126,6 +8130,10 @@
     }
 
     function csVisibleLeads() {
+      if (csFilter === 'followup') {
+        const now = Date.now();
+        return csLeads.filter(l => l.status === 'contacted' && l.follow_up_at && new Date(l.follow_up_at).getTime() <= now);
+      }
       return csFilter === 'all' ? csLeads : csLeads.filter(l => l.status === csFilter);
     }
 
@@ -8153,6 +8161,9 @@
             <span class="cs-mini-pill">Avg ${csMoney(fs.avg_cost_per_km)}/km</span>
             <span class="cs-mini-pill">Health ${fs.health_score || 0}%</span>
             ${lead.attributed_installs > 0 ? `<span class="cs-installs">⬇ ${lead.attributed_installs} installs</span>` : ''}
+            ${lead.rotation_confidence ? `<span class="cs-mini-pill" style="color:${lead.rotation_confidence === 'high' ? '#16a34a' : lead.rotation_confidence === 'medium' ? '#d97706' : '#64748b'}">◈ ${lead.rotation_confidence}</span>` : ''}
+            ${lead.status === 'contacted' && lead.follow_up_at && new Date(lead.follow_up_at).getTime() <= Date.now() ? `<span class="cs-mini-pill" style="background:#fee2e2;color:#b91c1c">⏰ overdue</span>` : ''}
+            ${lead.snapshot_views > 0 ? `<span class="cs-mini-pill">👁 ${lead.snapshot_views}</span>` : ''}
             <span class="cs-status-badge" style="background:${meta.bg};color:${meta.fg}">${meta.label}</span>
           </div>
         </div>`;
@@ -8247,6 +8258,12 @@
           <textarea class="cs-pitch-text" id="cs-pitch-text">${escapeHtml(lead.draft_outreach_text || '')}</textarea>
           <div class="cs-actions" style="margin-top:10px">
             <button class="cs-btn" onclick="csSavePitch()"><i data-lucide="save"></i> Save Pitch</button>
+            <button class="cs-btn" onclick="csRegeneratePitch()" id="cs-regen-btn"><i data-lucide="refresh-cw"></i> Regenerate</button>
+            ${lead.status === 'contacted' || lead.status === 'replied' ? `
+            <select class="cs-btn" id="cs-contacted-via" onchange="csSetContactedVia(this.value)" style="padding:6px 10px">
+              <option value="">via…</option>
+              ${['email','instagram','youtube_comment','other'].map(v => `<option value="${v}" ${lead.contacted_via === v ? 'selected' : ''}>${v.replace('_',' ')}</option>`).join('')}
+            </select>` : ''}
             <a class="cs-btn" href="${escapeHtml(lead.source_url)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Open Video</a>
           </div>
         </div>
@@ -8257,14 +8274,24 @@
           <div class="cs-actions">
             <button class="cs-btn cs-btn-primary" onclick="csCopyPitchAndContact()"><i data-lucide="clipboard-copy"></i> Copy Pitch &amp; Mark Contacted</button>
             ${lead.contact_info && /@/.test(lead.contact_info) ? `<button class="cs-btn" onclick="csSendEmail()"><i data-lucide="mail"></i> Send via Email</button>` : ''}
+            ${lead.status === 'contacted' ? `<button class="cs-btn" onclick="csSetStatus('replied')" style="border-color:#a855f7;color:#9333ea"><i data-lucide="message-circle"></i> Replied</button>` : ''}
             <button class="cs-btn cs-btn-claim" onclick="csSetStatus('claimed')" ${lead.status === 'claimed' ? 'disabled' : ''}><i data-lucide="flame"></i> Claimed</button>
             <button class="cs-btn cs-btn-dismiss" onclick="csSetStatus('dismissed')" ${lead.status === 'dismissed' ? 'disabled' : ''}><i data-lucide="x"></i> Dismiss</button>
             <button class="cs-btn cs-btn-reset" onclick="csSetStatus('pending_review')" ${lead.status === 'pending_review' ? 'disabled' : ''}><i data-lucide="rotate-ccw"></i> Reset to Pending</button>
           </div>
-          ${lead.last_contacted_at ? `<div style="font-size:11px;color:var(--text-muted);margin-top:10px">Last contacted ${new Date(lead.last_contacted_at).toLocaleDateString()}${lead.follow_up_at ? ` · follow up by ${new Date(lead.follow_up_at).toLocaleDateString()}` : ''}</div>` : ''}
+          ${lead.last_contacted_at ? `<div style="font-size:11px;color:var(--text-muted);margin-top:10px">Last contacted ${new Date(lead.last_contacted_at).toLocaleDateString()}${lead.follow_up_at ? ` · follow up by ${new Date(lead.follow_up_at).toLocaleDateString()}` : ''}${lead.contacted_via ? ` · via ${lead.contacted_via.replace('_',' ')}` : ''}</div>` : ''}
         </div>
 
-        <!-- 4. Public snapshot preview -->
+        <!-- 4. Notes -->
+        <div class="cs-panel">
+          <div class="cs-panel-title"><i data-lucide="sticky-note"></i> Notes</div>
+          <textarea class="cs-pitch-text" id="cs-notes-text" style="min-height:60px" placeholder="Internal notes — replies, next steps, context…">${escapeHtml(lead.notes || '')}</textarea>
+          <div class="cs-actions" style="margin-top:10px">
+            <button class="cs-btn" onclick="csSaveNotes()"><i data-lucide="save"></i> Save Notes</button>
+          </div>
+        </div>
+
+        <!-- 5. Public snapshot preview -->
         ${snapshotUrl ? `
         <div class="cs-panel">
           <div class="cs-panel-title"><i data-lucide="eye"></i> Snapshot Preview <span style="font-weight:400;text-transform:none;letter-spacing:0">— what the creator sees</span></div>
@@ -8373,6 +8400,53 @@
       lead.draft_outreach_text = text;
       renderCsPills(); renderCsQueue(); renderCsInspector(); csUpdateBadges();
       showToast('Pitch copied — lead marked Contacted', 'success');
+    }
+
+    async function csSaveNotes() {
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      if (!lead) return;
+      const notes = document.getElementById('cs-notes-text')?.value ?? '';
+      const { error } = await getSupabase()
+        .from('creator_seeding_leads').update({ notes }).eq('id', lead.id);
+      if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+      lead.notes = notes;
+      showToast('Notes saved', 'success');
+    }
+
+    async function csSetContactedVia(via) {
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      if (!lead || !via) return;
+      const { error } = await getSupabase()
+        .from('creator_seeding_leads').update({ contacted_via: via }).eq('id', lead.id);
+      if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
+      lead.contacted_via = via;
+      showToast(`Marked contacted via ${via.replace('_',' ')}`, 'success');
+    }
+
+    async function csRegeneratePitch() {
+      const lead = csLeads.find(l => l.id === csSelectedId);
+      if (!lead) return;
+      const btn = document.getElementById('cs-regen-btn');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Regenerating…'; }
+      try {
+        const { data, error } = await getSupabase().functions.invoke('creator-scout-agent', {
+          body: { regenerateLeadId: lead.id, token: ADMIN_TOKEN },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        const { data: fresh } = await getSupabase()
+          .from('creator_seeding_leads').select('draft_outreach_text').eq('id', lead.id).single();
+        if (fresh?.draft_outreach_text) {
+          lead.draft_outreach_text = fresh.draft_outreach_text;
+          const ta = document.getElementById('cs-pitch-text');
+          if (ta) ta.value = fresh.draft_outreach_text;
+        }
+        showToast('Pitch regenerated', 'success');
+      } catch (err) {
+        showToast('Regenerate failed: ' + (err.message || 'unknown'), 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="refresh-cw"></i> Regenerate'; if (window.lucide) lucide.createIcons(); }
+      }
     }
 
     async function csSendEmail() {

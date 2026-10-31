@@ -91,6 +91,7 @@ function shoeRow(s) {
 (async () => {
   const app = document.getElementById('app');
   const slug = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '');
+  sb.rpc('increment_snapshot_views', { slug }).then(() => {}).catch(() => {});
   const { data: lead, error } = await sb
     .from('creator_seeding_leads').select('*')
     .eq('snapshot_slug', slug).maybeSingle();
