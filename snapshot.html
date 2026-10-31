@@ -88,7 +88,7 @@ function claimRotation(code) {
       window.location = '/';
     }, 1500);
     window.addEventListener('pagehide', () => clearTimeout(t), { once: true });
-    window.location = 'treadleft://redeem?code=' + encodeURIComponent(code);
+    window.location = 'treadleftapp://redeem?code=' + encodeURIComponent(code);
   } else {
     alert('Code ' + code + ' copied — open TreadLeft on your phone, Profile → Redeem VIP Code, and paste it.');
   }
