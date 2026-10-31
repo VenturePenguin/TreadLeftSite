@@ -8052,6 +8052,44 @@
     let csLeads = [];
     let csFilter = 'all';
     let csSort = 'score';
+    let csConsensusOpen = false;
+    let csConsensusData = null;
+    let csQuotesOpen = {};
+
+    async function csToggleConsensus() {
+      csConsensusOpen = !csConsensusOpen;
+      renderCsPills();
+      if (csConsensusOpen && !csConsensusData) {
+        const { data, error } = await getSupabase().rpc('get_creator_shoe_consensus');
+        if (error) { showToast('Consensus load failed: ' + error.message, 'error'); csConsensusData = []; }
+        else csConsensusData = data || [];
+        renderCsPills();
+      }
+    }
+
+    function csToggleQuotes(i) { csQuotesOpen[i] = !csQuotesOpen[i]; renderCsPills(); }
+
+    function csRenderConsensus() {
+      if (!csConsensusData) return '<div style="padding:12px;color:var(--text-muted);font-size:12px">Loading…</div>';
+      if (!csConsensusData.length) return '<div style="padding:12px;color:var(--text-muted);font-size:12px">No consensus data yet.</div>';
+      return `<div style="border:1px solid var(--border-subtle);border-radius:10px;overflow:hidden;font-size:12px">
+        <div style="display:grid;grid-template-columns:1.6fr .9fr .8fr 1fr;gap:8px;padding:8px 12px;background:var(--bg-subtle,#f8fafc);font-weight:700;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px">
+          <span>Shoe</span><span>Mentions</span><span>Avg km</span><span>Real Cost/km</span>
+        </div>
+        ${csConsensusData.map((r, i) => `
+        <div style="border-top:1px solid var(--border-subtle);padding:8px 12px">
+          <div style="display:grid;grid-template-columns:1.6fr .9fr .8fr 1fr;gap:8px;align-items:baseline">
+            <span style="font-weight:600">${escapeHtml(r.brand)} ${escapeHtml(r.model)}</span>
+            <span><span class="cs-mini-pill" style="background:rgba(59,130,246,.12);color:#2563eb;font-weight:700">${r.mention_count}×</span>
+              ${(r.creators || []).slice(0, 2).map(c => `<span class="cs-mini-pill">${escapeHtml(c)}</span>`).join('')}${(r.creators || []).length > 2 ? `<span class="cs-mini-pill">+${r.creators.length - 2}</span>` : ''}</span>
+            <span>${Math.round(r.avg_mileage_km || 0)} km</span>
+            <span style="font-weight:700;color:#d97706">£${Number(r.avg_cost_per_km || 0).toFixed(2)}/km</span>
+          </div>
+          ${(r.quotes || []).length ? `<div style="margin-top:4px"><a href="#" onclick="event.preventDefault();csToggleQuotes(${i})" style="font-size:11px;color:var(--accent,#f97316);text-decoration:none">${csQuotesOpen[i] ? '▾ hide quotes' : `▸ ${r.quotes.length} creator quote${r.quotes.length > 1 ? 's' : ''}`}</a>
+            ${csQuotesOpen[i] ? `<div style="margin-top:4px;color:var(--text-muted);font-style:italic">${r.quotes.map(q => `<div>“${escapeHtml(q)}”</div>`).join('')}</div>` : ''}</div>` : ''}
+        </div>`).join('')}
+      </div>`;
+    }
 
     function csLeadScore(l) {
       let s = 0;
@@ -8137,6 +8175,8 @@
         <span style="font-size:11px;color:var(--text-muted);align-self:center">Sort:</span>
         <button class="cs-pill ${csSort === 'score' ? 'active' : ''}" onclick="csSetSort('score')">Score (ROI)</button>
         <button class="cs-pill ${csSort === 'newest' ? 'active' : ''}" onclick="csSetSort('newest')">Newest</button>
+        <button class="cs-pill ${csConsensusOpen ? 'active' : ''}" onclick="csToggleConsensus()" style="margin-left:auto">📊 Consensus ${csConsensusOpen ? '▾' : '▸'}</button>
+        ${csConsensusOpen ? `<div style="flex-basis:100%">${csRenderConsensus()}</div>` : ''}
         <div style="flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11px">
           ${(() => {
             const c = st => csLeads.filter(l => l.status === st).length;
