@@ -79,6 +79,21 @@ function ring(score) {
     <div class="ring-label"><div class="ring-pct" style="color:${col}">${score}%</div><div class="ring-sub">Healthy</div></div></div>`;
 }
 
+function claimRotation(code) {
+  try { navigator.clipboard.writeText(code); } catch (e) {}
+  const isMobile = /iPhone|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    const t = setTimeout(() => {
+      alert('Get TreadLeft from the App Store / Google Play, then tap the code we copied to redeem your rotation.');
+      window.location = '/';
+    }, 1500);
+    window.addEventListener('pagehide', () => clearTimeout(t), { once: true });
+    window.location = 'treadleft://redeem?code=' + encodeURIComponent(code);
+  } else {
+    alert('Code ' + code + ' copied — open TreadLeft on your phone, Profile → Redeem VIP Code, and paste it.');
+  }
+}
+
 function shoeRow(s) {
   const tier = s.status === 'critical' ? 'critical' : s.status === 'worn' ? 'worn' : 'fresh';
   return `<div><div class="shoe"><span class="dot ${tier}"></span>
@@ -123,9 +138,9 @@ function shoeRow(s) {
       </div>
       ${fs.best_roi_shoe ? `<div class="roi">🏆 Best ROI: ${esc(fs.best_roi_shoe)} at ${money(fs.best_roi_value)}/km</div>` : ''}
       <div>${shoes.map(shoeRow).join('')}</div>
-      ${lead.vip_code ? `<div class="vip"><div><div class="vip-label">Lifetime Pro code</div><div class="vip-code">${esc(lead.vip_code)}</div></div><a class="dl-btn" href="/">Redeem in app</a></div>` : ''}
+      ${lead.vip_code ? `<div class="vip"><div><div class="vip-label">Lifetime Pro code</div><div class="vip-code">${esc(lead.vip_code)}</div></div><button class="dl-btn" style="border:0;cursor:pointer" onclick="claimRotation('${esc(lead.vip_code)}')">Claim This Rotation (1-Tap)</button></div>` : ''}
     </div>
-    <div class="cta"><p>Track your own rotation — mileage syncs automatically via Strava &amp; Apple Health.</p><a href="/">Download TreadLeft free</a></div>`;
+    <div class="cta"><p>Claim imports your full rotation — shoes, mileage &amp; cost/km — plus lifetime Pro.</p><a href="/">Get TreadLeft</a></div>`;
 })();
 </script>
 </body>

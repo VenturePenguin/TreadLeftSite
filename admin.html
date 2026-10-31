@@ -8051,6 +8051,18 @@
     let csLoaded = false;
     let csLeads = [];
     let csFilter = 'all';
+    let csSort = 'score';
+
+    function csLeadScore(l) {
+      let s = 0;
+      if (/@[\w-]+\.[\w.]+/.test(l.contact_info || '')) s += 35;
+      else if (l.contact_info) s += 15;
+      s += l.rotation_confidence === 'high' ? 30 : l.rotation_confidence === 'medium' ? 15 : 0;
+      const sub = l.subscriber_count || 0;
+      s += (sub >= 5000 && sub <= 100000) ? 20 : (sub >= 1000 && sub <= 250000) ? 10 : 0;
+      if ((l.extracted_shoes || []).length >= 3) s += 15;
+      return s;
+    }
     let csSelectedId = null;
     let csScoutBusy = false;
 
@@ -8120,7 +8132,21 @@
         const count = f.key === 'all' ? csLeads.length : csLeads.filter(l => l.status === f.key).length;
         const badge = f.key === 'pending_review' && count > 0 ? `<span class="cs-pill-count">${count}</span>` : (count ? `<span class="cs-pill-count">${count}</span>` : '');
         return `<button class="cs-pill ${csFilter === f.key ? 'active' : ''}" onclick="csSetFilter('${f.key}')">${f.label}${badge}</button>`;
-      }).join('');
+      }).join('') + `
+        <span style="flex-basis:100%"></span>
+        <span style="font-size:11px;color:var(--text-muted);align-self:center">Sort:</span>
+        <button class="cs-pill ${csSort === 'score' ? 'active' : ''}" onclick="csSetSort('score')">Score (ROI)</button>
+        <button class="cs-pill ${csSort === 'newest' ? 'active' : ''}" onclick="csSetSort('newest')">Newest</button>
+        <div style="flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11px">
+          ${(() => {
+            const c = st => csLeads.filter(l => l.status === st).length;
+            const n = { discovered: csLeads.length, pending: c('pending_review'), contacted: c('contacted') + c('replied'), replied: c('replied'), claimed: c('claimed') };
+            const installs = csLeads.reduce((a, l) => a + (l.attributed_installs || 0), 0);
+            const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+            const steps = [['Discovered', n.discovered, null], ['Pending', n.pending, pct(n.pending, n.discovered)], ['Contacted', n.contacted, pct(n.contacted, n.pending)], ['Replied', n.replied, pct(n.replied, n.contacted)], ['Claimed', n.claimed, pct(n.claimed, n.replied)], ['Installs', installs, null]];
+            return steps.map(([l, v, r]) => `<span class="cs-mini-pill">${l} <b>${v}</b>${r ? ` <span style="opacity:.6">(${r})</span>` : ''}</span>`).join('<span style="color:var(--text-muted)">→</span>');
+          })()}
+        </div>`;
     }
 
     function csSetFilter(key) {
@@ -8134,8 +8160,12 @@
         const now = Date.now();
         return csLeads.filter(l => l.status === 'contacted' && l.follow_up_at && new Date(l.follow_up_at).getTime() <= now);
       }
-      return csFilter === 'all' ? csLeads : csLeads.filter(l => l.status === csFilter);
+      const base = csFilter === 'all' ? csLeads : csLeads.filter(l => l.status === csFilter);
+      if (csSort === 'score') return [...base].sort((a, b) => csLeadScore(b) - csLeadScore(a));
+      return base;
     }
+
+    function csSetSort(s) { csSort = s; renderCsPills(); renderCsQueue(); }
 
     function renderCsQueue() {
       const el = document.getElementById('cs-queue');
@@ -8164,6 +8194,8 @@
             ${lead.rotation_confidence ? `<span class="cs-mini-pill" style="color:${lead.rotation_confidence === 'high' ? '#16a34a' : lead.rotation_confidence === 'medium' ? '#d97706' : '#64748b'}">◈ ${lead.rotation_confidence}</span>` : ''}
             ${lead.status === 'contacted' && lead.follow_up_at && new Date(lead.follow_up_at).getTime() <= Date.now() ? `<span class="cs-mini-pill" style="background:#fee2e2;color:#b91c1c">⏰ overdue</span>` : ''}
             ${lead.snapshot_views > 0 ? `<span class="cs-mini-pill">👁 ${lead.snapshot_views}</span>` : ''}
+            ${lead.reply_sentiment === 'positive' ? `<span class="cs-mini-pill" style="background:#dcfce7;color:#166534">🔥 Hot Reply</span>` : lead.reply_sentiment === 'negative' ? `<span class="cs-mini-pill" style="color:#b91c1c">👎 negative</span>` : ''}
+            <span class="cs-mini-pill" style="background:rgba(59,130,246,.12);color:#2563eb;font-weight:700" title="Lead score">${csLeadScore(lead)}</span>
             <span class="cs-status-badge" style="background:${meta.bg};color:${meta.fg}">${meta.label}</span>
           </div>
         </div>`;
