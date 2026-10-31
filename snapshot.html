@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Snapshot — TreadLeft</title>
+  <meta name="description" content="A creator's shoe rotation snapshot, powered by TreadLeft — track shoe mileage and cost per km.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',system-ui,sans-serif; background:#f8fafc; color:#0f172a; min-height:100vh; display:flex; flex-direction:column; }
+    .topbar { padding:16px 24px; display:flex; align-items:center; justify-content:space-between; max-width:720px; width:100%; margin:0 auto; }
+    .logo { display:flex; align-items:center; gap:8px; font-weight:800; font-size:18px; text-decoration:none; color:#0f172a; }
+    .logo-dot { color:#f97316; }
+    .dl-btn { background:#0f172a; color:#fff; padding:9px 18px; border-radius:999px; font-size:13px; font-weight:700; text-decoration:none; }
+    .wrap { flex:1; max-width:720px; width:100%; margin:0 auto; padding:12px 24px 48px; }
+    .eyebrow { text-align:center; font-size:11px; font-weight:700; letter-spacing:2px; color:#f97316; text-transform:uppercase; margin:18px 0 8px; }
+    h1 { text-align:center; font-size:28px; font-weight:800; margin-bottom:6px; }
+    .sub { text-align:center; color:#64748b; font-size:14px; margin-bottom:28px; }
+    .card { background:#fff; border:1px solid #e2e8f0; border-top:4px solid #f97316; border-radius:18px; padding:28px; box-shadow:0 4px 16px rgba(15,23,42,.07); }
+    .creator { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .creator-name { font-size:20px; font-weight:800; }
+    .creator-sub { font-size:12px; color:#64748b; margin-top:2px; }
+    .stats { display:flex; align-items:center; gap:24px; flex-wrap:wrap; margin-bottom:18px; }
+    .ring-wrap { position:relative; width:92px; height:92px; flex-shrink:0; }
+    .ring-wrap svg { transform:rotate(-90deg); }
+    .ring-label { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .ring-pct { font-size:20px; font-weight:800; line-height:1; }
+    .ring-sub { font-size:9px; font-weight:700; letter-spacing:1px; color:#94a3b8; text-transform:uppercase; }
+    .stat-v { font-size:22px; font-weight:800; line-height:1.1; }
+    .stat-l { font-size:10px; font-weight:700; letter-spacing:.8px; color:#94a3b8; text-transform:uppercase; }
+    .roi { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.3); border-radius:12px; padding:12px 16px; font-size:14px; font-weight:600; color:#b45309; margin-bottom:18px; }
+    .shoe { display:flex; align-items:baseline; gap:10px; padding:9px 0; border-top:1px solid #f1f5f9; font-size:13px; flex-wrap:wrap; }
+    .shoe:first-of-type { border-top:none; }
+    .dot { width:9px; height:9px; border-radius:50%; align-self:center; flex-shrink:0; }
+    .fresh { background:#22c55e; } .worn { background:#f59e0b; } .critical { background:#ef4444; }
+    .shoe-name { font-weight:600; flex:1; min-width:0; }
+    .shoe-km { color:#64748b; white-space:nowrap; }
+    .shoe-cost { font-weight:700; color:#d97706; white-space:nowrap; }
+    .shoe-notes { font-size:11px; color:#94a3b8; font-style:italic; padding-left:19px; padding-bottom:6px; }
+    .vip { margin-top:22px; background:linear-gradient(135deg,#0f172a,#1e293b); color:#f1f5f9; border-radius:14px; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .vip-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:#94a3b8; text-transform:uppercase; }
+    .vip-code { font-family:ui-monospace,monospace; font-size:20px; font-weight:800; letter-spacing:1px; color:#fbbf24; }
+    .cta { text-align:center; margin-top:30px; }
+    .cta p { color:#64748b; font-size:13px; margin-bottom:14px; }
+    .cta a { display:inline-block; background:#f97316; color:#fff; padding:13px 30px; border-radius:999px; font-weight:700; font-size:15px; text-decoration:none; }
+    .cta a:hover { background:#ea580c; }
+    .err { text-align:center; padding:80px 20px; color:#64748b; }
+    .spin { width:34px; height:34px; border:3px solid #e2e8f0; border-top-color:#f97316; border-radius:50%; margin:60px auto; animation:sp 1s linear infinite; }
+    @keyframes sp { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="logo" href="/">Tread<span class="logo-dot">Left</span></a>
+    <a class="dl-btn" href="/">Get the app</a>
+  </div>
+  <div class="wrap" id="app">
+    <div class="spin"></div>
+  </div>
+
+<script>
+const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXN6bGJycnF3c21uaHFkdHBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzY1NDQsImV4cCI6MjA4MDM1MjU0NH0.0E7C-mQZDRtzOIP-_MsQlpAt8RMo7IM7ZWUmZhRCELg';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const esc = t => { const d = document.createElement('div'); d.textContent = t ?? ''; return d.innerHTML; };
+const money = v => '£' + Number(v || 0).toFixed(2);
+
+function ring(score) {
+  const r = 36, c = 2 * Math.PI * r;
+  const col = score >= 70 ? '#22c55e' : score >= 40 ? '#f59e0b' : '#ef4444';
+  return `<div class="ring-wrap"><svg width="92" height="92">
+    <circle cx="46" cy="46" r="${r}" stroke="#e2e8f0" stroke-width="9" fill="none"/>
+    <circle cx="46" cy="46" r="${r}" stroke="${col}" stroke-width="9" fill="none" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - Math.min(100,Math.max(0,score))/100)).toFixed(1)}"/></svg>
+    <div class="ring-label"><div class="ring-pct" style="color:${col}">${score}%</div><div class="ring-sub">Healthy</div></div></div>`;
+}
+
+function shoeRow(s) {
+  const tier = s.status === 'critical' ? 'critical' : s.status === 'worn' ? 'worn' : 'fresh';
+  return `<div><div class="shoe"><span class="dot ${tier}"></span>
+    <span class="shoe-name">${esc(s.brand)} ${esc(s.model)}</span>
+    <span class="shoe-km">${Math.round(s.mileage_km || 0)} km</span>
+    <span class="shoe-cost">${money(s.cost_per_km)}/km</span></div>
+    ${s.creator_notes ? `<div class="shoe-notes">${esc(s.creator_notes)}</div>` : ''}</div>`;
+}
+
+(async () => {
+  const app = document.getElementById('app');
+  const slug = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '');
+  const { data: lead, error } = await sb
+    .from('creator_seeding_leads').select('*')
+    .eq('snapshot_slug', slug).maybeSingle();
+
+  if (error || !lead) {
+    app.innerHTML = '<div class="err"><h2>Fleet snapshot not found</h2><p style="margin-top:8px">This link may have expired or the slug is wrong.</p></div>';
+    return;
+  }
+  document.title = `${lead.creator_name} — Fleet Snapshot — TreadLeft`;
+
+  const fs = lead.fleet_summary || {};
+  const shoes = Array.isArray(lead.extracted_shoes) ? lead.extracted_shoes : [];
+  app.innerHTML = `
+    <div class="eyebrow">Fleet Snapshot</div>
+    <h1>${esc(lead.creator_name)}'s Rotation</h1>
+    <p class="sub">Powered by TreadLeft — true shoe wear &amp; cost-per-km tracking</p>
+    <div class="card">
+      <div class="creator">
+        <div>
+          <div class="creator-name">${esc(lead.creator_name)}</div>
+          <div class="creator-sub">${esc(lead.creator_handle || '')}${lead.video_title ? ' · ' + esc(lead.video_title) : ''}</div>
+        </div>
+      </div>
+      <div class="stats">
+        ${ring(fs.health_score || 0)}
+        <div><div class="stat-v">${fs.total_shoes || 0}</div><div class="stat-l">Shoes</div></div>
+        <div><div class="stat-v">${(fs.total_km || 0).toLocaleString()}</div><div class="stat-l">Total km</div></div>
+        <div><div class="stat-v">${money(fs.avg_cost_per_km)}</div><div class="stat-l">Avg /km</div></div>
+      </div>
+      ${fs.best_roi_shoe ? `<div class="roi">🏆 Best ROI: ${esc(fs.best_roi_shoe)} at ${money(fs.best_roi_value)}/km</div>` : ''}
+      <div>${shoes.map(shoeRow).join('')}</div>
+      ${lead.vip_code ? `<div class="vip"><div><div class="vip-label">Lifetime Pro code</div><div class="vip-code">${esc(lead.vip_code)}</div></div><a class="dl-btn" href="/">Redeem in app</a></div>` : ''}
+    </div>
+    <div class="cta"><p>Track your own rotation — mileage syncs automatically via Strava &amp; Apple Health.</p><a href="/">Download TreadLeft free</a></div>`;
+})();
+</script>
+</body>
+</html>
