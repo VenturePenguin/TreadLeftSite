@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-World Running Shoe Durability & Cost/km Leaderboard | TreadLeft</title>
+  <meta name="description" content="Real-world running shoe durability and true cost-per-km, aggregated from tracked running creator rotations. Compare mileage, £/km and creator quotes across the most-run shoes.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.treadleft.app/shoes">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TreadLeft">
+  <meta property="og:title" content="Real-World Running Shoe Durability & Cost/km Leaderboard | TreadLeft">
+  <meta property="og:description" content="Real-world mileage and true cost per km for the most-run shoes, aggregated from tracked creator rotations.">
+  <meta property="og:url" content="https://www.treadleft.app/shoes">
+  <meta property="og:image" content="https://www.treadleft.app/favicon.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Running Shoe Durability Leaderboard | TreadLeft">
+  <meta name="twitter:description" content="Real-world mileage and true cost per km for the most-run shoes, aggregated from tracked creator rotations.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',system-ui,sans-serif; background:#0b1220; color:#f1f5f9; min-height:100vh; padding-bottom:96px; }
+    .topbar { padding:16px 24px; display:flex; align-items:center; justify-content:space-between; max-width:960px; margin:0 auto; }
+    .logo { display:flex; align-items:center; gap:8px; font-weight:800; font-size:18px; text-decoration:none; color:#f1f5f9; }
+    .logo-dot { color:#f97316; }
+    .dl-btn { background:#f97316; color:#fff; padding:9px 18px; border-radius:999px; font-size:13px; font-weight:700; text-decoration:none; }
+    .wrap { max-width:960px; margin:0 auto; padding:12px 24px 48px; }
+    .eyebrow { text-align:center; font-size:11px; font-weight:700; letter-spacing:2px; color:#f97316; text-transform:uppercase; margin:22px 0 10px; }
+    h1 { text-align:center; font-size:30px; font-weight:800; line-height:1.2; margin-bottom:10px; }
+    .sub { text-align:center; color:#94a3b8; font-size:14px; max-width:640px; margin:0 auto 28px; }
+    .controls { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+    .controls input { flex:1; min-width:200px; background:#111c31; border:1px solid #243349; border-radius:12px; padding:11px 14px; color:#f1f5f9; font-size:14px; font-family:inherit; }
+    .controls input:focus { outline:none; border-color:#f97316; }
+    .controls select { background:#111c31; border:1px solid #243349; border-radius:12px; padding:11px 14px; color:#f1f5f9; font-size:14px; font-family:inherit; cursor:pointer; }
+    .grid-head, .row-main { display:grid; grid-template-columns:1.7fr .9fr .8fr 1fr; gap:10px; align-items:baseline; }
+    .grid-head { padding:10px 16px; font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:#64748b; }
+    .row { background:#111c31; border:1px solid #1e293b; border-radius:14px; padding:14px 16px; margin-bottom:10px; }
+    .rank { display:inline-flex; width:24px; height:24px; border-radius:8px; background:#1e293b; color:#f97316; font-size:11px; font-weight:800; align-items:center; justify-content:center; margin-right:8px; }
+    .shoe-name { font-weight:700; font-size:15px; }
+    .mentions { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+    .mcount { background:rgba(59,130,246,.15); color:#60a5fa; font-weight:700; font-size:11px; padding:2px 8px; border-radius:999px; }
+    .pill { background:#1e293b; color:#94a3b8; font-size:10px; padding:2px 8px; border-radius:999px; }
+    .km { color:#cbd5e1; font-size:13px; }
+    .cost { font-weight:700; color:#fbbf24; font-size:14px; }
+    .quotes-toggle { background:none; border:0; color:#f97316; font-size:11px; font-weight:600; cursor:pointer; padding:6px 0 0; font-family:inherit; }
+    .quotes { margin-top:8px; border-top:1px solid #1e293b; padding-top:8px; }
+    .quote { color:#94a3b8; font-size:12px; font-style:italic; padding:3px 0 3px 14px; border-left:2px solid #f97316; margin:6px 0; }
+    .quote-by { display:block; font-style:normal; font-size:10px; color:#64748b; margin-top:2px; }
+    .err, .loading { text-align:center; padding:70px 20px; color:#94a3b8; }
+    .spin { width:34px; height:34px; border:3px solid #1e293b; border-top-color:#f97316; border-radius:50%; margin:60px auto; animation:sp 1s linear infinite; }
+    @keyframes sp { to { transform:rotate(360deg); } }
+    .sticky-cta { position:fixed; left:0; right:0; bottom:0; background:rgba(15,23,42,.92); backdrop-filter:blur(10px); border-top:1px solid #1e293b; padding:12px 20px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; z-index:10; }
+    .sticky-cta p { font-size:13px; color:#cbd5e1; margin:0; }
+    .sticky-cta a { background:#f97316; color:#fff; padding:9px 20px; border-radius:999px; font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap; }
+    .sticky-cta a:hover { background:#ea580c; }
+    @media (max-width:640px) {
+      .grid-head { display:none; }
+      .row-main { grid-template-columns:1fr 1fr; row-gap:6px; }
+      h1 { font-size:24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="logo" href="/">Tread<span class="logo-dot">Left</span></a>
+    <a class="dl-btn" href="/">Get the app</a>
+  </div>
+  <div class="wrap">
+    <div class="eyebrow">Creator Consensus</div>
+    <h1>Real-World Running Shoe Durability &amp; Cost/km Leaderboard</h1>
+    <p class="sub">Aggregated from the tracked shoe rotations of running creators — actual mileage, true cost per kilometre, and what creators say about each shoe.</p>
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search shoes — e.g. Nike Pegasus, Novablast…" oninput="renderBoard()">
+      <select id="sort" onchange="renderBoard()">
+        <option value="mentions">Sort: Most mentioned</option>
+        <option value="mileage">Sort: Highest avg mileage</option>
+        <option value="cost">Sort: Lowest cost/km</option>
+      </select>
+    </div>
+    <div class="grid-head"><span>Shoe</span><span>Mentions</span><span>Avg km</span><span>Real cost/km</span></div>
+    <div id="board"><div class="spin"></div></div>
+    <noscript><div class="err">This leaderboard is aggregated live from tracked creator rotations — enable JavaScript to view it.</div></noscript>
+  </div>
+  <div class="sticky-cta">
+    <p>Track your own shoe rotation and true £/km in TreadLeft</p>
+    <a href="https://apps.apple.com/app/treadleft/id6756678478" target="_blank" rel="noopener">iOS</a>
+    <a href="https://play.google.com/store/apps/details?id=com.davidburns.treadleftapp" target="_blank" rel="noopener">Android</a>
+  </div>
+
+<script>
+const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_BNR1EmmFbVi-Bs72NSnvzw_thlz3W6b';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const esc = t => { const d = document.createElement('div'); d.textContent = t ?? ''; return d.innerHTML; };
+let DATA = null;
+const quotesOpen = {};
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  if (!DATA) return;
+  const q = (document.getElementById('q').value || '').toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let rows = DATA.filter(r => !q || (r.brand + ' ' + r.model).toLowerCase().includes(q));
+  rows = [...rows].sort((a, b) =>
+    sort === 'mileage' ? (b.avg_mileage_km || 0) - (a.avg_mileage_km || 0)
+    : sort === 'cost' ? (a.avg_cost_per_km || 0) - (b.avg_cost_per_km || 0)
+    : (b.mention_count || 0) - (a.mention_count || 0));
+  if (!rows.length) { board.innerHTML = '<div class="err">No shoes match that search.</div>'; return; }
+  board.innerHTML = rows.map((r, i) => {
+    const quotes = r.quotes || [];
+    const creators = r.creators || [];
+    const open = quotesOpen[i];
+    return `<div class="row">
+      <div class="row-main">
+        <span><span class="rank">${i + 1}</span><span class="shoe-name">${esc(r.brand)} ${esc(r.model)}</span></span>
+        <span class="mentions"><span class="mcount">${r.mention_count}×</span>
+          ${creators.slice(0, 2).map(c => `<span class="pill">${esc(c)}</span>`).join('')}
+          ${creators.length > 2 ? `<span class="pill">+${creators.length - 2}</span>` : ''}</span>
+        <span class="km">${Math.round(r.avg_mileage_km || 0)} km</span>
+        <span class="cost">£${Number(r.avg_cost_per_km || 0).toFixed(2)}/km</span>
+      </div>
+      ${quotes.length ? `<button class="quotes-toggle" onclick="quotesOpen[${i}]=!quotesOpen[${i}];renderBoard()">${open ? '▾ hide quotes' : '▸ ' + quotes.length + ' creator quote' + (quotes.length > 1 ? 's' : '')}</button>
+        ${open ? `<div class="quotes">${quotes.map((qt, j) => `<div class="quote">“${esc(qt)}”${creators[j] ? `<span class="quote-by">— ${esc(creators[j])}</span>` : ''}</div>`).join('')}</div>` : ''}` : ''}
+    </div>`;
+  }).join('');
+}
+
+(async () => {
+  const board = document.getElementById('board');
+  const { data, error } = await sb.rpc('get_creator_shoe_consensus');
+  if (error) { board.innerHTML = `<div class="err"><h2>Leaderboard unavailable</h2><p style="margin-top:8px">${esc(error.message)}</p></div>`; return; }
+  DATA = data || [];
+  if (!DATA.length) { board.innerHTML = '<div class="err">No consensus data yet — check back soon.</div>'; return; }
+  renderBoard();
+
+  const ld = document.createElement('script');
+  ld.type = 'application/ld+json';
+  ld.textContent = JSON.stringify({
+    '@context': 'https://schema.org', '@type': 'ItemList',
+    name: 'Real-World Running Shoe Durability & Cost/km Leaderboard',
+    url: 'https://www.treadleft.app/shoes',
+    itemListElement: DATA.map((r, i) => ({
+      '@type': 'ListItem', position: i + 1,
+      item: {
+        '@type': 'Product',
+        name: `${r.brand} ${r.model}`,
+        brand: { '@type': 'Brand', name: r.brand },
+        description: `${r.mention_count} creator mention${r.mention_count > 1 ? 's' : ''} — avg ${Math.round(r.avg_mileage_km || 0)} km tracked at £${Number(r.avg_cost_per_km || 0).toFixed(2)}/km real-world cost.`
+      }
+    }))
+  });
+  document.head.appendChild(ld);
+})();
+</script>
+</body>
+</html>

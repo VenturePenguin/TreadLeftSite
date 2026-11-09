@@ -4,7 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fleet Snapshot — TreadLeft</title>
-  <meta name="description" content="A creator's shoe rotation snapshot, powered by TreadLeft — track shoe mileage and cost per km.">
+  <meta name="description" content="A running creator's real shoe rotation — mileage tracked, true cost per km and Fleet Health score, powered by TreadLeft.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.treadleft.app/snapshot" id="canonical-link">
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="TreadLeft">
+  <meta property="og:title" content="Fleet Snapshot — TreadLeft" id="og-title">
+  <meta property="og:description" content="A running creator's real shoe rotation — mileage, true cost per km and Fleet Health, powered by TreadLeft." id="og-desc">
+  <meta property="og:url" content="https://www.treadleft.app/snapshot" id="og-url">
+  <meta property="og:image" content="https://www.treadleft.app/favicon.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Fleet Snapshot — TreadLeft" id="tw-title">
+  <meta name="twitter:description" content="A running creator's real shoe rotation — mileage, true cost per km and Fleet Health, powered by TreadLeft." id="tw-desc">
   <link rel="icon" type="image/png" href="/favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,6 +71,16 @@
   </div>
   <div class="wrap" id="app">
     <div class="spin"></div>
+  </div>
+  <noscript>
+    <div class="wrap"><div class="card" style="text-align:center">
+      <h2 style="margin-bottom:8px">Creator Fleet Snapshot</h2>
+      <p style="color:#64748b;font-size:14px">This page shows a running creator's real shoe rotation — tracked mileage, true cost per km and Fleet Health score — extracted by TreadLeft. Enable JavaScript to view the full snapshot, or browse the <a href="/shoes">Shoe Durability Leaderboard</a> aggregated across all creators.</p>
+    </div></div>
+  </noscript>
+  <div style="text-align:center;padding:0 24px 32px;font-size:12px;color:#94a3b8">
+    <a href="/shoes" style="color:#f97316;text-decoration:none;font-weight:600">Shoe Leaderboard</a> ·
+    <a href="/" style="color:#94a3b8;text-decoration:none">TreadLeft</a>
   </div>
 
 <script>
@@ -118,10 +139,39 @@ function shoeRow(s) {
     app.innerHTML = '<div class="err"><h2>Fleet snapshot not found</h2><p style="margin-top:8px">This link may have expired or the slug is wrong.</p></div>';
     return;
   }
-  document.title = `${lead.creator_name} — Fleet Snapshot — TreadLeft`;
-
   const fs = lead.fleet_summary || {};
   const shoes = Array.isArray(lead.extracted_shoes) ? lead.extracted_shoes : [];
+  const canonicalUrl = 'https://www.treadleft.app/snapshot/' + slug;
+  const pageTitle = `${lead.creator_name}'s Running Shoe Rotation, Mileage & Cost/km | TreadLeft`;
+  const pageDesc = `See ${lead.creator_name}'s ${shoes.length}-shoe running rotation (${Math.round(fs.total_km || 0).toLocaleString()}km tracked, ${money(fs.avg_cost_per_km)}/km avg, ${fs.health_score || 0}/100 Fleet Health) extracted by TreadLeft.`;
+
+  document.title = pageTitle;
+  document.querySelector('meta[name="description"]').setAttribute('content', pageDesc);
+  document.getElementById('canonical-link').setAttribute('href', canonicalUrl);
+  document.getElementById('og-title').setAttribute('content', pageTitle);
+  document.getElementById('og-desc').setAttribute('content', pageDesc);
+  document.getElementById('og-url').setAttribute('content', canonicalUrl);
+  document.getElementById('tw-title').setAttribute('content', pageTitle);
+  document.getElementById('tw-desc').setAttribute('content', pageDesc);
+
+  const ld = document.createElement('script');
+  ld.type = 'application/ld+json';
+  ld.textContent = JSON.stringify({
+    '@context': 'https://schema.org', '@type': 'ItemList',
+    name: `${lead.creator_name}'s Running Shoe Rotation`,
+    url: canonicalUrl,
+    itemListElement: shoes.map((s, i) => ({
+      '@type': 'ListItem', position: i + 1,
+      item: {
+        '@type': 'Product',
+        name: `${s.brand} ${s.model}`,
+        brand: { '@type': 'Brand', name: s.brand },
+        description: s.creator_notes || `${Math.round(s.mileage_km || 0)} km tracked at ${money(s.cost_per_km)}/km`
+      }
+    }))
+  });
+  document.head.appendChild(ld);
+
   app.innerHTML = `
     <div class="eyebrow">Fleet Snapshot</div>
     <h1>${esc(lead.creator_name)}'s Rotation</h1>

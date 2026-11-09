@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "TreadLeft marketing site (static HTML, served via GitHub Pages).",
   "scripts": {
-    "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./css/tailwind.min.css --minify"
+    "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./css/tailwind.min.css --minify",
+    "sitemap": "node scripts/generate-sitemap.js"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.19"
