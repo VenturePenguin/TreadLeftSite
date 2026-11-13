@@ -76,6 +76,7 @@
 
     <!-- LEADERBOARD -->
     <main class="container mx-auto px-6 max-w-3xl py-12 pb-32">
+        <div id="kpis" class="hidden sm:grid grid-cols-3 gap-3 mb-6"></div>
         <div class="flex flex-col sm:flex-row gap-3 mb-6">
             <input id="q" type="search" placeholder="Search shoes — e.g. Nike Pegasus, Novablast…"
                    oninput="renderBoard()"
@@ -145,7 +146,16 @@ function renderBoard() {
   board.innerHTML = rows.map((r, i) => {
     const quotes = r.quotes || [];
     const creators = r.creators || [];
+    const slugs = r.creator_slugs || [];
+    const avgKm = r.avg_mileage_km || 0;
+    const cost = Number(r.avg_cost_per_km || 0);
+    const costCls = cost <= 0.35 ? 'text-emerald-600' : cost <= 0.80 ? 'text-amber-600' : 'text-slate-500';
+    const earlyMiles = cost > 0.80 && avgKm < 150;
+    const kmBar = Math.min(100, Math.round((avgKm / 800) * 100));
     const open = quotesOpen[i];
+    const pill = (c, j) => slugs[j]
+      ? `<a href="/snapshot/${encodeURIComponent(slugs[j])}" class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full hover:bg-brand-orange/10 hover:text-brand-orange transition">${esc(c)}</a>`
+      : `<span class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full">${esc(c)}</span>`;
     return `<div class="bg-white border border-brand-border rounded-2xl px-5 py-4 mb-3 shadow-sm">
       <div class="grid grid-cols-2 sm:grid-cols-[1.7fr_.9fr_.8fr_1fr] gap-x-3 gap-y-2 items-baseline">
         <span class="col-span-2 sm:col-span-1">
@@ -154,11 +164,13 @@ function renderBoard() {
         </span>
         <span class="flex items-center gap-1.5 flex-wrap">
           <span class="bg-blue-50 text-brand-blue font-bold text-[11px] px-2 py-0.5 rounded-full">${r.mention_count}×</span>
-          ${creators.slice(0, 2).map(c => `<span class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full">${esc(c)}</span>`).join('')}
+          ${creators.slice(0, 2).map((c, j) => pill(c, j)).join('')}
           ${creators.length > 2 ? `<span class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full">+${creators.length - 2}</span>` : ''}
         </span>
-        <span class="text-brand-slate text-[13px]">${Math.round(r.avg_mileage_km || 0)} km</span>
-        <span class="font-bold text-amber-600 text-sm">£${Number(r.avg_cost_per_km || 0).toFixed(2)}/km</span>
+        <span class="text-brand-slate text-[13px]">${Math.round(avgKm)} km
+          <span class="block mt-1 h-1 w-16 bg-brand-light rounded-full overflow-hidden"><span class="block h-full bg-brand-orange rounded-full" style="width:${kmBar}%"></span></span>
+        </span>
+        <span class="font-bold ${costCls} text-sm">£${cost.toFixed(2)}/km${earlyMiles ? ' <span class="block font-normal text-[10px] text-brand-slate/70">early miles</span>' : ''}</span>
       </div>
       ${quotes.length ? `<button class="text-brand-orange text-[11px] font-semibold mt-2 hover:underline" onclick="quotesOpen[${i}]=!quotesOpen[${i}];renderBoard()">${open ? '▾ hide quotes' : '▸ ' + quotes.length + ' creator quote' + (quotes.length > 1 ? 's' : '')}</button>
         ${open ? `<div class="mt-2 border-t border-brand-border pt-2">${quotes.map((qt, j) => `<div class="border-l-2 border-brand-orange pl-3.5 my-1.5 py-0.5 text-brand-slate text-xs italic">“${esc(qt)}”${creators[j] ? `<span class="block not-italic text-[10px] text-brand-slate/70 mt-0.5">— ${esc(creators[j])}</span>` : ''}</div>`).join('')}</div>` : ''}` : ''}
@@ -172,6 +184,17 @@ function renderBoard() {
   if (error) { board.innerHTML = `<div class="text-center py-16 text-brand-slate"><h2 class="font-bold text-brand-navy mb-2">Leaderboard unavailable</h2><p class="text-sm">${esc(error.message)}</p></div>`; return; }
   DATA = data || [];
   if (!DATA.length) { board.innerHTML = '<div class="text-center py-16 text-brand-slate">No consensus data yet — check back soon.</div>'; return; }
+
+  const totalMentions = DATA.reduce((s, r) => s + (r.mention_count || 0), 0);
+  const avgCost = DATA.reduce((s, r) => s + Number(r.avg_cost_per_km || 0), 0) / DATA.length;
+  document.getElementById('kpis').innerHTML = [
+    [DATA.length, 'Shoe Models Ranked'],
+    [totalMentions, 'Creator Mentions'],
+    ['£' + avgCost.toFixed(2), 'Avg Cost/km'],
+  ].map(([v, l]) => `<div class="bg-white border border-brand-border rounded-2xl px-4 py-3 text-center shadow-sm">
+    <div class="text-xl font-extrabold text-brand-navy">${v}</div>
+    <div class="text-[10px] font-bold uppercase tracking-wider text-brand-slate mt-0.5">${l}</div></div>`).join('');
+
   renderBoard();
 
   const ld = document.createElement('script');
