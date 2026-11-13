@@ -7,6 +7,8 @@ module.exports = {
     "./legal-terms.html",
     "./release-notes.html",
     "./shoes.html",
+    "./blog.html",
+    "./blog/*.html",
   ],
   theme: {
     extend: {
