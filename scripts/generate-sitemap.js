@@ -161,7 +161,15 @@ function bakeSnapshotPage(lead, template) {
     url,
     itemListElement: shoes.map((s, i) => ({
       '@type': 'ListItem', position: i + 1,
-      item: { '@type': 'Product', name: `${s.brand} ${s.model}`, brand: { '@type': 'Brand', name: s.brand }, description: s.creator_notes || `${Math.round(s.mileage_km || 0)} km tracked at ${money(s.cost_per_km)}/km` },
+      item: {
+        '@type': 'Thing', name: `${s.brand} ${s.model}`, brand: { '@type': 'Brand', name: s.brand },
+        url,
+        description: s.creator_notes || `${Math.round(s.mileage_km || 0)} km tracked at ${money(s.cost_per_km)}/km`,
+        additionalProperty: [
+          { '@type': 'PropertyValue', name: 'Mileage', value: Math.round(s.mileage_km || 0), unitText: 'km' },
+          { '@type': 'PropertyValue', name: 'Cost per km', value: Number(s.cost_per_km || 0).toFixed(2), unitText: 'GBP/km' },
+        ],
+      },
     })),
   })}</script>`;
   html = html.replace('</head>', `  ${ld}\n</head>`);
@@ -384,7 +392,16 @@ function injectShoesPage(consensus) {
     url: `${BASE}/shoes`,
     itemListElement: consensus.map((r, i) => ({
       '@type': 'ListItem', position: i + 1,
-      item: { '@type': 'Product', name: `${r.brand} ${r.model}`, brand: { '@type': 'Brand', name: r.brand }, description: `${r.mention_count} creator mention${r.mention_count > 1 ? 's' : ''} — avg ${Math.round(r.avg_mileage_km || 0)} km tracked at £${Number(r.avg_cost_per_km || 0).toFixed(2)}/km real-world cost.` },
+      item: {
+        '@type': 'Thing', name: `${r.brand} ${r.model}`, brand: { '@type': 'Brand', name: r.brand },
+        url: `${BASE}/shoes`,
+        description: `${r.mention_count} creator mention${r.mention_count > 1 ? 's' : ''} — avg ${Math.round(r.avg_mileage_km || 0)} km tracked at £${Number(r.avg_cost_per_km || 0).toFixed(2)}/km real-world cost.`,
+        additionalProperty: [
+          { '@type': 'PropertyValue', name: 'Average mileage', value: Math.round(r.avg_mileage_km || 0), unitText: 'km' },
+          { '@type': 'PropertyValue', name: 'Cost per km', value: Number(r.avg_cost_per_km || 0).toFixed(2), unitText: 'GBP/km' },
+          { '@type': 'PropertyValue', name: 'Creator mentions', value: r.mention_count || 0 },
+        ],
+      },
     })),
   })}</script>`;
   html = html.replace(/<!-- SEO-SHOES-JSONLD-START -->[\s\S]*?<!-- SEO-SHOES-JSONLD-END -->/,

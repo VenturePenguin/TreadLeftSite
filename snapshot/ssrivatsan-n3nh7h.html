@@ -64,7 +64,7 @@
     .spin { width:34px; height:34px; border:3px solid #e2e8f0; border-top-color:#f97316; border-radius:50%; margin:60px auto; animation:sp 1s linear infinite; }
     @keyframes sp { to { transform:rotate(360deg); } }
   </style>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"Srivatsan Sridhar's Running Shoe Rotation","url":"https://www.treadleft.app/snapshot/ssrivatsan-n3nh7h","itemListElement":[{"@type":"ListItem","position":1,"item":{"@type":"Product","name":"ASICS Noosa Tri 16","brand":{"@type":"Brand","name":"ASICS"},"description":"Said it features a top-notch ASICSGRIP outsole."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"Srivatsan Sridhar's Running Shoe Rotation","url":"https://www.treadleft.app/snapshot/ssrivatsan-n3nh7h","itemListElement":[{"@type":"ListItem","position":1,"item":{"@type":"Thing","name":"ASICS Noosa Tri 16","brand":{"@type":"Brand","name":"ASICS"},"url":"https://www.treadleft.app/snapshot/ssrivatsan-n3nh7h","description":"Said it features a top-notch ASICSGRIP outsole.","additionalProperty":[{"@type":"PropertyValue","name":"Mileage","value":500,"unitText":"km"},{"@type":"PropertyValue","name":"Cost per km","value":"0.36","unitText":"GBP/km"}]}}]}</script>
 </head>
 <body>
   <div class="topbar">
@@ -194,10 +194,15 @@ function shoeRow(s) {
     itemListElement: shoes.map((s, i) => ({
       '@type': 'ListItem', position: i + 1,
       item: {
-        '@type': 'Product',
+        '@type': 'Thing',
         name: `${s.brand} ${s.model}`,
         brand: { '@type': 'Brand', name: s.brand },
-        description: s.creator_notes || `${Math.round(s.mileage_km || 0)} km tracked at ${money(s.cost_per_km)}/km`
+        url: canonicalUrl,
+        description: s.creator_notes || `${Math.round(s.mileage_km || 0)} km tracked at ${money(s.cost_per_km)}/km`,
+        additionalProperty: [
+          { '@type': 'PropertyValue', name: 'Mileage', value: Math.round(s.mileage_km || 0), unitText: 'km' },
+          { '@type': 'PropertyValue', name: 'Cost per km', value: Number(s.cost_per_km || 0).toFixed(2), unitText: 'GBP/km' },
+        ],
       }
     }))
   });
