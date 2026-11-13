@@ -38,6 +38,7 @@
     <meta name="twitter:image" content="https://treadleft.app/favicon.png">
 
     <link rel="canonical" href="https://www.treadleft.app/">
+    <meta name="apple-itunes-app" content="app-id=6756678478">
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
@@ -199,6 +200,42 @@
 <body class="bg-brand-light text-brand-navy font-sans antialiased selection:bg-brand-orange selection:text-white">
 
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand-navy focus:text-white focus:font-semibold">Skip to main content</a>
+
+    <!-- DESKTOP QR INSTALL MODAL -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-brand-navy/50 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center relative">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-brand-navy transition" aria-label="Close"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <h3 class="text-lg font-bold text-brand-navy mb-1">Get TreadLeft on your phone</h3>
+            <p class="text-sm text-brand-slate mb-5">Scan with your phone camera to install.</p>
+            <img id="qr-img" src="" alt="QR code to download TreadLeft" class="w-48 h-48 mx-auto rounded-xl border border-brand-border mb-5">
+            <a id="qr-continue" href="#" target="_blank" rel="noopener" class="text-sm text-brand-orange font-semibold hover:underline">Continue in browser →</a>
+        </div>
+    </div>
+    <script>
+        function openQrModal(url, label) {
+            const m = document.getElementById('qr-modal');
+            document.getElementById('qr-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=' + encodeURIComponent(url);
+            const c = document.getElementById('qr-continue');
+            c.href = url;
+            c.textContent = 'Continue to ' + label + ' in browser →';
+            m.classList.remove('hidden'); m.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeQrModal() {
+            const m = document.getElementById('qr-modal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('click', function (e) {
+            if (window.innerWidth < 1024) return;
+            const a = e.target.closest('a[href*="apps.apple.com"], a[href*="play.google.com"]');
+            if (!a) return;
+            e.preventDefault();
+            openQrModal(a.href, a.href.includes('apple.com') ? 'the App Store' : 'Google Play');
+        });
+        document.getElementById('qr-modal').addEventListener('click', function (e) { if (e.target === this) closeQrModal(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeQrModal(); });
+    </script>
 
     <!-- COOKIE CONSENT BANNER -->
     <div id="cookie-banner" class="hidden fixed bottom-0 left-0 right-0 z-[100] bg-brand-navy text-white px-6 py-4 shadow-2xl" role="dialog" aria-live="polite" aria-label="Cookie consent">
@@ -709,6 +746,62 @@
         </div>
     </section>
 
+    <!-- COMPARISON MATRIX -->
+    <section class="py-24 bg-brand-light border-y border-brand-border">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <div class="text-center max-w-2xl mx-auto mb-12 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-navy mb-4 tracking-tight">Why runners upgrade from Strava's default gear list</h2>
+                <p class="text-lg text-brand-slate">Strava counts your kilometres. TreadLeft tells you what they cost — and when they'll hurt you.</p>
+            </div>
+            <div class="bg-white border border-brand-border rounded-3xl overflow-hidden shadow-sm reveal">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm min-w-[560px]">
+                        <thead>
+                            <tr class="border-b border-brand-border bg-brand-light">
+                                <th class="text-left font-bold text-brand-navy px-5 py-4">Feature</th>
+                                <th class="text-center font-bold text-brand-orange px-4 py-4">TreadLeft</th>
+                                <th class="text-center font-bold text-brand-slate px-4 py-4">Strava Default Gear</th>
+                                <th class="text-center font-bold text-brand-slate px-4 py-4">Spreadsheets</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-brand-border">
+                            <tr>
+                                <td class="px-5 py-4 font-semibold text-brand-navy">Auto-assign shoes by workout type</td>
+                                <td class="px-4 py-4 text-center"><span class="inline-block bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full">Smart Rules</span></td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">1 default shoe only</td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">Manual</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-semibold text-brand-navy">48-hour midsole foam recovery</td>
+                                <td class="px-4 py-4 text-center"><span class="inline-block bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full">Live recharge %</span></td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-semibold text-brand-navy">True cost-per-km &amp; community benchmarks</td>
+                                <td class="px-4 py-4 text-center"><span class="inline-block bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full">Automated</span></td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">Manual math</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-semibold text-brand-navy">ACWR injury risk × worn-foam alerts</td>
+                                <td class="px-4 py-4 text-center"><span class="inline-block bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full">AI Coach</span></td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-semibold text-brand-navy">Replacement deal alerts at 80% wear</td>
+                                <td class="px-4 py-4 text-center"><span class="inline-block bg-emerald-50 text-emerald-700 font-semibold text-xs px-3 py-1 rounded-full">10+ running retailers</span></td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                                <td class="px-4 py-4 text-center text-brand-slate text-xs">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- FAQ SECTION -->
     <section id="faq" class="py-24 bg-white">
         <div class="container mx-auto px-6 max-w-3xl">
@@ -1015,7 +1108,7 @@
                             '        <i data-lucide="calendar" class="w-4 h-4" aria-hidden="true"></i>',
                             '        <span class="journal-date">' + date + '</span>',
                             '    </div>',
-                            '    <a href="https://treadleft-cms.netlify.app/posts/' + post.slug + '" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition" data-cta="blog_click" data-cta-location="journal_card">',
+                            '    <a href="/blog/' + post.slug + '" class="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition" data-cta="blog_click" data-cta-location="journal_card">',
                             '        Read article <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>',
                             '    </a>',
                             '</div>',
