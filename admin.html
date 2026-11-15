@@ -3474,7 +3474,15 @@
       <div id="view-blog-cms" class="view">
         <div class="view-header">
           <h2><i data-lucide="edit-3"></i> Blog CMS</h2>
-          <button class="deal-btn-primary" style="margin-left:auto" onclick="bcNewPost()"><i data-lucide="plus"></i> New Post</button>
+          <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
+            <select class="cohort-select" style="max-width:220px" onchange="bcGenDraft(this.value);this.value=''">
+              <option value="">✨ Generate Data Draft…</option>
+              <option value="value">Top 5 Best-Value Shoes (£/km)</option>
+              <option value="brands">Brand Durability Head-to-Head</option>
+              <option value="workhorses">High-Mileage Workhorses (500+ km)</option>
+            </select>
+            <button class="deal-btn-primary" onclick="bcNewPost()"><i data-lucide="plus"></i> New Post</button>
+          </div>
         </div>
         <div id="bc-list"><div class="cs-panel"><div class="empty"><p>Loading posts…</p></div></div></div>
       </div>
@@ -3542,6 +3550,7 @@
             <option value="NO_SHOES">Empty Lockers (0 active shoes)</option>
             <option value="STALE_SYNC">Stale Syncs (14+ days)</option>
             <option value="POWER_USERS">Power Users (3+ shoes)</option>
+            <option value="WORN_SHOES">Ready to Retire (Active shoe ≥85% worn)</option>
           </select>
           <span class="cohort-count-pill" id="cohort-count-label">— users</span>
           <button class="cohort-export-btn" id="cohort-export-btn" onclick="exportCohortCSV()" disabled>
@@ -4341,6 +4350,7 @@
         dealEngineLoaded = true;
         fetchDealMetrics();
       }
+      if (viewId === 'deal-engine' && !cgaRows.length) loadConsensusAdmin();
       if (viewId === 'creator-seeding' && !csLoaded) {
         csLoaded = true;
         loadCreatorLeads();
@@ -5534,8 +5544,13 @@
           ? `<img class="deal-shoe-thumb" src="${escapeHtml(prod.image_url)}" alt="" loading="lazy">`
           : `<div class="deal-shoe-thumb-placeholder"><i data-lucide="image"></i></div>`;
         const pillCls = discountPillClass(d.pct);
+        const nm = name.toLowerCase();
+        const cons = cgaRows.find(r => nm.includes((r.brand || '').toLowerCase()) && nm.includes((r.model || '').toLowerCase()));
+        const consBadge = cons && cons.avg_mileage_km
+          ? `<div style="font-size:10px;margin-top:2px"><span class="cs-mini-pill" title="Community consensus durability — deal price ÷ avg tracked mileage">Avg ${Math.round(cons.avg_mileage_km)} km · £${(d.price_cents / 100 / Math.max(cons.avg_mileage_km, 1)).toFixed(2)}/km w/ deal</span></div>`
+          : '';
         return `<tr>
-          <td style="display:flex;align-items:center;gap:10px;">${thumb}<span style="font-weight:500;">${escapeHtml(name)}</span></td>
+          <td style="display:flex;align-items:center;gap:10px;">${thumb}<span style="font-weight:500;">${escapeHtml(name)}${consBadge}</span></td>
           <td>${escapeHtml(d.retailer_name)}</td>
           <td style="color:var(--text-muted);text-decoration:line-through;">${fmtCents(d.msrp_cents, d.currency)}</td>
           <td style="font-weight:600;color:#10b981;">${fmtCents(d.price_cents, d.currency)}</td>
@@ -7698,12 +7713,18 @@
       { label: 'Discoveries', view: 'discovery-queue', icon: 'search', key: '3' },
       { label: 'Deals', view: 'deal-engine', icon: 'percent', key: '4' },
       { label: 'Shoe Lifespan', view: 'lifespan-insights', icon: 'skull', key: '5' },
+      { label: 'Consensus (/shoes)', view: 'consensus-manager', icon: 'bar-chart-2' },
+      { label: 'Creator Seeding', view: 'creator-seeding', icon: 'send' },
+      { label: 'Blog CMS', view: 'blog-cms', icon: 'edit-3' },
       { label: 'Duplicates', view: 'duplicate-resolver', icon: 'copy', key: '6' },
       { label: 'Brand Aliases', view: 'brand-normalization', icon: 'tag', key: '7' },
       { label: 'Audit Log', view: 'system-ledger', icon: 'file-text', key: '8' },
       { label: 'System', view: 'system-health', icon: 'heart', key: '9' },
       { label: 'User Lookup', view: 'user-support', icon: 'user' },
       { label: 'Cohorts', view: 'user-cohorts', icon: 'target' },
+      { label: '＋ New Manual Creator', icon: 'user-plus', act: () => { navigate('creator-seeding'); csManualOpen(); } },
+      { label: '＋ New Blog Post', icon: 'edit-3', act: () => { navigate('blog-cms'); setTimeout(bcNewPost, 60); } },
+      { label: '🚀 Rebuild Static SEO', icon: 'rocket', act: () => ghTriggerSeo() },
     ];
     let cmdSelectedIdx = 0;
     let cmdFiltered = [...CMD_ITEMS];
@@ -7713,7 +7734,11 @@
       overlay.classList.add('open');
       const input = document.getElementById('cmd-input');
       input.value = '';
-      cmdFiltered = [...CMD_ITEMS];
+      /* lazily warm the searchable datasets */
+      if (!csLeads.length) loadCreatorLeads();
+      if (!cgaRows.length) loadConsensusAdmin();
+      if (!bcPosts.length) loadBlogPosts();
+      cmdFiltered = cmdBuildItems('');
       cmdSelectedIdx = 0;
       renderCmdResults();
       setTimeout(() => input.focus(), 50);
@@ -7721,9 +7746,19 @@
     function closeCmdPalette() {
       document.getElementById('cmd-overlay').classList.remove('open');
     }
+    function cmdBuildItems(q) {
+      const items = CMD_ITEMS.filter(item => item.label.toLowerCase().includes(q));
+      if (!q) return items;
+      (csLeads || []).filter(l => (l.creator_name || '').toLowerCase().includes(q)).slice(0, 6)
+        .forEach(l => items.push({ label: `👟 ${l.creator_name}`, icon: 'send', act: () => { navigate('creator-seeding'); csSelectLead(l.id); } }));
+      (cgaRows || []).filter(r => (`${r.brand} ${r.model}`).toLowerCase().includes(q)).slice(0, 6)
+        .forEach(r => items.push({ label: `📊 ${r.brand} ${r.model}`, icon: 'bar-chart-2', act: () => { navigate('consensus-manager'); setTimeout(() => { document.getElementById('cga-search').value = `${r.brand} ${r.model}`; cgaRender(); }, 60); } }));
+      (bcPosts || []).filter(p => (p.title || '').toLowerCase().includes(q)).slice(0, 6)
+        .forEach(p => items.push({ label: `📝 ${p.title}`, icon: 'file-text', act: () => { navigate('blog-cms'); setTimeout(() => bcEdit(p.id), 80); } }));
+      return items;
+    }
     function filterCmdResults(query) {
-      const q = query.toLowerCase();
-      cmdFiltered = CMD_ITEMS.filter(item => item.label.toLowerCase().includes(q));
+      cmdFiltered = cmdBuildItems(query.toLowerCase().trim());
       cmdSelectedIdx = 0;
       renderCmdResults();
     }
@@ -7750,7 +7785,10 @@
     }
     function executeCmdItem(idx) {
       const item = cmdFiltered[idx];
-      if (item) { closeCmdPalette(); navigate(item.view); }
+      if (!item) return;
+      closeCmdPalette();
+      if (item.act) item.act();
+      else navigate(item.view);
     }
 
     /* ═══════════════════════════════════════════════════
@@ -8303,14 +8341,19 @@
         <button class="cs-pill ${csSort === 'newest' ? 'active' : ''}" onclick="csSetSort('newest')">Newest</button>
         <button class="cs-pill ${csConsensusOpen ? 'active' : ''}" onclick="csToggleConsensus()" style="margin-left:auto">📊 Consensus ${csConsensusOpen ? '▾' : '▸'}</button>
         ${csConsensusOpen ? `<div style="flex-basis:100%">${csRenderConsensus()}</div>` : ''}
-        <div style="flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11px">
+        <div style="flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11px;align-items:center">
           ${(() => {
             const c = st => csLeads.filter(l => l.status === st).length;
-            const n = { discovered: csLeads.length, pending: c('pending_review'), contacted: c('contacted') + c('replied'), replied: c('replied'), claimed: c('claimed') };
-            const installs = csLeads.reduce((a, l) => a + (l.attributed_installs || 0), 0);
+            const contacted = csLeads.filter(l => ['contacted', 'replied', 'claimed'].includes(l.status));
+            const n = { total: csLeads.length, contacted: contacted.length, viewed: contacted.filter(l => (l.snapshot_views || 0) > 0).length, replied: c('replied') + c('claimed'), claimed: c('claimed') };
             const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
-            const steps = [['Discovered', n.discovered, null], ['Pending', n.pending, pct(n.pending, n.discovered)], ['Contacted', n.contacted, pct(n.contacted, n.pending)], ['Replied', n.replied, pct(n.replied, n.contacted)], ['Claimed', n.claimed, pct(n.claimed, n.replied)], ['Installs', installs, null]];
-            return steps.map(([l, v, r]) => `<span class="cs-mini-pill">${l} <b>${v}</b>${r ? ` <span style="opacity:.6">(${r})</span>` : ''}</span>`).join('<span style="color:var(--text-muted)">→</span>');
+            const steps = [['Total Leads', n.total, null], ['Contacted', n.contacted, pct(n.contacted, n.total)], ['👀 Viewed', n.viewed, pct(n.viewed, n.contacted) + ' of contacted'], ['Replied', n.replied, pct(n.replied, n.contacted)], ['Claimed', n.claimed, pct(n.claimed, n.contacted)]];
+            /* best contacted_via channel by view rate */
+            const byChan = {};
+            contacted.forEach(l => { const v = l.contacted_via || 'unknown'; byChan[v] = byChan[v] || { n: 0, views: 0 }; byChan[v].n++; if ((l.snapshot_views || 0) > 0) byChan[v].views++; });
+            const best = Object.entries(byChan).filter(([, v]) => v.n >= 2).sort((a, b) => b[1].views / b[1].n - a[1].views / a[1].n)[0];
+            return steps.map(([l, v, r]) => `<span class="cs-mini-pill">${l} <b>${v}</b>${r ? ` <span style="opacity:.6">(${r})</span>` : ''}</span>`).join('<span style="color:var(--text-muted)">→</span>')
+              + (best ? `<span class="cs-mini-pill" style="background:#dcfce7;color:#166534;font-weight:700" title="Best channel by snapshot view rate">★ best: ${best[0].replace('_', ' ')} · ${Math.round(best[1].views / best[1].n * 100)}% viewed</span>` : '');
           })()}
         </div>`;
     }
@@ -8724,6 +8767,76 @@
       }
     }
 
+    /* ── Telemetry-driven blog draft generator ── */
+    async function bcEnsureConsensus() {
+      if (!cgaRows.length) await loadConsensusAdmin();
+      return cgaRows;
+    }
+    function bcFillDraft(d) {
+      bcEditing = null;
+      document.getElementById('bc-title').value = d.title;
+      document.getElementById('bc-slug').value = d.slug;
+      document.getElementById('bc-excerpt').value = d.excerpt;
+      bcShowEditor(d.html);
+      document.getElementById('bc-modal-title').innerHTML = '<i data-lucide="sparkles"></i> Data Draft — review &amp; publish';
+      document.getElementById('bc-overlay').classList.add('open');
+      if (window.lucide) lucide.createIcons();
+    }
+    const bcShoeLink = r => `<a href="https://www.treadleft.app/shoes">${escapeHtml(r.brand)} ${escapeHtml(r.model)}</a>`;
+    const bcQuotes = r => (r.quote_details || []).slice(0, 2).map(q =>
+      `<blockquote>“${escapeHtml(q.note || '')}” — <a href="https://www.treadleft.app/snapshot/${q.snapshot_slug}">${escapeHtml(q.creator_name)}</a>, ${Math.round(q.mileage_km || 0)} km logged</blockquote>`).join('');
+    function bcStatLine(r) {
+      return `<p><strong>${Math.round(r.avg_mileage_km || 0)} km</strong> community average · <strong>£${Number(r.avg_cost_per_km || 0).toFixed(2)}/km</strong> real cost · ${r.mention_count} creator mention${r.mention_count === 1 ? '' : 's'}${r.min_mileage_km !== r.max_mileage_km ? ` · range ${r.min_mileage_km}–${r.max_mileage_km} km` : ''}</p>`;
+    }
+    async function bcGenDraft(type) {
+      if (!type) return;
+      const rows = await bcEnsureConsensus();
+      if (!rows.length) { showToast('No consensus data yet', 'error'); return; }
+      if (type === 'value') {
+        const top = [...rows].filter(r => (r.avg_mileage_km || 0) >= 300).sort((a, b) => a.avg_cost_per_km - b.avg_cost_per_km).slice(0, 5);
+        if (!top.length) { showToast('No shoes with 300+ km yet', 'error'); return; }
+        bcFillDraft({
+          title: `The 5 Best-Value Running Shoes Right Now (Real £/km Data)`,
+          slug: 'best-value-running-shoes-cost-per-km',
+          excerpt: `Ranked by real cost per kilometre from tracked runner data — the shoes delivering the most miles per pound in ${new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.`,
+          html: `<p>Sticker price is a lie. What matters is <strong>cost per kilometre</strong> — what each shoe actually costs you over its usable life. We pulled the numbers from the <a href="https://www.treadleft.app/shoes">TreadLeft Shoe Durability Leaderboard</a>, built from real tracked mileage by running creators. Here are the five best-value trainers with 300+ km of community data behind them.</p>`
+            + top.map((r, i) => `<h2>${i + 1}. ${escapeHtml(r.brand)} ${escapeHtml(r.model)} — £${Number(r.avg_cost_per_km).toFixed(2)}/km</h2>${bcStatLine(r)}${bcQuotes(r)}`).join('')
+            + `<p>See the full live rankings — updated as creators log more kilometres — on the <a href="https://www.treadleft.app/shoes">TreadLeft Leaderboard</a>. Track your own shoes' £/km automatically from Strava with <a href="https://www.treadleft.app">TreadLeft</a>.</p>`,
+        });
+      } else if (type === 'brands') {
+        const counts = {};
+        rows.forEach(r => { counts[r.brand] = (counts[r.brand] || 0) + 1; });
+        const top2 = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([b]) => b);
+        const b1 = prompt('Brand A:', top2[0] || 'ASICS'); if (!b1) return;
+        const b2 = prompt('Brand B:', top2[1] || 'Saucony'); if (!b2) return;
+        const A = rows.filter(r => (r.brand || '').toLowerCase() === b1.trim().toLowerCase());
+        const B = rows.filter(r => (r.brand || '').toLowerCase() === b2.trim().toLowerCase());
+        if (!A.length || !B.length) { showToast(`Need consensus rows for both "${b1}" and "${b2}"`, 'error'); return; }
+        const avg = (arr, f) => arr.reduce((a, r) => a + Number(f(r) || 0), 0) / arr.length;
+        const sec = (brand, arr) => `<h2>${escapeHtml(brand)}</h2><p><strong>${avg(arr, r => r.avg_mileage_km).toFixed(0)} km</strong> average lifespan · <strong>£${avg(arr, r => r.avg_cost_per_km).toFixed(2)}/km</strong> average real cost across ${arr.length} tracked model${arr.length === 1 ? '' : 's'}.</p><ul>${arr.map(r => `<li>${bcShoeLink(r)} — ${Math.round(r.avg_mileage_km)} km · £${Number(r.avg_cost_per_km).toFixed(2)}/km</li>`).join('')}</ul>`;
+        bcFillDraft({
+          title: `${b1.trim()} vs ${b2.trim()}: Which Brand's Shoes Actually Last Longer?`,
+          slug: `${bcSlugify(b1)}-vs-${bcSlugify(b2)}-durability`,
+          excerpt: `Real tracked-mileage data comparing ${b1.trim()} and ${b2.trim()} — average lifespan, cost per kilometre, and which models go the distance.`,
+          html: `<p>Marketing claims are cheap. Tracked mileage isn't. Using live data from the <a href="https://www.treadleft.app/shoes">TreadLeft Shoe Durability Leaderboard</a>, we put <strong>${escapeHtml(b1.trim())}</strong> and <strong>${escapeHtml(b2.trim())}</strong> head-to-head on the only metric that matters: how far they actually run.</p>`
+            + sec(b1.trim(), A) + sec(b2.trim(), B)
+            + `<p>The verdict? Check the live numbers yourself — they update daily as creators log more kilometres on the <a href="https://www.treadleft.app/shoes">leaderboard</a>.</p>`,
+        });
+      } else if (type === 'workhorses') {
+        const big = [...rows].filter(r => (r.avg_mileage_km || 0) >= 500).sort((a, b) => b.avg_mileage_km - a.avg_mileage_km);
+        if (!big.length) { showToast('No 500+ km shoes in consensus yet', 'error'); return; }
+        bcFillDraft({
+          title: `The 500km Club: Running Shoes That Refuse to Die`,
+          slug: 'running-shoes-500km-durability',
+          excerpt: `${big.length} shoe${big.length === 1 ? '' : 's'} in our community dataset average 500+ tracked kilometres — these are the workhorses worth your money.`,
+          html: `<p>Most running shoes are retired between 400–600 km. These ones just keep going. Every shoe below averages <strong>500+ tracked kilometres</strong> on the <a href="https://www.treadleft.app/shoes">TreadLeft Leaderboard</a> — real mileage logged by real runners, not lab estimates.</p>`
+            + big.map((r, i) => `<h2>${i + 1}. ${escapeHtml(r.brand)} ${escapeHtml(r.model)} — ${Math.round(r.avg_mileage_km)} km avg</h2>${bcStatLine(r)}${bcQuotes(r)}`).join('')
+            + `<p>Wondering how your own shoes compare? Track mileage and £/km automatically from Strava with <a href="https://www.treadleft.app">TreadLeft</a>.</p>`,
+        });
+      }
+      showToast('Data draft generated — review, then Publish', 'success');
+    }
+
     function renderCsInspector() {
       const el = document.getElementById('cs-inspector');
       const lead = csLeads.find(l => l.id === csSelectedId);
@@ -8841,9 +8954,11 @@
         showToast(`Scout done: ${s.inserted || 0} lead(s) added, ${s.discovered || 0} discovered, ${s.skipped || 0} skipped`, 'success');
         if (s.errors && s.errors.length) console.warn('[scout] errors:', s.errors);
         await loadCreatorLeads();
+        return s;
       } catch (err) {
         console.error('Scout error:', err);
         showToast('Scout failed: ' + (err.message || 'Unknown error'), 'error');
+        return null;
       } finally {
         csScoutBusy = false;
         if (btn) btn.disabled = false;
@@ -8851,11 +8966,13 @@
       }
     }
 
-    function csAnalyzeManual() {
+    async function csAnalyzeManual() {
       const input = document.getElementById('cs-manual-url');
       const url = (input.value || '').trim();
       if (!url) { showToast('Paste a YouTube URL first', 'error'); return; }
-      csTriggerScout({ manualVideoUrl: url, token: ADMIN_TOKEN }, 'cs-analyze-btn');
+      const s = await csTriggerScout({ video_url: url, token: ADMIN_TOKEN }, 'cs-analyze-btn');
+      const leadId = s && s.leads && s.leads[0] ? (s.leads[0].id || s.leads[0].merged_into) : null;
+      if (leadId) { csSelectedId = leadId; input.value = ''; renderCsQueue(); renderCsInspector(); }
     }
 
     function csRunAutoScout() {
