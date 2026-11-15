@@ -2855,6 +2855,10 @@
     .cs-shoe-meta { color: var(--text-muted); white-space: nowrap; }
     .cs-shoe-cost { font-weight: 700; color: #d97706; white-space: nowrap; }
     .cs-shoe-notes { font-size: 11px; color: var(--text-muted); font-style: italic; padding-left: 18px; padding-bottom: 6px; }
+    .cs-shoe-edit { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0; border-top: 1px solid var(--border-subtle); align-items: center; }
+    .cs-shoe-edit:first-of-type { border-top: none; }
+    .cs-shoe-in { font-size: 11px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-surface); color: var(--text-primary); min-width: 0; }
+    .cs-shoe-in:focus { border-color: #f97316; outline: none; }
 
     .cs-kv { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .cs-kv-label { font-weight: 600; color: var(--text-secondary); min-width: 92px; }
@@ -3333,6 +3337,7 @@
           <h2><i data-lucide="send"></i> Creator Seeding <span class="badge" id="cs-pending-badge">0 pending</span></h2>
           <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
             <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadCreatorLeads(true)"><i data-lucide="refresh-cw"></i> Refresh</button>
+            <button class="deal-btn-primary" style="flex:none" onclick="csManualOpen()"><i data-lucide="user-plus"></i> Add Creator</button>
           </div>
         </div>
 
@@ -3342,6 +3347,40 @@
           <button class="deal-btn-primary" id="cs-analyze-btn" onclick="csAnalyzeManual()"><i data-lucide="search"></i> Analyze Video</button>
           <button class="deal-btn-secondary" id="cs-scout-btn" onclick="csRunAutoScout()"><i data-lucide="bot"></i> Run Auto-Scout</button>
           <span class="cs-scout-status" id="cs-scout-status"></span>
+        </div>
+
+        <!-- Manual Creator modal -->
+        <div class="deal-modal-overlay" id="cs-manual-overlay" onclick="csManualOverlayClick(event)" role="dialog" aria-label="Add manual creator">
+          <div class="deal-modal">
+            <h3><i data-lucide="user-plus"></i> Add Manual Creator</h3>
+            <div class="deal-form-grid">
+              <div class="deal-form-group">
+                <label>Creator Name *</label>
+                <input id="cm-name" type="text" placeholder="e.g. Sarah Runs London">
+              </div>
+              <div class="deal-form-group">
+                <label>Platform / Channel URL</label>
+                <input id="cm-url" type="text" placeholder="instagram.com/…, tiktok.com/@…, strava.com/…">
+              </div>
+              <div class="deal-form-group">
+                <label>Contact Email / Handle</label>
+                <input id="cm-contact" type="text" placeholder="@handle or email">
+              </div>
+              <div class="deal-form-group">
+                <label>Subscribers / Followers</label>
+                <input id="cm-subs" type="number" min="0" placeholder="e.g. 12500">
+              </div>
+              <div class="deal-form-group full">
+                <label>Initial Rotation (up to 5 shoes)</label>
+                <div id="cm-shoes"></div>
+                <button class="deal-btn-secondary" style="margin-top:6px" onclick="csManualAddShoe()"><i data-lucide="plus"></i> Add Shoe</button>
+              </div>
+            </div>
+            <div class="deal-modal-actions" style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+              <button class="deal-btn-secondary" onclick="csManualClose()">Cancel</button>
+              <button class="deal-btn-primary" id="cm-save-btn" onclick="csCreateManualLead()"><i data-lucide="check"></i> Create Lead</button>
+            </div>
+          </div>
         </div>
 
         <!-- Status filter pills -->
@@ -8108,7 +8147,7 @@
       { key: 'all', label: 'All' },
       { key: 'pending_review', label: 'Pending Review' },
       { key: 'contacted', label: 'Contacted' },
-      { key: 'followup', label: '⏰ Follow Up' },
+      { key: 'followup', label: '⏰ Follow-Up Due (5d+)' },
       { key: 'replied', label: 'Replied' },
       { key: 'claimed', label: 'Claimed 🔥' },
       { key: 'dismissed', label: 'Dismissed' },
@@ -8167,7 +8206,7 @@
     function renderCsPills() {
       const el = document.getElementById('cs-pills');
       el.innerHTML = CS_FILTERS.map(f => {
-        const count = f.key === 'all' ? csLeads.length : csLeads.filter(l => l.status === f.key).length;
+        const count = f.key === 'all' ? csLeads.length : f.key === 'followup' ? csLeads.filter(csFollowupDue).length : csLeads.filter(l => l.status === f.key).length;
         const badge = f.key === 'pending_review' && count > 0 ? `<span class="cs-pill-count">${count}</span>` : (count ? `<span class="cs-pill-count">${count}</span>` : '');
         return `<button class="cs-pill ${csFilter === f.key ? 'active' : ''}" onclick="csSetFilter('${f.key}')">${f.label}${badge}</button>`;
       }).join('') + `
@@ -8195,11 +8234,23 @@
       renderCsQueue();
     }
 
+    /* contacted leads past their follow-up date OR untouched for 5+ days */
+    function csFollowupDue(l) {
+      if (l.status !== 'contacted') return false;
+      const now = Date.now();
+      if (l.follow_up_at && new Date(l.follow_up_at).getTime() <= now) return true;
+      const since = new Date(l.last_contacted_at || l.updated_at || l.created_at).getTime();
+      return since && (now - since) > 5 * 864e5;
+    }
+    function csRelTime(iso) {
+      const s = (Date.now() - new Date(iso).getTime()) / 1e3;
+      if (s < 3600) return Math.max(1, Math.round(s / 60)) + 'm';
+      if (s < 86400) return Math.round(s / 3600) + 'h';
+      if (s < 86400 * 14) return Math.round(s / 86400) + 'd';
+      return Math.round(s / 604800) + 'w';
+    }
     function csVisibleLeads() {
-      if (csFilter === 'followup') {
-        const now = Date.now();
-        return csLeads.filter(l => l.status === 'contacted' && l.follow_up_at && new Date(l.follow_up_at).getTime() <= now);
-      }
+      if (csFilter === 'followup') return csLeads.filter(csFollowupDue);
       const base = csFilter === 'all' ? csLeads : csLeads.filter(l => l.status === csFilter);
       if (csSort === 'score') return [...base].sort((a, b) => csLeadScore(b) - csLeadScore(a));
       return base;
@@ -8233,7 +8284,9 @@
             ${lead.attributed_installs > 0 ? `<span class="cs-installs">⬇ ${lead.attributed_installs} installs</span>` : ''}
             ${lead.rotation_confidence ? `<span class="cs-mini-pill" style="color:${lead.rotation_confidence === 'high' ? '#16a34a' : lead.rotation_confidence === 'medium' ? '#d97706' : '#64748b'}">◈ ${lead.rotation_confidence}</span>` : ''}
             ${lead.status === 'contacted' && lead.follow_up_at && new Date(lead.follow_up_at).getTime() <= Date.now() ? `<span class="cs-mini-pill" style="background:#fee2e2;color:#b91c1c">⏰ overdue</span>` : ''}
-            ${lead.snapshot_views > 0 ? `<span class="cs-mini-pill">👁 ${lead.snapshot_views}</span>` : ''}
+            ${lead.snapshot_views > 0 ? `<span class="cs-mini-pill" style="background:#dcfce7;color:#166534;font-weight:700">👀 Viewed ${lead.snapshot_views}×</span>` : ''}
+            ${lead.claimed_at ? `<span class="cs-mini-pill" style="background:#fef3c7;color:#b45309;font-weight:700">✓ Claimed</span>` : ''}
+            ${lead.last_contacted_at ? `<span class="cs-mini-pill" title="${escapeHtml(lead.last_contacted_at)}">Contacted ${csRelTime(lead.last_contacted_at)} ago${lead.contacted_via ? ` via ${lead.contacted_via.replace('_', ' ')}` : ''}</span>` : ''}
             ${lead.reply_sentiment === 'positive' ? `<span class="cs-mini-pill" style="background:#dcfce7;color:#166534">🔥 Hot Reply</span>` : lead.reply_sentiment === 'negative' ? `<span class="cs-mini-pill" style="color:#b91c1c">👎 negative</span>` : ''}
             <span class="cs-mini-pill" style="background:rgba(59,130,246,.12);color:#2563eb;font-weight:700" title="Lead score">${csLeadScore(lead)}</span>
             <span class="cs-status-badge" style="background:${meta.bg};color:${meta.fg}">${meta.label}</span>
@@ -8264,19 +8317,127 @@
       </div>`;
     }
 
-    function csShoeRow(shoe) {
-      const tier = shoe.status === 'critical' ? 'critical' : shoe.status === 'worn' ? 'worn' : 'fresh';
-      const notes = shoe.creator_notes ? `<div class="cs-shoe-notes">${escapeHtml(shoe.creator_notes)}</div>` : '';
-      return `
-        <div>
-          <div class="cs-shoe-row">
-            <span class="cs-tier-dot cs-tier-${tier}" title="${tier}"></span>
-            <span class="cs-shoe-name">${escapeHtml(shoe.brand)} ${escapeHtml(shoe.model)}</span>
-            <span class="cs-shoe-meta">${Math.round(shoe.mileage_km || 0)} km</span>
-            <span class="cs-shoe-cost">${csMoney(shoe.cost_per_km)}/km</span>
-          </div>
-          ${notes}
-        </div>`;
+    /* Editable extracted-shoe editor — edits live on lead._shoesDraft until Save */
+    const CS_SHOE_ROLES = ['', 'daily trainer', 'tempo', 'race day', 'recovery', 'trail', 'other'];
+    function csShoeDraftOf(lead) {
+      if (!lead._shoesDraft) lead._shoesDraft = JSON.parse(JSON.stringify(Array.isArray(lead.extracted_shoes) ? lead.extracted_shoes : []));
+      return lead._shoesDraft;
+    }
+    function csShoeEditRow(shoe, i) {
+      return `<div class="cs-shoe-edit">
+        <input class="cs-shoe-in" style="width:74px" value="${escapeHtml(shoe.brand || '')}" placeholder="Brand" oninput="csShoeEdit(${i},'brand',this.value)">
+        <input class="cs-shoe-in" style="flex:1;min-width:80px" value="${escapeHtml(shoe.model || '')}" placeholder="Model" oninput="csShoeEdit(${i},'model',this.value)">
+        <input class="cs-shoe-in" style="width:60px" type="number" min="0" value="${shoe.mileage_km ?? ''}" placeholder="km" oninput="csShoeEdit(${i},'mileage_km',this.value)">
+        <input class="cs-shoe-in" style="width:58px" type="number" min="0" value="${shoe.rrp_gbp ?? ''}" placeholder="£RRP" oninput="csShoeEdit(${i},'rrp_gbp',this.value)">
+        <select class="cs-shoe-in" style="width:88px" onchange="csShoeEdit(${i},'role',this.value)">
+          ${CS_SHOE_ROLES.map(r => `<option value="${r}" ${String(shoe.role || '') === r ? 'selected' : ''}>${r || 'role…'}</option>`).join('')}
+        </select>
+        <button class="cs-copy-btn" style="color:#dc2626" title="Remove shoe" onclick="csShoeRemove(${i})"><i data-lucide="trash-2" style="width:13px;height:13px"></i></button>
+        <input class="cs-shoe-in" style="flex-basis:100%" value="${escapeHtml(shoe.sentiment_notes || shoe.creator_notes || '')}" placeholder="Notes / why they rate it…" oninput="csShoeEdit(${i},'sentiment_notes',this.value)">
+      </div>`;
+    }
+    function csLeadOf() { return csLeads.find(l => l.id === csSelectedId); }
+    function csShoeEdit(i, field, value) {
+      const lead = csLeadOf(); if (!lead) return;
+      const draft = csShoeDraftOf(lead);
+      if (!draft[i]) return;
+      draft[i][field] = field === 'mileage_km' || field === 'rrp_gbp' ? (value === '' ? null : Number(value)) : value;
+      lead._shoesDirty = true;
+      const btn = document.getElementById('cs-shoes-save'); if (btn) btn.style.display = '';
+    }
+    function csShoeRemove(i) {
+      const lead = csLeadOf(); if (!lead) return;
+      csShoeDraftOf(lead).splice(i, 1);
+      lead._shoesDirty = true;
+      renderCsInspector();
+    }
+    function csShoeAdd() {
+      const lead = csLeadOf(); if (!lead) return;
+      csShoeDraftOf(lead).push({ brand: '', model: '', mileage_km: null, rrp_gbp: null, role: '', sentiment_notes: '' });
+      lead._shoesDirty = true;
+      renderCsInspector();
+    }
+    async function csSaveShoes() {
+      const lead = csLeadOf(); if (!lead) return;
+      const cleaned = (lead._shoesDraft || [])
+        .filter(s => (s.brand || '').trim() || (s.model || '').trim())
+        .map(s => ({ ...s, cost_per_km: +(Number(s.rrp_gbp || 0) / Math.max(Number(s.mileage_km) || 0, 1)).toFixed(2) }));
+      const { error } = await getSupabase().from('creator_seeding_leads').update({ extracted_shoes: cleaned }).eq('id', lead.id);
+      if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+      lead.extracted_shoes = cleaned; delete lead._shoesDraft; lead._shoesDirty = false;
+      renderCsQueue(); renderCsInspector();
+      showToast(`Saved ${cleaned.length} shoe${cleaned.length === 1 ? '' : 's'}`, 'success');
+    }
+
+    /* "+ Add Creator" manual lead modal — IG/TikTok/Strava creators outside the YouTube scout */
+    let csManualShoes = [];
+    function csManualOpen() {
+      csManualShoes = [{}];
+      document.getElementById('cs-manual-overlay').classList.add('open');
+      csManualRenderShoes();
+      if (window.lucide) lucide.createIcons();
+    }
+    function csManualClose() { document.getElementById('cs-manual-overlay').classList.remove('open'); }
+    function csManualOverlayClick(e) { if (e.target.id === 'cs-manual-overlay') csManualClose(); }
+    function csManualAddShoe() {
+      if (csManualShoes.length >= 5) { showToast('Max 5 shoes', 'error'); return; }
+      csManualShoes.push({});
+      csManualRenderShoes();
+    }
+    function csManualRenderShoes() {
+      document.getElementById('cm-shoes').innerHTML = csManualShoes.map((s, i) => `
+        <div class="cs-shoe-edit" style="padding:6px 0">
+          <input class="cs-shoe-in" style="width:80px" placeholder="Brand" value="${escapeHtml(s.brand || '')}" oninput="csManualShoes[${i}].brand=this.value">
+          <input class="cs-shoe-in" style="flex:1;min-width:80px" placeholder="Model" value="${escapeHtml(s.model || '')}" oninput="csManualShoes[${i}].model=this.value">
+          <input class="cs-shoe-in" style="width:64px" type="number" min="0" placeholder="km" value="${s.mileage_km ?? ''}" oninput="csManualShoes[${i}].mileage_km=this.value===''?null:Number(this.value)">
+          <input class="cs-shoe-in" style="width:60px" type="number" min="0" placeholder="£RRP" value="${s.rrp_gbp ?? ''}" oninput="csManualShoes[${i}].rrp_gbp=this.value===''?null:Number(this.value)">
+          <input class="cs-shoe-in" style="flex-basis:100%" placeholder="Notes…" value="${escapeHtml(s.sentiment_notes || '')}" oninput="csManualShoes[${i}].sentiment_notes=this.value">
+        </div>`).join('');
+    }
+    function csSlugify(s) { return (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12) || 'creator'; }
+    function csRand(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join(''); }
+    async function csCreateManualLead() {
+      const name = document.getElementById('cm-name').value.trim();
+      if (!name) { showToast('Creator name is required', 'error'); return; }
+      const urlRaw = document.getElementById('cm-url').value.trim();
+      const contact = document.getElementById('cm-contact').value.trim();
+      const subs = parseInt(document.getElementById('cm-subs').value, 10) || null;
+      const platform = /instagram/i.test(urlRaw + contact) ? 'instagram' : /tiktok/i.test(urlRaw + contact) ? 'tiktok' : /strava/i.test(urlRaw + contact) ? 'strava' : /youtube|youtu\.be/i.test(urlRaw + contact) ? 'youtube' : 'manual';
+      const slug = csSlugify(name) + '-' + csRand(6);
+      const vipCode = 'TL-' + csSlugify(name).toUpperCase().slice(0, 10) + '-' + csRand(3).toUpperCase();
+      const shoes = csManualShoes
+        .filter(s => (s.brand || '').trim() || (s.model || '').trim())
+        .map(s => ({ brand: s.brand || '', model: s.model || '', mileage_km: s.mileage_km || 0, rrp_gbp: s.rrp_gbp || null, role: '', sentiment_notes: s.sentiment_notes || '', cost_per_km: +(Number(s.rrp_gbp || 0) / Math.max(Number(s.mileage_km) || 0, 1)).toFixed(2) }));
+      const totalKm = shoes.reduce((a, s) => a + (s.mileage_km || 0), 0);
+      const avgCost = shoes.length ? shoes.reduce((a, s) => a + s.cost_per_km, 0) / shoes.length : 0;
+      const best = [...shoes].sort((a, b) => a.cost_per_km - b.cost_per_km)[0];
+      const pitch = `Love what you're building with your running content! We featured your shoe notes + attribution on the live TreadLeft Running Shoe Durability Leaderboard (https://www.treadleft.app/shoes). Your pre-loaded Fleet Card: https://treadleft.app/snapshot/${slug} — your rotation is already there to import in 1 tap (import code ${vipCode}), then Strava auto-tracks mileage and 48h foam recovery.`;
+      const row = {
+        creator_name: name,
+        platform,
+        source_url: urlRaw || `manual://${slug}`,
+        video_title: `Manual add — ${platform}`,
+        contact_info: contact || null,
+        subscriber_count: subs,
+        extracted_shoes: shoes,
+        fleet_summary: { total_shoes: shoes.length, total_km: totalKm, avg_cost_per_km: +avgCost.toFixed(2), health_score: 80, best_roi_shoe: best ? `${best.brand} ${best.model}`.trim() : null, best_roi_value: best ? best.cost_per_km : null },
+        rotation_confidence: 'high',
+        snapshot_slug: slug,
+        vip_code: vipCode,
+        draft_outreach_text: pitch,
+        status: 'pending_review',
+      };
+      const btn = document.getElementById('cm-save-btn');
+      btn.disabled = true;
+      const { data, error } = await getSupabase().from('creator_seeding_leads').insert(row).select().single();
+      btn.disabled = false;
+      if (error) { showToast('Create failed: ' + error.message, 'error'); return; }
+      csLeads.unshift(data);
+      csSelectedId = data.id;
+      csManualClose();
+      ['cm-name', 'cm-url', 'cm-contact', 'cm-subs'].forEach(id => document.getElementById(id).value = '');
+      renderCsPills(); renderCsQueue(); renderCsInspector(); csUpdateBadges();
+      showToast(`Creator "${name}" added`, 'success');
     }
 
     function renderCsInspector() {
@@ -8303,6 +8464,11 @@
             </div>
             ${snapshotUrl ? `<a href="${snapshotUrl}" target="_blank" rel="noopener" style="color:var(--text-muted)" title="Open public snapshot"><i data-lucide="external-link" style="width:16px;height:16px"></i></a>` : ''}
           </div>
+          ${lead.snapshot_views > 0 || lead.claimed_at ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+            ${lead.snapshot_views > 0 ? `<span class="cs-mini-pill" style="background:#dcfce7;color:#166534;font-weight:700">👀 Viewed ${lead.snapshot_views}×</span>` : ''}
+            ${lead.claimed_at ? `<span class="cs-mini-pill" style="background:#fef3c7;color:#b45309;font-weight:700">✓ Claimed ${csRelTime(lead.claimed_at)} ago</span>` : ''}
+            ${lead.last_contacted_at ? `<span class="cs-mini-pill">Contacted ${csRelTime(lead.last_contacted_at)} ago${lead.contacted_via ? ` via ${lead.contacted_via.replace('_', ' ')}` : ''}</span>` : ''}
+          </div>` : lead.last_contacted_at ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><span class="cs-mini-pill">Contacted ${csRelTime(lead.last_contacted_at)} ago${lead.contacted_via ? ` via ${lead.contacted_via.replace('_', ' ')}` : ''}</span></div>` : ''}
           <div class="cs-fleet-stats">
             ${csRing(fs.health_score || 0)}
             <div class="cs-fleet-stat"><div class="cs-fleet-stat-v">${fs.total_shoes || 0}</div><div class="cs-fleet-stat-l">Shoes</div></div>
@@ -8310,7 +8476,11 @@
             <div class="cs-fleet-stat"><div class="cs-fleet-stat-v">${csMoney(fs.avg_cost_per_km)}</div><div class="cs-fleet-stat-l">Avg /km</div></div>
           </div>
           ${fs.best_roi_shoe ? `<div class="cs-roi-callout">🏆 Best ROI: ${escapeHtml(fs.best_roi_shoe)} at ${csMoney(fs.best_roi_value)}/km</div>` : ''}
-          <div>${shoes.map(csShoeRow).join('') || '<div style="font-size:12px;color:#94a3b8">No shoes extracted</div>'}</div>
+          <div>${csShoeDraftOf(lead).map(csShoeEditRow).join('') || '<div style="font-size:12px;color:#94a3b8">No shoes — add them below</div>'}</div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="cs-btn" onclick="csShoeAdd()"><i data-lucide="plus"></i> Add Shoe</button>
+            <button class="cs-btn" id="cs-shoes-save" style="display:${lead._shoesDirty ? '' : 'none'};background:#dcfce7;color:#166534" onclick="csSaveShoes()"><i data-lucide="save"></i> Save Shoes</button>
+          </div>
         </div>
 
         <!-- 2. Editable Outreach Pitch & Quick Import -->
