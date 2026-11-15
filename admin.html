@@ -8313,13 +8313,13 @@
           <div>${shoes.map(csShoeRow).join('') || '<div style="font-size:12px;color:#94a3b8">No shoes extracted</div>'}</div>
         </div>
 
-        <!-- 2. Editable Outreach Pitch & VIP Code -->
+        <!-- 2. Editable Outreach Pitch & Quick Import -->
         <div class="cs-panel">
-          <div class="cs-panel-title"><i data-lucide="mail"></i> Outreach Pitch &amp; VIP Access</div>
+          <div class="cs-panel-title"><i data-lucide="mail"></i> Outreach Pitch &amp; Quick Import</div>
           <div class="cs-kv">
-            <span class="cs-kv-label">VIP Code</span>
+            <span class="cs-kv-label">1-Tap Import Code</span>
             <span class="cs-kv-value">${escapeHtml(lead.vip_code)}</span>
-            <button class="cs-copy-btn" onclick="csCopy('${escapeHtml(lead.vip_code)}','VIP code')">Copy</button>
+            <button class="cs-copy-btn" onclick="csCopy('${escapeHtml(lead.vip_code)}','Import code')">Copy</button>
           </div>
           <div class="cs-kv">
             <span class="cs-kv-label">Snapshot</span>

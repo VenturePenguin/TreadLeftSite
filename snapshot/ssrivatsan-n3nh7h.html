@@ -98,9 +98,9 @@
     <span class="shoe-km">500 km</span>
     <span class="shoe-cost">£0.36/km</span></div>
     <div class="shoe-notes">Said it features a top-notch ASICSGRIP outsole.</div></div></div>
-      <div class="vip"><div><div class="vip-label">Lifetime Pro code</div><div class="vip-code">TL-SSRIVATSAN-SX3</div></div><button class="dl-btn" style="border:0;cursor:pointer" onclick="claimRotation('TL-SSRIVATSAN-SX3')">Claim This Rotation (1-Tap)</button></div>
+      <div class="vip"><div><div class="vip-label">1-Tap import code</div><div class="vip-code">TL-SSRIVATSAN-SX3</div></div><button class="dl-btn" style="border:0;cursor:pointer" onclick="claimRotation('TL-SSRIVATSAN-SX3')">Import This Rotation (1-Tap)</button></div>
     </div>
-    <div class="cta"><p>Claim imports your full rotation — shoes, mileage &amp; cost/km — plus lifetime Pro.</p><a href="/">Get TreadLeft</a></div>
+    <div class="cta"><p>Is this your rotation? Import these shoes into TreadLeft in 1 tap — auto-tracks mileage &amp; 48h foam recovery via Strava.</p><a href="/">Get TreadLeft</a></div>
   </div>
   </div>
   <noscript>
@@ -227,9 +227,9 @@ function shoeRow(s) {
       </div>
       ${fs.best_roi_shoe ? `<div class="roi">🏆 Best ROI: ${esc(fs.best_roi_shoe)} at ${money(fs.best_roi_value)}/km</div>` : ''}
       <div>${shoes.map(shoeRow).join('')}</div>
-      ${lead.vip_code ? `<div class="vip"><div><div class="vip-label">Lifetime Pro code</div><div class="vip-code">${esc(lead.vip_code)}</div></div><button class="dl-btn" style="border:0;cursor:pointer" onclick="claimRotation('${esc(lead.vip_code)}')">Claim This Rotation (1-Tap)</button></div>` : ''}
+      ${lead.vip_code ? `<div class="vip"><div><div class="vip-label">1-Tap import code</div><div class="vip-code">${esc(lead.vip_code)}</div></div><button class="dl-btn" style="border:0;cursor:pointer" onclick="claimRotation('${esc(lead.vip_code)}')">Import This Rotation (1-Tap)</button></div>` : ''}
     </div>
-    <div class="cta"><p>Claim imports your full rotation — shoes, mileage &amp; cost/km — plus lifetime Pro.</p><a href="/">Get TreadLeft</a></div>`;
+    <div class="cta"><p>Is this your rotation? Import these shoes into TreadLeft in 1 tap — auto-tracks mileage &amp; 48h foam recovery via Strava.</p><a href="/">Get TreadLeft</a></div>`;
 })();
 </script>
 </body>
