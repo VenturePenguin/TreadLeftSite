@@ -1,14 +1,58 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Redirecting…</title></head>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TreadLeft</title>
+<style>
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f8fafc; color:#0f172a; }
+  .nav { position:sticky; top:0; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid #e2e8f0; padding:14px 20px; display:flex; align-items:center; gap:14px; font-size:14px; }
+  .nav a { color:#f97316; font-weight:600; text-decoration:none; }
+  .nav .spacer { flex:1; }
+  article { max-width:720px; margin:40px auto; padding:0 20px 60px; }
+  h1 { font-size:32px; font-weight:800; letter-spacing:-.02em; line-height:1.2; margin:0 0 10px; }
+  .excerpt { color:#475569; font-size:17px; margin-bottom:8px; }
+  .meta { color:#94a3b8; font-size:13px; margin-bottom:28px; }
+  .body { font-size:16px; line-height:1.75; color:#1e293b; }
+  .body img { max-width:100%; border-radius:12px; }
+  .body h2 { font-size:22px; font-weight:700; margin:28px 0 10px; }
+  .body h3 { font-size:18px; font-weight:700; margin:22px 0 8px; }
+  .body blockquote { border-left:3px solid #f97316; margin:14px 0; padding:6px 16px; color:#475569; }
+  .body a { color:#f97316; }
+</style>
+</head>
 <body>
+<div class="nav"><a href="/">← TreadLeft</a><span class="spacer"></span><a href="/shoes">Shoe Leaderboard</a><a href="/blog">Blog</a></div>
+<article id="post"><p style="color:#94a3b8">Loading…</p></article>
 <script>
-  // GitHub Pages serves this for unknown paths — route /snapshot/{slug}
-  // to the static snapshot page, everything else to the homepage.
+  // GitHub Pages serves this for unknown paths. Static files already exist for
+  // baked pages; this handles anything saved since the last daily build:
+  //   /snapshot/{slug} → dynamic snapshot template
+  //   /blog/{slug}     → render the post live from Supabase
   var m = location.pathname.match(/^\/snapshot\/([^/]+)\/?$/);
-  location.replace(m
-    ? '/snapshot.html?slug=' + encodeURIComponent(m[1]) + location.search + location.hash
-    : '/');
+  if (m) {
+    location.replace('/snapshot.html?slug=' + encodeURIComponent(m[1]) + location.search + location.hash);
+  } else {
+    var b = location.pathname.match(/^\/blog\/([^/]+)\/?$/);
+    if (!b) { location.replace('/'); }
+    else {
+      var SUPA = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co/rest/v1/blog_posts?slug=eq.'
+        + encodeURIComponent(b[1]) + '&status=eq.published&select=title,excerpt,content,published_at';
+      fetch(SUPA, { headers: { apikey: 'sb_publishable_BNR1EmmFbVi-Bs72NSnvzw_thlz3W6b' } })
+        .then(function (r) { return r.json(); })
+        .then(function (rows) {
+          var p = rows && rows[0];
+          if (!p) { location.replace('/blog'); return; }
+          document.title = p.title + ' | TreadLeft Blog';
+          document.getElementById('post').innerHTML =
+            '<h1>' + p.title.replace(/</g, '&lt;') + '</h1>'
+            + (p.excerpt ? '<p class="excerpt">' + p.excerpt.replace(/</g, '&lt;') + '</p>' : '')
+            + '<div class="meta">' + (p.published_at ? new Date(p.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '') + ' · TreadLeft</div>'
+            + '<div class="body">' + (p.content || '') + '</div>';
+        })
+        .catch(function () { location.replace('/blog'); });
+    }
+  }
 </script>
 </body>
 </html>

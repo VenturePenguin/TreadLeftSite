@@ -2859,6 +2859,19 @@
     .cs-shoe-edit:first-of-type { border-top: none; }
     .cs-shoe-in { font-size: 11px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-surface); color: var(--text-primary); min-width: 0; }
     .cs-shoe-in:focus { border-color: #f97316; outline: none; }
+    /* Blog CMS + Consensus admin */
+    .bc-table { width: 100%; border-collapse: collapse; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .bc-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
+    .bc-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); font-size: 13px; vertical-align: middle; }
+    .bc-table tr:last-child td { border-bottom: none; }
+    .bc-editor { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-surface); color: var(--text-primary); font-size: 14px; line-height: 1.6; overflow-y: auto; }
+    .bc-editor:focus { border-color: #f97316; outline: none; }
+    .bc-editor img { max-width: 100%; }
+    .bc-editor blockquote { border-left: 3px solid #f97316; margin: 8px 0; padding: 4px 12px; color: var(--text-muted); }
+    .cga-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface); font-size: 13px; }
+    .cga-row:first-child { border-radius: 12px 12px 0 0; }
+    .cga-row:last-child { border-bottom: none; border-radius: 0 0 12px 12px; }
+    .cga-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 
     .cs-kv { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .cs-kv-label { font-weight: 600; color: var(--text-secondary); min-width: 92px; }
@@ -2911,6 +2924,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="cmdk-hint" onclick="openCmdPalette()" title="Search"><kbd>⌘</kbd><kbd>K</kbd></span>
+        <button class="topbar-bell" onclick="ghTriggerSeo(event)" title="Rebuild static SEO pages — snapshots, blog, sitemap (Shift-click to update token)" aria-label="Rebuild static SEO"><i data-lucide="rocket" style="width:16px;height:16px"></i></button>
         <button class="topbar-bell" id="topbar-bell" onclick="toggleToastTray()" title="Notifications" aria-label="Notifications">
           <i data-lucide="bell" style="width:16px;height:16px"></i>
           <span class="bell-dot" id="topbar-bell-dot"></span>
@@ -2952,6 +2966,10 @@
           <span class="nav-icon"><i data-lucide="skull"></i></span>
           Shoe Lifespan
         </button>
+        <button class="nav-item" data-view="consensus-manager" onclick="navigate('consensus-manager')">
+          <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>
+          Consensus (/shoes)
+        </button>
       </div>
 
       <div class="sidebar-group" data-section="growth" style="margin-top:8px;">
@@ -2981,11 +2999,10 @@
 
       <div class="sidebar-group" data-section="content" style="margin-top:8px;">
         <div class="sidebar-section-label" onclick="toggleSidebarSection(this)">Content</div>
-        <a class="nav-item" href="https://treadleft-cms.netlify.app/admin/posts" target="_blank" rel="noopener" id="cms-link" title="Manage blog posts in the CMS">
+        <button class="nav-item" data-view="blog-cms" onclick="navigate('blog-cms')" title="Manage blog posts">
           <span class="nav-icon"><i data-lucide="edit-3"></i></span>
           Blog CMS
-          <span class="nav-icon" style="margin-left:auto;font-size:12px;opacity:.5"><i data-lucide="external-link"></i></span>
-        </a>
+        </button>
       </div>
 
       <div class="sidebar-group" data-section="system" style="margin-top:8px;">
@@ -3442,6 +3459,73 @@
       </div>
 
       <!-- VIEW: Cohorts CRM -->
+      <!-- VIEW: Consensus Leaderboard Manager -->
+      <div id="view-consensus-manager" class="view">
+        <div class="view-header">
+          <h2><i data-lucide="bar-chart-2"></i> Consensus Leaderboard <span style="font-size:12px;color:var(--text-muted);font-weight:400">powers /shoes — edits apply across creator rotations</span></h2>
+          <button class="batch-btn" style="flex:none;width:auto;padding:8px 16px" onclick="loadConsensusAdmin(true)"><i data-lucide="refresh-cw"></i> Refresh</button>
+        </div>
+        <div id="cga-kpis" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+        <input class="cs-input" id="cga-search" placeholder="Search brand or model…" oninput="cgaRender()" style="max-width:320px;margin-bottom:12px">
+        <div id="cga-list"><div class="cs-panel"><div class="empty"><p>Loading consensus…</p></div></div></div>
+      </div>
+
+      <!-- VIEW: Blog CMS -->
+      <div id="view-blog-cms" class="view">
+        <div class="view-header">
+          <h2><i data-lucide="edit-3"></i> Blog CMS</h2>
+          <button class="deal-btn-primary" style="margin-left:auto" onclick="bcNewPost()"><i data-lucide="plus"></i> New Post</button>
+        </div>
+        <div id="bc-list"><div class="cs-panel"><div class="empty"><p>Loading posts…</p></div></div></div>
+      </div>
+
+      <!-- Blog post editor modal -->
+      <div class="deal-modal-overlay" id="bc-overlay" onclick="bcOverlayClick(event)" role="dialog" aria-label="Edit blog post">
+        <div class="deal-modal" style="width:760px">
+          <h3 id="bc-modal-title"><i data-lucide="edit-3"></i> Edit Post</h3>
+          <div class="deal-form-grid">
+            <div class="deal-form-group">
+              <label>Title *</label>
+              <input id="bc-title" type="text" placeholder="Post title" oninput="bcAutoSlug()">
+            </div>
+            <div class="deal-form-group">
+              <label>Slug</label>
+              <input id="bc-slug" type="text" placeholder="url-friendly-slug">
+            </div>
+            <div class="deal-form-group full">
+              <label>Excerpt</label>
+              <input id="bc-excerpt" type="text" placeholder="1–2 sentence summary for cards &amp; SEO">
+            </div>
+            <div class="deal-form-group full">
+              <label>Content</label>
+              <div id="bc-toolbar" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+                <button class="cs-btn" onclick="bcCmd('formatBlock','<h2>')" title="Heading 2">H2</button>
+                <button class="cs-btn" onclick="bcCmd('formatBlock','<h3>')" title="Heading 3">H3</button>
+                <button class="cs-btn" onclick="bcCmd('formatBlock','<p>')" title="Paragraph">¶</button>
+                <button class="cs-btn" style="font-weight:800" onclick="bcCmd('bold')" title="Bold">B</button>
+                <button class="cs-btn" style="font-style:italic" onclick="bcCmd('italic')" title="Italic">I</button>
+                <button class="cs-btn" style="text-decoration:underline" onclick="bcCmd('underline')" title="Underline">U</button>
+                <button class="cs-btn" onclick="bcCmd('formatBlock','<blockquote>')" title="Blockquote">❝</button>
+                <button class="cs-btn" onclick="bcCmd('insertOrderedList')" title="Ordered list">1.</button>
+                <button class="cs-btn" onclick="bcCmd('insertUnorderedList')" title="Bullet list">•</button>
+                <button class="cs-btn" onclick="bcLink()" title="Insert link">🔗</button>
+                <button class="cs-btn" onclick="bcImage()" title="Insert image by URL">🖼</button>
+                <button class="cs-btn" onclick="bcCmd('removeFormat')" title="Clear formatting">⌫</button>
+                <button class="cs-btn" id="bc-src-btn" onclick="bcToggleSource()" title="Edit raw HTML">&lt;/&gt;</button>
+              </div>
+              <div id="bc-editor" class="bc-editor" contenteditable="true" style="min-height:280px"></div>
+              <textarea id="bc-source" class="bc-editor" style="display:none;min-height:280px;font-family:ui-monospace,monospace;font-size:12px"></textarea>
+            </div>
+          </div>
+          <div class="deal-modal-actions" style="display:flex;gap:10px;margin-top:20px">
+            <button class="deal-btn-secondary" onclick="bcClose()">← Back</button>
+            <span style="flex:1"></span>
+            <button class="deal-btn-secondary" onclick="bcSave('draft')">Save Draft</button>
+            <button class="deal-btn-primary" onclick="bcSave('published')"><i data-lucide="check"></i> Publish</button>
+          </div>
+        </div>
+      </div>
+
       <div id="view-user-cohorts" class="view">
         <div class="view-header">
           <h2><i data-lucide="target"></i> Cohorts</h2>
@@ -4190,7 +4274,8 @@
       'discovery-queue': 'Discoveries', 'deal-engine': 'Deals',
       'lifespan-insights': 'Shoe Lifespan', 'duplicate-resolver': 'Duplicates',
       'brand-normalization': 'Brand Aliases', 'system-ledger': 'Audit Log',
-      'creator-seeding': 'Creator Seeding',
+      'creator-seeding': 'Creator Seeding', 'consensus-manager': 'Consensus (/shoes)',
+      'blog-cms': 'Blog CMS',
       'system-health': 'System',
       'user-support': 'User Lookup', 'user-cohorts': 'Cohorts',
     };
@@ -4260,6 +4345,8 @@
         csLoaded = true;
         loadCreatorLeads();
       }
+      if (viewId === 'blog-cms') loadBlogPosts();
+      if (viewId === 'consensus-manager') loadConsensusAdmin();
       if (viewId === 'platform-pulse') loadTelemetry();
     }
 
@@ -8438,6 +8525,203 @@
       ['cm-name', 'cm-url', 'cm-contact', 'cm-subs'].forEach(id => document.getElementById(id).value = '');
       renderCsPills(); renderCsQueue(); renderCsInspector(); csUpdateBadges();
       showToast(`Creator "${name}" added`, 'success');
+    }
+
+    /* ── CONSENSUS (/shoes) MANAGER ── */
+    let cgaRows = [];
+    const cgaNorm = s => (s || '').toLowerCase().trim();
+    const cgaMatch = (s, brand, model) => cgaNorm(s.brand) === cgaNorm(brand) && cgaNorm(s.model) === cgaNorm(model);
+    async function loadConsensusAdmin(force) {
+      const el = document.getElementById('cga-list');
+      try {
+        const { data, error } = await getSupabase().rpc('get_creator_shoe_consensus');
+        if (error) throw error;
+        cgaRows = data || [];
+        const mentions = cgaRows.reduce((a, r) => a + (r.mention_count || 0), 0);
+        const avg = cgaRows.length ? cgaRows.reduce((a, r) => a + Number(r.avg_cost_per_km || 0), 0) / cgaRows.length : 0;
+        document.getElementById('cga-kpis').innerHTML = [
+          `${cgaRows.length} Models Ranked`, `${mentions} Creator Mentions`, `${csMoney(avg)} Avg £/km`,
+        ].map(t => `<span class="cs-mini-pill" style="font-weight:700">${t}</span>`).join('');
+        cgaRender();
+      } catch (e) {
+        el.innerHTML = `<div class="cs-panel"><div class="empty"><p>Error: ${escapeHtml(e.message)}</p></div></div>`;
+      }
+    }
+    function cgaRender() {
+      const q = cgaNorm(document.getElementById('cga-search').value);
+      const rows = cgaRows.filter(r => !q || cgaNorm(r.brand + ' ' + r.model).includes(q));
+      document.getElementById('cga-list').innerHTML = rows.length
+        ? `<div class="cga-wrap">${rows.map((r, i) => {
+            const idx = cgaRows.indexOf(r);
+            return `<div class="cga-row">
+              <span style="color:var(--text-muted);font-weight:700;width:26px">#${i + 1}</span>
+              <span style="font-weight:700;flex:1;min-width:140px">${escapeHtml(r.brand)} ${escapeHtml(r.model)}</span>
+              <span class="cs-mini-pill">${r.mention_count} mention${r.mention_count === 1 ? '' : 's'}</span>
+              <span class="cs-mini-pill">${Math.round(r.avg_mileage_km || 0)} km</span>
+              <span class="cs-mini-pill" style="color:#d97706;font-weight:700">${csMoney(r.avg_cost_per_km)}/km</span>
+              <button class="cs-copy-btn" title="Edit canonical RRP across all leads" onclick="cgaEditRrp(${idx})">£ RRP</button>
+              <button class="cs-copy-btn" title="Rename/merge model across all leads" onclick="cgaRename(${idx})">✎ Rename</button>
+              <button class="cs-copy-btn" style="color:#dc2626" title="Remove this model from all rotations" onclick="cgaPurge(${idx})">🗑 Purge</button>
+            </div>`;
+          }).join('')}</div>`
+        : '<div class="cs-panel"><div class="empty"><p>No models match</p></div></div>';
+    }
+    /* Apply fn(shoe)→shoe|null across every lead's extracted_shoes for a brand+model match */
+    async function cgaBulkApply(brand, model, fn, verb) {
+      const { data: leads, error } = await getSupabase().from('creator_seeding_leads').select('id,extracted_shoes');
+      if (error) { showToast('Load failed: ' + error.message, 'error'); return; }
+      let touched = 0;
+      for (const l of leads || []) {
+        const src = Array.isArray(l.extracted_shoes) ? l.extracted_shoes : [];
+        let changed = false;
+        const next = [];
+        for (const s of src) {
+          if (cgaMatch(s, brand, model)) { const r = fn(s); changed = true; if (r) next.push(r); }
+          else next.push(s);
+        }
+        if (!changed) continue;
+        const { error: ue } = await getSupabase().from('creator_seeding_leads').update({ extracted_shoes: next }).eq('id', l.id);
+        if (ue) { showToast('Update failed on a lead: ' + ue.message, 'error'); return; }
+        touched++;
+      }
+      csLeads.forEach(l => delete l._shoesDraft);
+      showToast(`${verb} applied to ${touched} lead${touched === 1 ? '' : 's'}`, 'success');
+      loadConsensusAdmin();
+    }
+    async function cgaEditRrp(i) {
+      const r = cgaRows[i]; if (!r) return;
+      const v = prompt(`New canonical RRP (£) for ${r.brand} ${r.model}:`, '140');
+      if (v === null) return;
+      const rrp = parseFloat(v);
+      if (!isFinite(rrp) || rrp <= 0) { showToast('Invalid RRP', 'error'); return; }
+      await cgaBulkApply(r.brand, r.model, s => ({ ...s, rrp_gbp: rrp, cost_per_km: +(rrp / Math.max(Number(s.mileage_km) || 0, 1)).toFixed(2) }), `RRP £${rrp}`);
+    }
+    async function cgaRename(i) {
+      const r = cgaRows[i]; if (!r) return;
+      const nb = prompt(`New brand for "${r.brand} ${r.model}":`, r.brand);
+      if (nb === null || !nb.trim()) return;
+      const nm = prompt(`New model for "${r.brand} ${r.model}" (merges duplicate split mentions):`, r.model);
+      if (nm === null || !nm.trim()) return;
+      await cgaBulkApply(r.brand, r.model, s => ({ ...s, brand: nb.trim(), model: nm.trim() }), `Renamed → ${nb.trim()} ${nm.trim()}`);
+    }
+    async function cgaPurge(i) {
+      const r = cgaRows[i]; if (!r) return;
+      if (!confirm(`Remove "${r.brand} ${r.model}" from every creator rotation? This cannot be undone.`)) return;
+      await cgaBulkApply(r.brand, r.model, () => null, `Purged "${r.brand} ${r.model}"`);
+    }
+
+    /* ── NATIVE BLOG CMS ── */
+    let bcPosts = [], bcEditing = null, bcSourceMode = false;
+    async function loadBlogPosts() {
+      const { data, error } = await getSupabase().from('blog_posts').select('*').order('updated_at', { ascending: false });
+      if (error) { showToast('Blog load failed: ' + error.message, 'error'); return; }
+      bcPosts = data || [];
+      bcRender();
+    }
+    function bcRender() {
+      const el = document.getElementById('bc-list');
+      if (!bcPosts.length) { el.innerHTML = '<div class="cs-panel"><div class="empty"><p>No posts yet — create your first.</p></div></div>'; return; }
+      el.innerHTML = `<table class="bc-table"><thead><tr><th>Title</th><th>Status</th><th>Updated</th><th style="text-align:right">Actions</th></tr></thead><tbody>` +
+        bcPosts.map(p => `<tr>
+          <td><b>${escapeHtml(p.title)}</b><div style="font-size:11px;color:var(--text-muted)">/blog/${escapeHtml(p.slug)}</div></td>
+          <td><span class="cs-mini-pill" style="${p.status === 'published' ? 'background:#dcfce7;color:#166534' : 'background:#fef3c7;color:#b45309'};font-weight:700">${p.status}</span></td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap">${new Date(p.updated_at).toLocaleDateString()}</td>
+          <td style="text-align:right;white-space:nowrap">
+            <button class="cs-copy-btn" onclick="bcEdit('${p.id}')">Edit</button>
+            ${p.status === 'published' ? `<a class="cs-copy-btn" href="/blog/${escapeHtml(p.slug)}" target="_blank" rel="noopener">View Live</a>` : ''}
+            <button class="cs-copy-btn" style="color:#dc2626" onclick="bcDelete('${p.id}')">Delete</button>
+          </td></tr>`).join('') + `</tbody></table>`;
+    }
+    function bcSlugify(s) { return (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+    function bcAutoSlug() { if (!bcEditing) document.getElementById('bc-slug').value = bcSlugify(document.getElementById('bc-title').value); }
+    function bcShowEditor(html) {
+      document.getElementById('bc-editor').innerHTML = html;
+      document.getElementById('bc-source').value = html;
+      bcSourceMode = false;
+      document.getElementById('bc-editor').style.display = '';
+      document.getElementById('bc-source').style.display = 'none';
+    }
+    function bcNewPost() {
+      bcEditing = null;
+      ['bc-title', 'bc-slug', 'bc-excerpt'].forEach(id => document.getElementById(id).value = '');
+      bcShowEditor('');
+      document.getElementById('bc-modal-title').innerHTML = '<i data-lucide="plus"></i> New Post';
+      document.getElementById('bc-overlay').classList.add('open');
+      if (window.lucide) lucide.createIcons();
+    }
+    function bcEdit(id) {
+      const p = bcPosts.find(x => x.id === id); if (!p) return;
+      bcEditing = p;
+      document.getElementById('bc-title').value = p.title;
+      document.getElementById('bc-slug').value = p.slug;
+      document.getElementById('bc-excerpt').value = p.excerpt || '';
+      bcShowEditor(p.content || '');
+      document.getElementById('bc-modal-title').innerHTML = '<i data-lucide="edit-3"></i> Edit Post';
+      document.getElementById('bc-overlay').classList.add('open');
+      if (window.lucide) lucide.createIcons();
+    }
+    function bcOverlayClick(e) { if (e.target.id === 'bc-overlay') bcClose(); }
+    function bcClose() { document.getElementById('bc-overlay').classList.remove('open'); }
+    function bcCmd(cmd, arg) { if (bcSourceMode) return; document.execCommand(cmd, false, arg || null); document.getElementById('bc-editor').focus(); }
+    function bcLink() { const u = prompt('Link URL:', 'https://'); if (u) bcCmd('createLink', u); }
+    function bcImage() { const u = prompt('Image URL:', 'https://'); if (u) bcCmd('insertImage', u); }
+    function bcToggleSource() {
+      const ed = document.getElementById('bc-editor'), src = document.getElementById('bc-source');
+      if (bcSourceMode) { ed.innerHTML = src.value; src.style.display = 'none'; ed.style.display = ''; }
+      else { src.value = ed.innerHTML; ed.style.display = 'none'; src.style.display = ''; }
+      bcSourceMode = !bcSourceMode;
+    }
+    function bcContent() { return bcSourceMode ? document.getElementById('bc-source').value : document.getElementById('bc-editor').innerHTML; }
+    async function bcSave(status) {
+      const title = document.getElementById('bc-title').value.trim();
+      const slug = bcSlugify(document.getElementById('bc-slug').value);
+      if (!title || !slug) { showToast('Title and slug are required', 'error'); return; }
+      const row = {
+        title, slug,
+        excerpt: document.getElementById('bc-excerpt').value.trim() || null,
+        content: bcContent(),
+        status,
+        updated_at: new Date().toISOString(),
+      };
+      if (status === 'published' && !(bcEditing && bcEditing.published_at)) row.published_at = new Date().toISOString();
+      let res;
+      if (bcEditing) res = await getSupabase().from('blog_posts').update(row).eq('id', bcEditing.id);
+      else res = await getSupabase().from('blog_posts').insert({ ...row, created_at: new Date().toISOString() });
+      if (res.error) { showToast('Save failed: ' + res.error.message, 'error'); return; }
+      bcClose();
+      showToast(status === 'published' ? `Published — live at /blog/${slug} (static page builds at 09:00 UTC or via 🚀 button)` : 'Draft saved', 'success');
+      loadBlogPosts();
+    }
+    async function bcDelete(id) {
+      const p = bcPosts.find(x => x.id === id); if (!p) return;
+      if (!confirm(`Delete "${p.title}" permanently?`)) return;
+      const { error } = await getSupabase().from('blog_posts').delete().eq('id', id);
+      if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
+      showToast('Post deleted', 'success');
+      loadBlogPosts();
+    }
+
+    /* ── 1-click static SEO rebuild via GitHub Actions workflow_dispatch ── */
+    async function ghTriggerSeo(e) {
+      if (e && e.shiftKey) { localStorage.removeItem('tl_gh_pat'); showToast('GitHub token cleared — click again to set a new one', 'success'); return; }
+      let pat = localStorage.getItem('tl_gh_pat');
+      if (!pat) {
+        pat = prompt('Enter a GitHub fine-grained PAT with actions:write on TreadLeftSite (stored in localStorage only):');
+        if (!pat) return;
+        localStorage.setItem('tl_gh_pat', pat.trim());
+      }
+      try {
+        const r = await fetch('https://api.github.com/repos/VenturePenguin/TreadLeftSite/actions/workflows/seo-sync.yml/dispatches', {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + pat.trim(), Accept: 'application/vnd.github+json' },
+          body: JSON.stringify({ ref: 'main' }),
+        });
+        if (r.status === 204) showToast('🚀 Static SEO build triggered on GitHub Actions (~45s to live)', 'success');
+        else if (r.status === 401 || r.status === 403) { localStorage.removeItem('tl_gh_pat'); showToast('GitHub auth failed — token cleared, click to re-enter', 'error'); }
+        else showToast('Trigger failed: HTTP ' + r.status, 'error');
+      } catch (err) {
+        showToast('Trigger failed: ' + err.message, 'error');
+      }
     }
 
     function renderCsInspector() {
