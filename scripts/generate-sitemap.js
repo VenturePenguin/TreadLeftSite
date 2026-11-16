@@ -6,7 +6,7 @@
 //   shoes.html             — leaderboard cards + KPIs + JSON-LD injected between markers
 // Run: node scripts/generate-sitemap.js   (then commit + push to publish)
 
-const { writeFileSync, readFileSync, mkdirSync } = require('fs');
+const { writeFileSync, readFileSync, mkdirSync, existsSync } = require('fs');
 const { join } = require('path');
 
 const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
@@ -467,6 +467,33 @@ ${urls.map(u => `  <url>
   writeFileSync(join(ROOT, 'sitemap.xml'), xml);
   console.log(`sitemap.xml: ${STATIC_PAGES.length} static + ${validPosts.length} blog + ${validLeads.length} snapshot URLs`);
   console.log(`generated: ${validPosts.length} blog pages + blog.html + ${validLeads.length} snapshot pages + shoes.html injection`);
+
+  // 5. Integrity gate: every <loc> must resolve to a physical .html file
+  // whose <link rel="canonical"> matches the loc byte-for-byte.
+  // Fails the build rather than shipping a sitemap Google can't index.
+  const locToFile = loc => (loc === '/' ? 'index.html' : loc.replace(/^\//, '') + '.html');
+  let bad = 0;
+  for (const u of urls) {
+    const loc = `${BASE}${u.loc}`;
+    const rel = locToFile(u.loc);
+    if (!existsSync(join(ROOT, rel))) {
+      console.error(`✗ 404 in sitemap: ${loc} → no file ${rel}`);
+      bad++;
+      continue;
+    }
+    const canon = (readFileSync(join(ROOT, rel), 'utf8').match(/rel="canonical"[^>]*href="([^"]+)"/)
+      || readFileSync(join(ROOT, rel), 'utf8').match(/href="([^"]+)"[^>]*rel="canonical"/) || [])[1];
+    if (canon !== loc) {
+      console.error(`✗ canonical mismatch: ${loc} ⇄ ${canon || '(none)'} (${rel})`);
+      bad++;
+    }
+  }
+  if (bad) {
+    console.error(`\nsitemap integrity: ${bad} problem(s) — refusing to ship a broken sitemap`);
+    process.exitCode = 1;
+  } else {
+    console.log(`✓ sitemap verified: ${urls.length}/${urls.length} URLs map to files with matching canonicals`);
+  }
 }
 
 main().catch(e => { console.error(e.message); process.exit(1); });
