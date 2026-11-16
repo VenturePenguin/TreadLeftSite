@@ -8347,7 +8347,7 @@
             const contacted = csLeads.filter(l => ['contacted', 'replied', 'claimed'].includes(l.status));
             const n = { total: csLeads.length, contacted: contacted.length, viewed: contacted.filter(l => (l.snapshot_views || 0) > 0).length, replied: c('replied') + c('claimed'), claimed: c('claimed') };
             const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
-            const steps = [['Total Leads', n.total, null], ['Contacted', n.contacted, pct(n.contacted, n.total)], ['👀 Viewed', n.viewed, pct(n.viewed, n.contacted) + ' of contacted'], ['Replied', n.replied, pct(n.replied, n.contacted)], ['Claimed', n.claimed, pct(n.claimed, n.contacted)]];
+            const steps = [['Total Leads', n.total, null], ['Contacted', n.contacted, pct(n.contacted, n.total)], ['👀 Viewed', n.viewed, pct(n.viewed, n.contacted) + ' of contacted'], ['Replied', n.replied, pct(n.replied, n.contacted)], ['Claimed', n.claimed, pct(n.claimed, n.contacted)], ['📲 Installs', csLeads.reduce((sum, l) => sum + Number(l.attributed_installs || 0), 0), null]];
             /* best contacted_via channel by view rate */
             const byChan = {};
             contacted.forEach(l => { const v = l.contacted_via || 'unknown'; byChan[v] = byChan[v] || { n: 0, views: 0 }; byChan[v].n++; if ((l.snapshot_views || 0) > 0) byChan[v].views++; });
@@ -8411,7 +8411,7 @@
             <span class="cs-mini-pill">👟 ${fs.total_shoes || 0} Shoes</span>
             <span class="cs-mini-pill">Avg ${csMoney(fs.avg_cost_per_km)}/km</span>
             <span class="cs-mini-pill">Health ${fs.health_score || 0}%</span>
-            ${lead.attributed_installs > 0 ? `<span class="cs-installs">⬇ ${lead.attributed_installs} installs</span>` : ''}
+            <span class="cs-installs">📲 ${Number(lead.attributed_installs || 0)} Installs</span>
             ${lead.rotation_confidence ? `<span class="cs-mini-pill" style="color:${lead.rotation_confidence === 'high' ? '#16a34a' : lead.rotation_confidence === 'medium' ? '#d97706' : '#64748b'}">◈ ${lead.rotation_confidence}</span>` : ''}
             ${lead.status === 'contacted' && lead.follow_up_at && new Date(lead.follow_up_at).getTime() <= Date.now() ? `<span class="cs-mini-pill" style="background:#fee2e2;color:#b91c1c">⏰ overdue</span>` : ''}
             ${lead.snapshot_views > 0 ? `<span class="cs-mini-pill" style="background:#dcfce7;color:#166534;font-weight:700">👀 Viewed ${lead.snapshot_views}×</span>` : ''}
@@ -8857,6 +8857,7 @@
           <div class="cs-fleet-head">
             <div>
               <div class="cs-fleet-creator">${escapeHtml(lead.creator_name)}</div>
+              <span class="cs-installs">📲 ${Number(lead.attributed_installs || 0)} Installs</span>
               <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${escapeHtml(lead.creator_handle || '')} · ${csFmtSubs(lead.subscriber_count)}</div>
             </div>
             ${snapshotUrl ? `<a href="${snapshotUrl}" target="_blank" rel="noopener" style="color:var(--text-muted)" title="Open public snapshot"><i data-lucide="external-link" style="width:16px;height:16px"></i></a>` : ''}
