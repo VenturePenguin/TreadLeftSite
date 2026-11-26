@@ -3517,12 +3517,13 @@
                 <button class="cs-btn" onclick="bcCmd('insertOrderedList')" title="Ordered list">1.</button>
                 <button class="cs-btn" onclick="bcCmd('insertUnorderedList')" title="Bullet list">•</button>
                 <button class="cs-btn" onclick="bcLink()" title="Insert link">🔗</button>
-                <button class="cs-btn" onclick="bcImage()" title="Insert image by URL">🖼</button>
+                <button class="cs-btn" id="bc-img-btn" onclick="bcImage()" title="Upload image">🖼</button>
                 <button class="cs-btn" onclick="bcCmd('removeFormat')" title="Clear formatting">⌫</button>
                 <button class="cs-btn" id="bc-src-btn" onclick="bcToggleSource()" title="Edit raw HTML">&lt;/&gt;</button>
               </div>
               <div id="bc-editor" class="bc-editor" contenteditable="true" style="min-height:280px"></div>
               <textarea id="bc-source" class="bc-editor" style="display:none;min-height:280px;font-family:ui-monospace,monospace;font-size:12px"></textarea>
+              <input type="file" id="bc-image-file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif" style="display:none" onchange="bcImageFileChosen(this)">
             </div>
           </div>
           <div class="deal-modal-actions" style="display:flex;gap:10px;margin-top:20px">
@@ -8707,7 +8708,83 @@
     function bcClose() { document.getElementById('bc-overlay').classList.remove('open'); }
     function bcCmd(cmd, arg) { if (bcSourceMode) return; document.execCommand(cmd, false, arg || null); document.getElementById('bc-editor').focus(); }
     function bcLink() { const u = prompt('Link URL:', 'https://'); if (u) bcCmd('createLink', u); }
-    function bcImage() { const u = prompt('Image URL:', 'https://'); if (u) bcCmd('insertImage', u); }
+    // Image insertion: opens a file picker, downscales large photos client-side,
+    // uploads to the public `blog-assets` Supabase Storage bucket, and inserts
+    // the resulting URL at the saved cursor position. Pasting a raw URL is still
+    // possible in source (</>) mode.
+    let bcSavedRange = null;
+    function bcSaveSelection() {
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) bcSavedRange = sel.getRangeAt(0).cloneRange();
+    }
+    function bcRestoreSelection() {
+      const ed = document.getElementById('bc-editor');
+      ed.focus();
+      if (!bcSavedRange) return;
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      try { sel.addRange(bcSavedRange); } catch (_) { ed.focus(); }
+    }
+    function bcImage() {
+      if (bcSourceMode) { showToast('Switch out of source mode to insert an image', 'error'); return; }
+      bcSaveSelection();
+      const input = document.getElementById('bc-image-file');
+      input.value = '';
+      input.click();
+    }
+    function bcLoadImage(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        const timer = setTimeout(() => { URL.revokeObjectURL(url); reject(new Error('Image decoding timed out — HEIC/HEIF may not be supported in this browser')); }, 15000);
+        img.onload = () => { clearTimeout(timer); resolve({ img, url }); };
+        img.onerror = () => { clearTimeout(timer); URL.revokeObjectURL(url); reject(new Error('Could not decode this image — if it is HEIC/HEIF (iPhone), export it as JPEG first')); };
+        img.src = url;
+      });
+    }
+    // Downscale to max 1600px edge and re-encode as JPEG (keeps blog posts small).
+    // GIFs are passed through untouched so animations survive.
+    async function bcProcessImage(file) {
+      if (file.type === 'image/gif') return { blob: file, ext: 'gif', contentType: 'image/gif' };
+      const { img, url } = await bcLoadImage(file);
+      try {
+        const maxDim = 1600;
+        const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('Image conversion failed')), 'image/jpeg', 0.85));
+        return { blob, ext: 'jpg', contentType: 'image/jpeg' };
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+    async function bcImageFileChosen(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const btn = document.getElementById('bc-img-btn');
+      btn.disabled = true;
+      showToast('Uploading image…', 'info');
+      try {
+        if (file.size > 20 * 1024 * 1024) { showToast('Image is over 20 MB — please use a smaller file', 'error'); return; }
+        const { blob, ext, contentType } = await bcProcessImage(file);
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await getSupabase().storage.from('blog-assets').upload(name, blob, { contentType, cacheControl: '3600', upsert: false });
+        if (error) { showToast('Image upload failed: ' + error.message, 'error'); return; }
+        const { data } = getSupabase().storage.from('blog-assets').getPublicUrl(name);
+        bcRestoreSelection();
+        document.execCommand('insertImage', false, data.publicUrl);
+        showToast('Image uploaded', 'success');
+      } catch (err) {
+        showToast('Image upload failed: ' + (err && err.message ? err.message : err), 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
     function bcToggleSource() {
       const ed = document.getElementById('bc-editor'), src = document.getElementById('bc-source');
       if (bcSourceMode) { ed.innerHTML = src.value; src.style.display = 'none'; ed.style.display = ''; }
