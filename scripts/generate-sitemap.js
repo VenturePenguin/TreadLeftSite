@@ -11,6 +11,14 @@ const { join } = require('path');
 
 const SUPABASE_URL = 'https://vpeszlbrrqwsmnhqdtpf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_BNR1EmmFbVi-Bs72NSnvzw_thlz3W6b';
+// creator_seeding_leads is admin-only under RLS — the generator needs the
+// service-role key (export SUPABASE_SERVICE_ROLE_KEY=... before running).
+// Falls back to the anon key for local previews, but leads will be empty.
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || null;
+const AUTH_KEY = SUPABASE_SERVICE_KEY || SUPABASE_ANON_KEY;
+if (!SUPABASE_SERVICE_KEY) {
+  console.warn('warn: SUPABASE_SERVICE_ROLE_KEY not set — creator lead data is admin-only, snapshot pages will regenerate empty.');
+}
 const BASE = 'https://www.treadleft.app';
 const ROOT = join(__dirname, '..');
 
@@ -30,7 +38,7 @@ const J = s => JSON.stringify(s ?? '');
 
 async function fetchJson(path) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    headers: { apikey: AUTH_KEY, Authorization: `Bearer ${AUTH_KEY}` },
   });
   if (!res.ok) throw new Error(`Supabase ${res.status}: ${await res.text()}`);
   return res.json();
@@ -39,7 +47,7 @@ async function fetchJson(path) {
 async function fetchRpc(name) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
     method: 'POST',
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+    headers: { apikey: AUTH_KEY, Authorization: `Bearer ${AUTH_KEY}`, 'Content-Type': 'application/json' },
     body: '{}',
   });
   if (!res.ok) throw new Error(`RPC ${name} ${res.status}: ${await res.text()}`);
