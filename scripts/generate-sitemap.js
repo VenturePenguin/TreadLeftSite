@@ -345,7 +345,7 @@ function leaderboardRowHtml(r, i) {
   const hasRange = r.mention_count > 1 && r.min_mileage_km !== r.max_mileage_km;
   const deal = r.best_deal_gbp ? Number(r.best_deal_gbp) : null;
   const pill = (c, j) => slugs[j]
-    ? `<a href="/snapshot/${encodeURIComponent(slugs[j])}" class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full hover:bg-brand-orange/10 hover:text-brand-orange transition">${esc(c)}</a>`
+    ? `<a rel="nofollow" href="/snapshot/${encodeURIComponent(slugs[j])}" class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full hover:bg-brand-orange/10 hover:text-brand-orange transition">${esc(c)}</a>`
     : `<span class="bg-brand-light text-brand-slate text-[10px] px-2 py-0.5 rounded-full">${esc(c)}</span>`;
   return `<div class="bg-white border border-brand-border rounded-2xl px-5 py-4 mb-3 shadow-sm">
       <div class="grid grid-cols-2 sm:grid-cols-[1.7fr_.9fr_.8fr_1fr] gap-x-3 gap-y-2 items-baseline">
@@ -448,11 +448,6 @@ async function main() {
       lastmod: (p.published_at || p.created_at || '').slice(0, 10) || today,
       changefreq: 'monthly', priority: '0.7',
     })),
-    ...validLeads.map(l => ({
-      loc: `/snapshot/${l.snapshot_slug}`,
-      lastmod: (l.updated_at || '').slice(0, 10) || today,
-      changefreq: 'weekly', priority: '0.7',
-    })),
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -465,7 +460,7 @@ ${urls.map(u => `  <url>
 </urlset>
 `;
   writeFileSync(join(ROOT, 'sitemap.xml'), xml);
-  console.log(`sitemap.xml: ${STATIC_PAGES.length} static + ${validPosts.length} blog + ${validLeads.length} snapshot URLs`);
+  console.log(`sitemap.xml: ${STATIC_PAGES.length} static + ${validPosts.length} blog URLs (snapshots excluded — noindex)`);
   console.log(`generated: ${validPosts.length} blog pages + blog.html + ${validLeads.length} snapshot pages + shoes.html injection`);
 
   // 5. Integrity gate: every <loc> must resolve to a physical .html file
