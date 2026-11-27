@@ -379,8 +379,12 @@ function injectShoesPage(consensus) {
     `<!-- SEO-LEADERBOARD-START -->\n            ${rowsHtml}\n            <!-- SEO-LEADERBOARD-END -->`);
 
   const totalMentions = consensus.reduce((s, r) => s + (r.mention_count || 0), 0);
-  const avgCost = consensus.reduce((s, r) => s + Number(r.avg_cost_per_km || 0), 0) / Math.max(consensus.length, 1);
-  const kpisHtml = [[consensus.length, 'Shoe Models Ranked'], [totalMentions, 'Creator Mentions'], ['£' + avgCost.toFixed(2), 'Avg Cost/km']]
+  // Median resists low-mileage outliers that inflate a simple mean.
+  const costs = consensus.map(r => Number(r.avg_cost_per_km || 0)).filter(c => c > 0).sort((a, b) => a - b);
+  const medianCost = costs.length
+    ? (costs.length % 2 ? costs[(costs.length - 1) / 2] : (costs[costs.length / 2 - 1] + costs[costs.length / 2]) / 2)
+    : 0;
+  const kpisHtml = [[consensus.length, 'Shoe Models Ranked'], [totalMentions, 'Creator Mentions'], ['£' + medianCost.toFixed(2), 'Median Cost/km']]
     .map(([v, l]) => `<div class="bg-white border border-brand-border rounded-2xl px-4 py-3 text-center shadow-sm">
     <div class="text-xl font-extrabold text-brand-navy">${v}</div>
     <div class="text-[10px] font-bold uppercase tracking-wider text-brand-slate mt-0.5">${l}</div></div>`).join('');
